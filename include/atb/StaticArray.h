@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined (__cplusplus)
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -16,8 +16,7 @@ extern "C" {
   for (elem = atb_StaticArray_Begin(array);                                    \
        elem != atb_StaticArray_End(array); ++elem)
 
-#define atb_StaticArray_RBegin(array)                                          \
-  atb_StaticArray_End(array) - 1
+#define atb_StaticArray_RBegin(array) atb_StaticArray_End(array) - 1
 #define atb_StaticArray_REnd(array)                                            \
   atb_StaticArray_RBegin(array) - atb_StaticArray_GetSize(array)
 
@@ -25,6 +24,6 @@ extern "C" {
   for (elem = atb_StaticArray_RBegin(array);                                   \
        elem != atb_StaticArray_REnd(array); --elem)
 
-#if defined (__cplusplus)
+#if defined(__cplusplus)
 } /* extern "C" */
 #endif

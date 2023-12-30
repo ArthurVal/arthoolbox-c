@@ -1,5 +1,6 @@
 add_executable(${PROJECT_NAME}-test
   test_StaticArray.cpp
+  test_LinkedList.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test
