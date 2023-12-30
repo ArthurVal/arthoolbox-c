@@ -6,7 +6,10 @@ extern "C" {
 
 #include <assert.h>
 
-#define atb_StaticArray_GetSize(array) (sizeof(array) / sizeof(*array))
+#define atb_StaticArray_GetSize(array) (sizeof((array)) / sizeof(*(array)))
+
+#define atb_StaticArray_IsInRangeOf(array, idx)                                \
+  ((0 <= (idx)) && ((idx) < atb_StaticArray_GetSize(array)))
 
 #define atb_StaticArray_Begin(array) array
 #define atb_StaticArray_End(array)                                             \

@@ -12,6 +12,18 @@ TEST(AtbStaticArray, Size) {
   EXPECT_EQ(atb_StaticArray_GetSize(toto), size);
 }
 
+TEST(AtbStaticArray, IsInRangeOf) {
+  constexpr auto size = 10u;
+  int toto[size];
+  EXPECT_TRUE(atb_StaticArray_IsInRangeOf(toto, 0));
+  EXPECT_TRUE(atb_StaticArray_IsInRangeOf(toto, 1));
+  EXPECT_TRUE(atb_StaticArray_IsInRangeOf(toto, size - 1));
+
+  EXPECT_FALSE(atb_StaticArray_IsInRangeOf(toto, -1));
+  EXPECT_FALSE(atb_StaticArray_IsInRangeOf(toto, size));
+  EXPECT_FALSE(atb_StaticArray_IsInRangeOf(toto, size + 2));
+}
+
 TEST(AtbStaticArray, Begin) {
   constexpr auto size = 10u;
   int toto[size];
