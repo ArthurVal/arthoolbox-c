@@ -1,6 +1,7 @@
 add_executable(${PROJECT_NAME}-test
   test_StaticArray.cpp
   test_LinkedList.cpp
+  test_String.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test
@@ -17,6 +18,10 @@ target_link_libraries(${PROJECT_NAME}-test
 
 target_compile_options(${PROJECT_NAME}-test
   PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic
+)
+
+target_compile_features(${PROJECT_NAME}-test
+  PRIVATE cxx_std_17
 )
 
 include(GoogleTest)

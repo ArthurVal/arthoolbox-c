@@ -5,20 +5,20 @@
 #include <iterator>
 
 namespace {
-TEST(CoreLinkedList, StaticInit) {
+TEST(AtbLinkedList, StaticInit) {
   atb_DLinkedList list = atb_DLinkedList_HEAD_INITIALIZER(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(CoreLinkedList, Init) {
+TEST(AtbLinkedList, Init) {
   atb_DLinkedList list;
   atb_DLinkedList_Init(&list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(CoreLinkedList, InsertAfter) {
+TEST(AtbLinkedList, InsertAfter) {
   atb_DLinkedList first = atb_DLinkedList_HEAD_INITIALIZER(first);
   atb_DLinkedList second = atb_DLinkedList_HEAD_INITIALIZER(second);
   atb_DLinkedList_InsertAfter(&(first), &(second));
@@ -42,7 +42,7 @@ TEST(CoreLinkedList, InsertAfter) {
   EXPECT_EQ(first.prev, &(third));
 }
 
-TEST(CoreLinkedList, InsertBefore) {
+TEST(AtbLinkedList, InsertBefore) {
   atb_DLinkedList first = atb_DLinkedList_HEAD_INITIALIZER(first);
   atb_DLinkedList second = atb_DLinkedList_HEAD_INITIALIZER(second);
   atb_DLinkedList_InsertBefore(&(first), &(second));
@@ -66,7 +66,7 @@ TEST(CoreLinkedList, InsertBefore) {
   EXPECT_EQ(first.prev, &(second));
 }
 
-TEST(CoreLinkedList, Pop) {
+TEST(AtbLinkedList, Pop) {
   atb_DLinkedList first = atb_DLinkedList_HEAD_INITIALIZER(first);
 
   // Poping an empty list does nothing
@@ -101,7 +101,7 @@ struct Toto {
   std::size_t useless_1;
 };
 
-TEST(CoreLinkedList, Entry) {
+TEST(AtbLinkedList, Entry) {
   Toto toto = {
       0,
       atb_DLinkedList_HEAD_INITIALIZER(toto.list),
@@ -113,7 +113,7 @@ TEST(CoreLinkedList, Entry) {
   EXPECT_EQ(&toto, atb_DLinkedList_Entry(toto_list, struct Toto, list));
 }
 
-TEST(CoreLinkedList, ForEach) {
+TEST(AtbLinkedList, ForEach) {
   atb_DLinkedList head = atb_DLinkedList_HEAD_INITIALIZER(head);
 
   Toto first{0, atb_DLinkedList_HEAD_INITIALIZER(first.list), 0};
