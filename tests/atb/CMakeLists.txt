@@ -2,6 +2,7 @@ add_executable(${PROJECT_NAME}-test
   test_StaticArray.cpp
   test_LinkedList.cpp
   test_String.cpp
+  test_AnsiTerm.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test
