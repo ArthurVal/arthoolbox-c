@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 
+#include "atb/MacroUtils.h"  /* ATB_COMPOUND_LITERAL */
 #include "atb/StaticArray.h" /* GetSize */
 
 #include <assert.h>
@@ -21,6 +22,12 @@ struct atb_String {
 };
 
 /**
+ *  \brief Statically initialize a atb_String data structure
+ */
+#define atb_String_INITIALIZER()                                               \
+  { NULL, 0, 0 }
+
+/**
  *  \brief Non-owning c-string view
  */
 struct atb_StringView {
@@ -29,12 +36,24 @@ struct atb_StringView {
 };
 
 /**
+ *  \brief Statically initialize a atb_StringView data structure
+ */
+#define atb_StringView_INITIALIZER()                                           \
+  { NULL, 0 }
+
+/**
  *  \brief Non-owning constant c-string view
  */
 struct atb_ConstStringView {
   const char *data;
   size_t size;
 };
+
+/**
+ *  \brief Statically initialize a atb_ConstStringView data structure
+ */
+#define atb_ConstStringView_INITIALIZER()                                      \
+  { NULL, 0 }
 
 /**
  *  \return atb_StringView From other c-string
@@ -57,8 +76,8 @@ atb_StringView_FromStr(struct atb_String *const other);
  *  \param[in] str TODO
  */
 #define atb_ConstStringView_FromStaticString(str)                              \
-  (struct atb_ConstStringView) {                                               \
-    .data = str, .size = (atb_StaticArray_GetSize(str) - 1)                    \
+  ATB_COMPOUND_LITERAL(atb_ConstStringView) {                                  \
+    /* .data =  */ str, /* .size =  */ (atb_StaticArray_GetSize(str) - 1)      \
   }
 
 /**
@@ -76,12 +95,6 @@ atb_ConstStringView_FromCStr(const char *const other);
  */
 static inline struct atb_ConstStringView
 atb_ConstStringView_FromStr(struct atb_String const *const other);
-
-/**
- *  \brief Statically initialize a atb_String data structure
- */
-#define atb_String_INITIALIZER()                                               \
-  { NULL, 0, 0 }
 
 /**
  *  \brief Initialize a atb_String data structure
@@ -150,11 +163,13 @@ atb_String_MakeByMoving(struct atb_String *const other);
 void atb_String_Reserve(struct atb_String *const str, size_t capacity);
 
 /**
- *  \brief TODO
+ *  \brief Striong Generator used to fill a String
  */
 struct atb_String_Generator {
-  void *self;
-  void (*FillRange)(void *const self, char *first, char *last);
+  void *self; /*!< Opaque pointer forwarded to the FillRange function */
+  void (*FillRange)(void *const self, char *first,
+                    char *const last); /*!< Function used to fill a range
+                                   starting at first, until last */
 };
 
 /**
@@ -326,11 +341,11 @@ atb_String_ResizeAndFill(struct atb_String *const str, size_t new_size,
     atb_String_Reserve(str, new_size + 1);
 
     if (gen.FillRange != NULL) {
-      /* NOTE, size is superior to str->size (which is the old size) since here
-       * size is superior or equals to the previous capacity. Hence begin <= end
-       */
+
       char *begin = str->data + str->size;
       char *end = str->data + new_size;
+      assert(end >= begin);
+
       gen.FillRange(gen.self, begin, end);
     }
   }
