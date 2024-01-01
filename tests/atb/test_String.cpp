@@ -233,7 +233,7 @@ TEST_F(AtbString, ShrinkToFit) {
   EXPECT_EQ(str_pool[0].capacity, str_pool[0].size + 1);
 }
 
-TEST_F(AtbString, AppendSubStr) {
+TEST_F(AtbString, Append) {
   constexpr auto other_str = std::string_view{"Chocolatine"};
 
   atb_String_Reserve(&str_pool[0], other_str.size() + 3);
@@ -243,50 +243,23 @@ TEST_F(AtbString, AppendSubStr) {
   std::string expected_str{other_str};
 
   // Does not trigger realloc
-  atb_String_AppendSubStr(
-      &str_pool[0], atb_ConstStringView{other_str.data(), other_str.size()});
+  atb_String_Append(&str_pool[0],
+                    atb_ConstStringView{other_str.data(), other_str.size()});
   EXPECT_EQ(str_pool[0].capacity, other_str.size() + 3);
   EXPECT_EQ(str_pool[0].size, expected_str.size());
   EXPECT_EQ(str_pool[0], expected_str);
 
   expected_str += other_str;
   // triggers realloc
-  atb_String_AppendSubStr(
-      &str_pool[0], atb_ConstStringView{other_str.data(), other_str.size()});
+  atb_String_Append(&str_pool[0],
+                    atb_ConstStringView{other_str.data(), other_str.size()});
   EXPECT_EQ(str_pool[0].capacity, expected_str.size() + 1);
   EXPECT_EQ(str_pool[0].size, expected_str.size());
   EXPECT_EQ(str_pool[0], expected_str);
 
   expected_str += std::string_view(other_str.data(), 3);
   // sub string
-  atb_String_AppendSubStr(&str_pool[0],
-                          atb_ConstStringView{other_str.data(), 3});
-  EXPECT_EQ(str_pool[0].capacity, expected_str.size() + 1);
-  EXPECT_EQ(str_pool[0].size, expected_str.size());
-  EXPECT_EQ(str_pool[0], expected_str);
-}
-
-TEST_F(AtbString, Append) {
-
-  constexpr auto coucou = std::string_view{"Coucou"};
-  str_pool[1] = atb_String_MakeCopyFromSubStr(
-      atb_ConstStringView{coucou.data(), coucou.size()});
-
-  atb_String_Reserve(&str_pool[0], str_pool[1].size + 3);
-  EXPECT_EQ(str_pool[0].capacity, str_pool[1].size + 3);
-  EXPECT_EQ(str_pool[0].size, 0);
-
-  std::string expected_str{str_pool[1].data};
-
-  // Does not trigger realloc
-  atb_String_Append(&str_pool[0], &str_pool[1]);
-  EXPECT_EQ(str_pool[0].capacity, str_pool[1].size + 3);
-  EXPECT_EQ(str_pool[0].size, expected_str.size());
-  EXPECT_EQ(str_pool[0], expected_str);
-
-  expected_str += str_pool[1].data;
-  // triggers realloc
-  atb_String_Append(&str_pool[0], &str_pool[1]);
+  atb_String_Append(&str_pool[0], atb_ConstStringView{other_str.data(), 3});
   EXPECT_EQ(str_pool[0].capacity, expected_str.size() + 1);
   EXPECT_EQ(str_pool[0].size, expected_str.size());
   EXPECT_EQ(str_pool[0], expected_str);
@@ -300,9 +273,8 @@ TEST_F(AtbString, PopN) {
 
   constexpr auto expected_str = std::string_view{"Coucou"};
 
-  atb_String_AppendSubStr(
-      &str_pool[0],
-      atb_ConstStringView{expected_str.data(), expected_str.size()});
+  atb_String_Append(&str_pool[0], atb_ConstStringView{expected_str.data(),
+                                                      expected_str.size()});
 
   EXPECT_EQ(str_pool[0].capacity, expected_str.size() + 1);
   EXPECT_EQ(str_pool[0].size, expected_str.size());
@@ -324,9 +296,8 @@ TEST_F(AtbString, IsEqualToSubStr) {
   constexpr auto expected_str = std::string_view{"Coucou"};
   constexpr auto other_str = std::string_view{"Chocolatine"};
 
-  atb_String_AppendSubStr(
-      &str_pool[0],
-      atb_ConstStringView{expected_str.data(), expected_str.size()});
+  atb_String_Append(&str_pool[0], atb_ConstStringView{expected_str.data(),
+                                                      expected_str.size()});
   EXPECT_PRED2(atb_String_IsEqualToSubStr, &str_pool[0],
                (atb_ConstStringView{str_pool[0].data, str_pool[0].size}));
 
@@ -349,19 +320,16 @@ TEST_F(AtbString, IsEqualToSubStr) {
 
 TEST_F(AtbString, IsEqualTo) {
   constexpr auto expected_str = std::string_view{"Coucou"};
-  atb_String_AppendSubStr(
-      &str_pool[0],
-      atb_ConstStringView{expected_str.data(), expected_str.size()});
-  atb_String_AppendSubStr(
-      &str_pool[1],
-      atb_ConstStringView{expected_str.data(), expected_str.size()});
+  atb_String_Append(&str_pool[0], atb_ConstStringView{expected_str.data(),
+                                                      expected_str.size()});
+  atb_String_Append(&str_pool[1], atb_ConstStringView{expected_str.data(),
+                                                      expected_str.size()});
 
   EXPECT_PRED2(atb_String_IsEqualTo, &str_pool[0], &str_pool[0]);
   EXPECT_PRED2(atb_String_IsEqualTo, &str_pool[0], &str_pool[1]);
 
-  atb_String_AppendSubStr(
-      &str_pool[1],
-      atb_ConstStringView{expected_str.data(), expected_str.size()});
+  atb_String_Append(&str_pool[1], atb_ConstStringView{expected_str.data(),
+                                                      expected_str.size()});
   EXPECT_FALSE(atb_String_IsEqualTo(&str_pool[0], &str_pool[1]));
 
   atb_String_PopN(&str_pool[1], expected_str.size() + 3);
