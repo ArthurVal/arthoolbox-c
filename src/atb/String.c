@@ -78,6 +78,22 @@ void atb_String_Delete(struct atb_String *const str) {
   atb_String_Init(str);
 }
 
+struct atb_StringView atb_StringView_CopyInto(struct atb_StringView buffer,
+                                              struct atb_ConstStringView view) {
+
+  assert(buffer.data != NULL);
+  assert(view.data != NULL);
+  assert(buffer.data != view.data);
+
+  size_t written = (buffer.size < view.size ? buffer.size : view.size);
+  memcpy(buffer.data, view.data, written);
+
+  buffer.data += written;
+  buffer.size -= written;
+
+  return buffer;
+}
+
 void atb_String_Append(struct atb_String *const str,
                        struct atb_ConstStringView view) {
   assert(str != NULL);

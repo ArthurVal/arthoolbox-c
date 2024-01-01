@@ -2,6 +2,7 @@
 
 #include "test_StringUtils.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <string>
@@ -231,6 +232,55 @@ TEST_F(AtbString, ShrinkToFit) {
 
   atb_String_ShrinkToFit(&str_pool[0]);
   EXPECT_EQ(str_pool[0].capacity, str_pool[0].size + 1);
+}
+
+TEST_F(AtbString, CopyInto) {
+  constexpr auto other_str = std::string_view{"Chocolatine"};
+  std::array<char, other_str.size() * 2> buffer = {0};
+  auto buffer_view = atb_StringView{};
+
+  // Buffer empty
+  std::fill(std::begin(buffer), std::end(buffer), '\0');
+  EXPECT_EQ(atb_StringView_CopyInto(atb_StringView{buffer.data(), 0},
+                                    atb_ConstStringView{
+                                        other_str.data(),
+                                        other_str.size(),
+                                    }),
+            (atb_StringView{buffer.data(), 0}));
+  EXPECT_EQ(buffer.data(), std::string_view{""});
+
+  // Empty view
+  std::fill(std::begin(buffer), std::end(buffer), '\0');
+  buffer_view = atb_StringView{buffer.data(), buffer.size()};
+  EXPECT_EQ(atb_StringView_CopyInto(buffer_view,
+                                    atb_ConstStringView{other_str.data(), 0}),
+            buffer_view);
+  EXPECT_EQ(buffer.data(), std::string_view{""});
+
+  // Buffer big enougth
+  std::fill(std::begin(buffer), std::end(buffer), '\0');
+  EXPECT_EQ(
+      atb_StringView_CopyInto(
+          buffer_view, atb_ConstStringView{other_str.data(), other_str.size()}),
+      (atb_StringView{
+          buffer.data() + other_str.size(),
+          buffer_view.size - other_str.size(),
+      }));
+  EXPECT_EQ(buffer.data(), other_str);
+
+  // Buffer too small
+  std::fill(std::begin(buffer), std::end(buffer), '\0');
+  buffer_view = atb_StringView{buffer.data(), 3};
+  EXPECT_EQ(
+      atb_StringView_CopyInto(
+          buffer_view, atb_ConstStringView{other_str.data(), other_str.size()}),
+      (atb_StringView{
+          buffer.data() + buffer_view.size,
+          0,
+      }));
+
+  EXPECT_EQ(std::string_view(buffer.data(), buffer_view.size),
+            std::string_view(other_str.data(), buffer_view.size));
 }
 
 TEST_F(AtbString, Append) {

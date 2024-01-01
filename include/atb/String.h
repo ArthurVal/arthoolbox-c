@@ -199,7 +199,21 @@ void atb_String_Delete(struct atb_String *const str);
 static inline void atb_String_ShrinkToFit(struct atb_String *const str);
 
 /**
- *  \brief Append size byte of other at the end of str
+ *  \brief Ty to append the view into the given buffer up to the buffer size
+ *
+ *  \param[in] buffer View of a buffer to write to
+ *  \param[in] view A sub c-string view to write to
+ *
+ *  \return struct atb_StringView The remaining view of the input buffer,
+ *                                offseted by the number of byte written to it
+ *
+ *  \warning This will NOT add the '\0' char at the end
+ */
+struct atb_StringView atb_StringView_CopyInto(struct atb_StringView buffer,
+                                              struct atb_ConstStringView view);
+
+/**
+ *  \brief Append the given view into the string
  *
  *  \param[in] view A sub c-string range
  *
