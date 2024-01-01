@@ -130,11 +130,11 @@ atb_String_MakeCopyFrom(const struct atb_String *const other);
  *        pointer pointed by other has been allocated using malloc.
  *
  *  \param[inout] other Ptr of a buffer that the string will use
- *  \param[in] capacity Expected capacity of the buffer
  *  \param[in] size Expected size (if relevant) of the buffer
+ *  \param[in] capacity Expected capacity of the buffer
  */
-struct atb_String atb_String_MakeByMovingSubStr(char **const other,
-                                                size_t capacity, size_t size);
+struct atb_String atb_String_MakeByMovingSubStr(char **const other, size_t size,
+                                                size_t capacity);
 
 /**
  *  \return atb_String A new string using the null terminated c-str other
@@ -199,7 +199,7 @@ void atb_String_Delete(struct atb_String *const str);
 static inline void atb_String_ShrinkToFit(struct atb_String *const str);
 
 /**
- *  \brief Ty to append the view into the given buffer up to the buffer size
+ *  \brief Ty to copy the view into the given buffer up to the buffer size
  *
  *  \param[in] buffer View of a buffer to write to
  *  \param[in] view A sub c-string view to write to

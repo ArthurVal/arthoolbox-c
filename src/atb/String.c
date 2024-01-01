@@ -3,16 +3,16 @@
 #include <stdio.h>  /* perror */
 #include <stdlib.h> /* malloc/free/... */
 
-struct atb_String atb_String_MakeByMovingSubStr(char **const other,
-                                                size_t capacity, size_t size) {
+struct atb_String atb_String_MakeByMovingSubStr(char **const other, size_t size,
+                                                size_t capacity) {
   assert(other != NULL);
   assert(*other != NULL);
   assert(capacity > size);
 
   struct atb_String str;
   str.data = *other;
-  str.capacity = capacity;
   str.size = size;
+  str.capacity = capacity;
 
   str.data[str.size] = '\0';
 
