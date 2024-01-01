@@ -200,18 +200,13 @@ static inline void atb_String_ShrinkToFit(struct atb_String *const str);
 
 /**
  *  \brief Append size byte of other at the end of str
- *  \param[in] view A sub c-string range
- */
-void atb_String_AppendSubStr(struct atb_String *const str,
-                             struct atb_ConstStringView view);
-
-/**
- *  \brief Append other at the end of str
  *
- *  \param[in] other An other atb_String appended into str
+ *  \param[in] view A sub c-string range
+ *
+ *  \note This will grow the string in order to fit the given view into it
  */
-static inline void atb_String_Append(struct atb_String *const str,
-                                     struct atb_String const *const other);
+void atb_String_Append(struct atb_String *const str,
+                       struct atb_ConstStringView view);
 
 /**
  *  \brief Pop N char from the string
@@ -302,7 +297,7 @@ atb_String_MakeCopyFromSubStr(struct atb_ConstStringView view) {
   assert(view.data != NULL);
 
   struct atb_String output = atb_String_MakeEmpty();
-  atb_String_AppendSubStr(&(output), view);
+  atb_String_Append(&(output), view);
 
   return output;
 }
@@ -360,16 +355,6 @@ static inline void atb_String_ShrinkToFit(struct atb_String *const str) {
   if (str->capacity > (str->size + 1)) {
     atb_String_Reserve(str, (str->size + 1));
   }
-}
-
-static inline void atb_String_Append(struct atb_String *const str,
-                                     struct atb_String const *const other) {
-  assert(str != NULL);
-  assert(other != NULL);
-  assert(str != other);
-  assert(str->data != other->data);
-
-  atb_String_AppendSubStr(str, atb_ConstStringView_FromStr(other));
 }
 
 static inline void atb_String_PopN(struct atb_String *const str, size_t n) {

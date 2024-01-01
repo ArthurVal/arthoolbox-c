@@ -78,8 +78,8 @@ void atb_String_Delete(struct atb_String *const str) {
   atb_String_Init(str);
 }
 
-void atb_String_AppendSubStr(struct atb_String *const str,
-                             struct atb_ConstStringView view) {
+void atb_String_Append(struct atb_String *const str,
+                       struct atb_ConstStringView view) {
   assert(str != NULL);
   assert(view.data != NULL);
   assert(str->data != view.data);
