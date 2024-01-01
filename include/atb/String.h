@@ -42,20 +42,6 @@ struct atb_StringView {
   { NULL, 0 }
 
 /**
- *  \brief Non-owning constant c-string view
- */
-struct atb_ConstStringView {
-  const char *data;
-  size_t size;
-};
-
-/**
- *  \brief Statically initialize a atb_ConstStringView data structure
- */
-#define atb_ConstStringView_INITIALIZER()                                      \
-  { NULL, 0 }
-
-/**
  *  \return atb_StringView From other c-string
  *
  *  \param[in] other Ptr to the begin of a raw c-string (null-terminated)
@@ -69,6 +55,20 @@ static inline struct atb_StringView atb_StringView_FromCStr(char *const other);
  */
 static inline struct atb_StringView
 atb_StringView_FromStr(struct atb_String *const other);
+
+/**
+ *  \brief Non-owning constant c-string view
+ */
+struct atb_ConstStringView {
+  const char *data;
+  size_t size;
+};
+
+/**
+ *  \brief Statically initialize a atb_ConstStringView data structure
+ */
+#define atb_ConstStringView_INITIALIZER()                                      \
+  { NULL, 0 }
 
 /**
  *  \return atb_ConstStringView TODO
