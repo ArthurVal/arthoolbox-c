@@ -51,7 +51,8 @@ void atb_String_Reserve(struct atb_String *const str, size_t new_capacity) {
   }
 }
 
-static void FillRangeWithValue(void *const value, char *first, char *last) {
+static void FillRangeWithValue(void *const value, char *first,
+                               char *const last) {
   memset(first, *((int *)value), (size_t)(last - first));
 }
 
@@ -59,12 +60,12 @@ void atb_String_Resize(struct atb_String *const str, size_t new_size,
                        int fill) {
   assert(str != NULL);
 
-  struct atb_String_Generator gen = {
-      .self = &fill,
-      .FillRange = (fill >= 0 ? &FillRangeWithValue : NULL),
-  };
-
-  atb_String_ResizeAndFill(str, new_size, gen);
+  atb_String_ResizeAndFill(
+      str, new_size,
+      (struct atb_String_Generator){
+          .self = &fill,
+          .FillRange = (fill >= 0 ? &FillRangeWithValue : NULL),
+      });
 }
 
 void atb_String_Delete(struct atb_String *const str) {
