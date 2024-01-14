@@ -1,6 +1,7 @@
 add_executable(${PROJECT_NAME}-test
   test_StaticArray.cpp
   test_LinkedList.cpp
+  test_RangeView.cpp
   test_String.cpp
   test_AnsiTerm.cpp
 )

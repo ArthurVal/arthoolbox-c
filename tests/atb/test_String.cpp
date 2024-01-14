@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "test_StringUtils.hpp"
+#include "StringUtils.hpp"
 
 #include <algorithm>
 #include <array>

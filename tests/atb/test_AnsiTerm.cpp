@@ -3,7 +3,7 @@
 
 #include "atb/AnsiTerm.h"
 
-#include "test_StringUtils.hpp"
+#include "StringUtils.hpp"
 
 #include <array>
 
