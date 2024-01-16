@@ -298,7 +298,7 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  * Custom macro helper to declare a single generic association for one
  * RangeViews, used inside _Generic()
  */
-#define _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix)                           \
+#define ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix)                        \
   struct atb_##prefix##RangeView : atb_##prefix##RangeView##fn_postfix
 
 /**
@@ -306,11 +306,11 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  * RangeViews (NRangeView, ConstNRangeView, const NRangeView and const
  * ConstNRangeView), used inside _Generic() (all pointing to the same function)
  */
-#define _ADD_GENERIC_ASSOCIATION_ALL_CV(prefix, fn_postfix)                    \
-  _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                                \
-      const _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                      \
-      _ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)                      \
-          const _ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)
+#define ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(prefix, fn_postfix)                 \
+  ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                             \
+      const ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                   \
+      ATB_ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)                   \
+          const ATB_ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)
 
 /**
  *  \brief Shrink a range (reduce it's size) from the front OR the back
@@ -327,16 +327,16 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *          requested amount
  */
 #define atb_AnyRangeView_Shrink(range, offset, front)                          \
-  _Generic((range), _ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shrink),               \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shrink),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shrink),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shrink),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shrink),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shrink),                      \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shrink),                      \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shrink),                      \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shrink))(range, offset,      \
-                                                           front)
+  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shrink),            \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shrink),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shrink),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shrink),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shrink),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shrink),                   \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shrink),                   \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shrink),                   \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shrink))(range, offset,   \
+                                                              front)
 
 /**
  *  \brief Shift/translate a range to the right or left
@@ -351,16 +351,16 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *          requested amount
  */
 #define atb_AnyRangeView_Shift(range, offset, right)                           \
-  _Generic((range), _ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shift),                \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shift),                        \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shift),                        \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shift),                        \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shift),                        \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shift),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shift),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shift),                       \
-           _ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shift))(range, offset,       \
-                                                          right)
+  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shift),             \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shift),                     \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shift),                     \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shift),                     \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shift),                     \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shift),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shift),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shift),                    \
+           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shift))(range, offset,    \
+                                                             right)
 
 /**
  *  \brief Copy other into range, up to the range size
@@ -374,15 +374,15 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *          amount of elements written into it
  */
 #define atb_AnyRangeView_CopyInto(range, other)                                \
-  _Generic((range), _ADD_GENERIC_ASSOCIATION(8, _CopyInto),                    \
-           _ADD_GENERIC_ASSOCIATION(16, _CopyInto),                            \
-           _ADD_GENERIC_ASSOCIATION(32, _CopyInto),                            \
-           _ADD_GENERIC_ASSOCIATION(64, _CopyInto),                            \
-           _ADD_GENERIC_ASSOCIATION(u8, _CopyInto),                            \
-           _ADD_GENERIC_ASSOCIATION(u16, _CopyInto),                           \
-           _ADD_GENERIC_ASSOCIATION(u32, _CopyInto),                           \
-           _ADD_GENERIC_ASSOCIATION(u64, _CopyInto),                           \
-           _ADD_GENERIC_ASSOCIATION(Char, _CopyInto))(range, other)
+  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION(8, _CopyInto),                 \
+           ATB_ADD_GENERIC_ASSOCIATION(16, _CopyInto),                         \
+           ATB_ADD_GENERIC_ASSOCIATION(32, _CopyInto),                         \
+           ATB_ADD_GENERIC_ASSOCIATION(64, _CopyInto),                         \
+           ATB_ADD_GENERIC_ASSOCIATION(u8, _CopyInto),                         \
+           ATB_ADD_GENERIC_ASSOCIATION(u16, _CopyInto),                        \
+           ATB_ADD_GENERIC_ASSOCIATION(u32, _CopyInto),                        \
+           ATB_ADD_GENERIC_ASSOCIATION(u64, _CopyInto),                        \
+           ATB_ADD_GENERIC_ASSOCIATION(Char, _CopyInto))(range, other)
 
 /**
  *  \return True when both range are equals (data), false otherwise.
@@ -393,18 +393,15 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *  \param[in] lhs, rhs Ranges we wish to compare
  */
 #define atb_AnyRangeView_IsEqualTo(lhs, rhs)                                   \
-  _Generic((lhs), _ADD_GENERIC_ASSOCIATION(Const8, _IsEqualTo),                \
-           _ADD_GENERIC_ASSOCIATION(Const16, _IsEqualTo),                      \
-           _ADD_GENERIC_ASSOCIATION(Const32, _IsEqualTo),                      \
-           _ADD_GENERIC_ASSOCIATION(Const64, _IsEqualTo),                      \
-           _ADD_GENERIC_ASSOCIATION(Constu8, _IsEqualTo),                      \
-           _ADD_GENERIC_ASSOCIATION(Constu16, _IsEqualTo),                     \
-           _ADD_GENERIC_ASSOCIATION(Constu32, _IsEqualTo),                     \
-           _ADD_GENERIC_ASSOCIATION(Constu64, _IsEqualTo),                     \
-           _ADD_GENERIC_ASSOCIATION(ConstChar, _IsEqualTo))(lhs, rhs)
-
-#undef _ADD_GENERIC_ASSOCIATION_ALL_CV
-#undef _ADD_GENERIC_ASSOCIATION
+  _Generic((lhs), ATB_ADD_GENERIC_ASSOCIATION(Const8, _IsEqualTo),             \
+           ATB_ADD_GENERIC_ASSOCIATION(Const16, _IsEqualTo),                   \
+           ATB_ADD_GENERIC_ASSOCIATION(Const32, _IsEqualTo),                   \
+           ATB_ADD_GENERIC_ASSOCIATION(Const64, _IsEqualTo),                   \
+           ATB_ADD_GENERIC_ASSOCIATION(Constu8, _IsEqualTo),                   \
+           ATB_ADD_GENERIC_ASSOCIATION(Constu16, _IsEqualTo),                  \
+           ATB_ADD_GENERIC_ASSOCIATION(Constu32, _IsEqualTo),                  \
+           ATB_ADD_GENERIC_ASSOCIATION(Constu64, _IsEqualTo),                  \
+           ATB_ADD_GENERIC_ASSOCIATION(ConstChar, _IsEqualTo))(lhs, rhs)
 
 #if defined(__cplusplus)
 } /* extern "C" */

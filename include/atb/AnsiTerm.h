@@ -59,25 +59,8 @@ struct atb_AnsiColor_Property {
   unsigned background : 1;
 };
 
-static inline struct atb_ConstStringView
-atb_AnsiColor_Property_ToString(struct atb_AnsiColor_Property prop) {
-  const struct atb_ConstStringView table[2][2] = {
-      {
-          atb_ConstStringView_FromStaticString(
-              "{.bright = false, .background = false}"),
-          atb_ConstStringView_FromStaticString(
-              "{.bright = false, .background = true}"),
-      },
-      {
-          atb_ConstStringView_FromStaticString(
-              "{.bright = true, .background = false}"),
-          atb_ConstStringView_FromStaticString(
-              "{.bright = true, .background = true}"),
-      },
-  };
-
-  return table[prop.bright][prop.background];
-}
+#define atb_AnsiColor_Property_Fmt "{.bright=%d, .background=%d}"
+#define atb_AnsiColor_Property_FmtArg(prop) (prop).bright, (prop).background
 
 /**
  *  \brief Ansi terminal color representation
@@ -87,32 +70,11 @@ struct atb_AnsiColor {
   struct atb_AnsiColor_Property property;
 };
 
-static inline struct atb_StringView
-atb_AnsiColor_ToStringInto(struct atb_StringView buffer,
-                           struct atb_AnsiColor color) {
-
-  struct atb_ConstStringView const all_tokens[] = {
-      atb_ConstStringView_FromStaticString("{ .value = "),
-      atb_AnsiColor_Value_ToString(color.value),
-      atb_ConstStringView_FromStaticString(".property = "),
-      atb_AnsiColor_Property_ToString(color.property),
-      atb_ConstStringView_FromStaticString("}"),
-  };
-
-  struct atb_ConstStringView const *token;
-
-  if (buffer.size == 0) {
-    atb_StaticArray_ForEach(token, all_tokens) { buffer.size += token->size; }
-  } else {
-    atb_StaticArray_ForEach(token, all_tokens) {
-      buffer = atb_StringView_CopyInto(buffer, *token);
-      if (buffer.size == 0)
-        break;
-    }
-  }
-
-  return buffer;
-}
+#define atb_AnsiColor_Fmt                                                      \
+  "{.value=" atb_String_Fmt ", .property=" atb_AnsiColor_Property_Fmt "}"
+#define atb_AnsiColor_FmtArg(color)                                            \
+  atb_String_FmtArg(atb_AnsiColor_Value_ToString((color).value)),              \
+      atb_AnsiColor_Property_FmtArg((color).property)
 
 /**
  *  \return atb_ConstStringView Corresponding to the ANSI terminal string code
