@@ -13,65 +13,7 @@ extern "C" {
 #include "atb/MacroUtils.h"  /* ATB_COMPOUND_LITERAL */
 #include "atb/StaticArray.h" /* GetSize */
 
-/**
- *  \brief Statically initialize a atb_NRangeView data structure
- */
-#define atb_AnyRangeView_INITIALIZER()                                         \
-  { NULL, 0 }
-
-/**
- *  \brief Map a STATIC array (size known at compile time) into the range
- *
- *  \param[inout] range Range used to map the array
- *  \param[in] array Compile time array
- */
-#define atb_AnyRangeView_MapStaticArray(range, array)                          \
-  do {                                                                         \
-    range.data = array;                                                        \
-    range.size = atb_StaticArray_GetSize(array);                               \
-  } while (0)
-
-/**
- *  \return atb_**RangeView Maping a STATIC array (size known at compile time)
- *
- *  \param[in] prefix The prefix name of the range view
- *  \param[in] array Compile time array
- */
-#define atb_RangeView_FromStaticArray(prefix, array)                           \
-  ATB_COMPOUND_LITERAL(atb_##prefix##RangeView) {                              \
-    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
-  }
-
-/**
- *  \return atb_**ConstRangeNView Maping a STATIC array (size known at compile
- *                                time)
- *
- *  \param[in] prefix The prefix name of the range view
- *  \param[in] array Compile time array
- */
-#define atb_ConstRangeView_FromStaticArray(prefix, array)                      \
-  ATB_COMPOUND_LITERAL(atb_##prefix##ConstRangeView) {                         \
-    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
-  }
-
-#define atb_AnyRangeView_Fmt "{.data = %p, .size = %zu (%zu bytes)}"
-#define atb_AnyRangeView_FmtArg(range)                                         \
-  ((void *)(range).data), (range).size, ((range).size * sizeof(*(range).data))
-
-#define atb_AnyRangeView_Begin(range) (range).data
-#define atb_AnyRangeView_End(range)                                            \
-  (atb_AnyRangeView_Begin(range) + (range).size)
-#define atb_AnyRangeView_ForEach(elem, range)                                  \
-  for (elem = atb_AnyRangeView_Begin(range);                                   \
-       elem != atb_AnyRangeView_End(range); elem += 1)
-
-#define atb_AnyRangeView_RBegin(range) atb_AnyRangeView_End(range) - 1
-#define atb_AnyRangeView_REnd(range) atb_AnyRangeView_Begin(range) - 1
-#define atb_AnyRangeView_RForEach(elem, range)                                 \
-  for (elem = atb_AnyRangeView_RBegin(range);                                  \
-       elem != atb_AnyRangeView_REnd(range); elem -= 1)
-
-#define ATB_RANGEVIEW_DECLARE(prefix, type)                                    \
+#define _DECLARE_NEW_RANGEVIEW(prefix, type)                                   \
   struct atb_##prefix##RangeView {                                             \
     type *data;                                                                \
     size_t size;                                                               \
@@ -202,24 +144,129 @@ extern "C" {
     }                                                                          \
   }
 
-ATB_RANGEVIEW_DECLARE(8, int8_t)
-ATB_RANGEVIEW_DECLARE(16, int16_t)
-ATB_RANGEVIEW_DECLARE(32, int32_t)
-ATB_RANGEVIEW_DECLARE(64, int64_t)
+/**
+ *  \brief Statically initialize a atb_**RangeView data structure
+ */
+#define atb_AnyRangeView_INITIALIZER()                                         \
+  { NULL, 0 }
 
-ATB_RANGEVIEW_DECLARE(U8, uint8_t)
-ATB_RANGEVIEW_DECLARE(U16, uint16_t)
-ATB_RANGEVIEW_DECLARE(U32, uint32_t)
-ATB_RANGEVIEW_DECLARE(U64, uint64_t)
+/**
+ *  \brief Printf format string helper
+ */
+#define atb_AnyRangeView_Fmt "{.data = %p, .size = %zu (%zu bytes)}"
 
-ATB_RANGEVIEW_DECLARE(Char, char)
+/**
+ *  \brief Printf argument helper
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_FmtArg(range)                                         \
+  ((void *)((range).data)), (range).size,                                      \
+      ((range).size * sizeof(*((range).data)))
+
+/**
+ *  \brief Map a STATIC array (size known at compile time) into the range
+ *
+ *  \param[inout] range Range used to map the array
+ *  \param[in] array Compile time array
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_MapStaticArray(range, array)                          \
+  do {                                                                         \
+    (range).data = array;                                                      \
+    (range).size = atb_StaticArray_GetSize(array);                             \
+  } while (0)
+
+/**
+ *  \return atb_**RangeView Maping a STATIC array (size known at compile time)
+ *
+ *  \param[in] prefix The prefix name of the range view
+ *  \param[in] array Compile time array
+ */
+#define atb_RangeView_FromStaticArray(prefix, array)                           \
+  ATB_COMPOUND_LITERAL(atb_##prefix##RangeView) {                              \
+    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
+  }
+
+/**
+ *  \return atb_**ConstRangeNView Maping a STATIC array (size known at compile
+ *                                time)
+ *
+ *  \param[in] prefix The prefix name of the range view
+ *  \param[in] array Compile time array
+ */
+#define atb_ConstRangeView_FromStaticArray(prefix, array)                      \
+  ATB_COMPOUND_LITERAL(atb_##prefix##ConstRangeView) {                         \
+    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
+  }
+
+/**
+ *  \return Pointer to the begin of the range
+ */
+#define atb_AnyRangeView_Begin(range) (range).data
+
+/**
+ *  \return Pointer to the end of the range (one past the last valid element)
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_End(range)                                            \
+  (atb_AnyRangeView_Begin(range) + (range).size)
+
+/**
+ *  \brief Loop helper used to iterate over the range, using elem as iterator
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_ForEach(elem, range)                                  \
+  for ((elem) = atb_AnyRangeView_Begin(range);                                 \
+       (elem) != atb_AnyRangeView_End(range); (elem) += 1)
+
+/**
+ *  \return Pointer to the rbegin of the range. (Last valid element)
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_RBegin(range) atb_AnyRangeView_End(range) - 1
+
+/**
+ *  \return Pointer to the rend of the range (one before the first valid
+ * element)
+ */
+#define atb_AnyRangeView_REnd(range) atb_AnyRangeView_Begin(range) - 1
+
+/**
+ *  \brief Loop helper used to REVERSE iterate over the range, using elem as
+ * iterator
+ *
+ *  \warning DO NOT use any side effect statement as range input
+ */
+#define atb_AnyRangeView_RForEach(elem, range)                                 \
+  for (elem = atb_AnyRangeView_RBegin(range);                                  \
+       elem != atb_AnyRangeView_REnd(range); elem -= 1)
+
+_DECLARE_NEW_RANGEVIEW(8, int8_t)
+_DECLARE_NEW_RANGEVIEW(16, int16_t)
+_DECLARE_NEW_RANGEVIEW(32, int32_t)
+_DECLARE_NEW_RANGEVIEW(64, int64_t)
+
+_DECLARE_NEW_RANGEVIEW(u8, uint8_t)
+_DECLARE_NEW_RANGEVIEW(u16, uint16_t)
+_DECLARE_NEW_RANGEVIEW(u32, uint32_t)
+_DECLARE_NEW_RANGEVIEW(u64, uint64_t)
+
+/* Used as string view */
+_DECLARE_NEW_RANGEVIEW(Char, char)
+
+#undef _DECLARE_NEW_RANGEVIEW
 
 /**
  *  \return atb_ConstRangeView From a STRING LITERAL
  *  \param[in] str String literal
  */
-#define atb_CharConstRangeView_FromStringLiteral(str)                          \
-  ATB_COMPOUND_LITERAL(atb_CharConstRangeView) {                               \
+#define atb_ConstCharRangeView_FromStringLiteral(str)                          \
+  ATB_COMPOUND_LITERAL(atb_ConstCharRangeView) {                               \
     /* .data =  */ str, /* .size =  */ (atb_StaticArray_GetSize(str) - 1)      \
   }
 
@@ -247,15 +294,23 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
   };
 }
 
-#define ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix)              \
+/**
+ * Custom macro helper to declare a single generic association for one
+ * RangeViews, used inside _Generic()
+ */
+#define _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix)                           \
   struct atb_##prefix##RangeView : atb_##prefix##RangeView##fn_postfix
 
-#define ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(prefix, fn_postfix)      \
-  ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                   \
-      const ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),         \
-      ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)         \
-          const ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const##prefix,           \
-                                                      fn_postfix)
+/**
+ * Custom macro helper to declare ALL generic association of generated
+ * RangeViews (NRangeView, ConstNRangeView, const NRangeView and const
+ * ConstNRangeView), used inside _Generic() (all pointing to the same function)
+ */
+#define _ADD_GENERIC_ASSOCIATION_ALL_CV(prefix, fn_postfix)                    \
+  _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                                \
+      const _ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                      \
+      _ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)                      \
+          const _ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)
 
 /**
  *  \brief Shrink a range (reduce it's size) from the front OR the back
@@ -271,17 +326,17 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *  \return atb_**RangeView corresponding to the same range, shrinked by the
  *          requested amount
  */
-#define atb_RangeView_Shrink(range, offset, front)                             \
-  _Generic((range), ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(8, _Shrink), \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(16, _Shrink),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(32, _Shrink),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(64, _Shrink),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U8, _Shrink),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U16, _Shrink),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U32, _Shrink),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U64, _Shrink),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(Char, _Shrink))(      \
-      range, offset, front)
+#define atb_AnyRangeView_Shrink(range, offset, front)                          \
+  _Generic((range), _ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shrink),               \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shrink),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shrink),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shrink),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shrink),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shrink),                      \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shrink),                      \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shrink),                      \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shrink))(range, offset,      \
+                                                           front)
 
 /**
  *  \brief Shift/translate a range to the right or left
@@ -295,17 +350,17 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *  \return atb_**RangeView corresponding to the same range, shifted by the
  *          requested amount
  */
-#define atb_RangeView_Shift(range, offset, right)                              \
-  _Generic((range), ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(8, _Shift),  \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(16, _Shift),          \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(32, _Shift),          \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(64, _Shift),          \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U8, _Shift),          \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U16, _Shift),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U32, _Shift),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(U64, _Shift),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION_FOR_ALL(Char, _Shift))(       \
-      range, offset, right)
+#define atb_AnyRangeView_Shift(range, offset, right)                           \
+  _Generic((range), _ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shift),                \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shift),                        \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shift),                        \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shift),                        \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shift),                        \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shift),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shift),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shift),                       \
+           _ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shift))(range, offset,       \
+                                                          right)
 
 /**
  *  \brief Copy other into range, up to the range size
@@ -318,29 +373,38 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
  *  \return atb_**RangeView corresponding to the input range, shifted by the
  *          amount of elements written into it
  */
-#define atb_RangeView_CopyInto(range, other)                                   \
-  _Generic((range), ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(8, _CopyInto),       \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(16, _CopyInto),               \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(32, _CopyInto),               \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(64, _CopyInto),               \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(U8, _CopyInto),               \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(U16, _CopyInto),              \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(U32, _CopyInto),              \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(U64, _CopyInto),              \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Char, _CopyInto))(range,      \
-                                                                   other)
+#define atb_AnyRangeView_CopyInto(range, other)                                \
+  _Generic((range), _ADD_GENERIC_ASSOCIATION(8, _CopyInto),                    \
+           _ADD_GENERIC_ASSOCIATION(16, _CopyInto),                            \
+           _ADD_GENERIC_ASSOCIATION(32, _CopyInto),                            \
+           _ADD_GENERIC_ASSOCIATION(64, _CopyInto),                            \
+           _ADD_GENERIC_ASSOCIATION(u8, _CopyInto),                            \
+           _ADD_GENERIC_ASSOCIATION(u16, _CopyInto),                           \
+           _ADD_GENERIC_ASSOCIATION(u32, _CopyInto),                           \
+           _ADD_GENERIC_ASSOCIATION(u64, _CopyInto),                           \
+           _ADD_GENERIC_ASSOCIATION(Char, _CopyInto))(range, other)
 
-#define atb_RangeView_IsEqualTo(lhs, rhs)                                      \
-  _Generic((lhs), ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const8, _IsEqualTo),   \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const16, _IsEqualTo),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const32, _IsEqualTo),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(Const64, _IsEqualTo),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(ConstU8, _IsEqualTo),         \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(ConstU16, _IsEqualTo),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(ConstU32, _IsEqualTo),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(ConstU64, _IsEqualTo),        \
-           ATB_RANGEVIEW_ADD_GENERIC_ASSOCIATION(ConstChar, _IsEqualTo))(lhs,  \
-                                                                         rhs)
+/**
+ *  \return True when both range are equals (data), false otherwise.
+ *
+ *  \note If both ranges have NULL data, it actually compares the size of both
+ * ranges, hence 2 NULL ranges with the same sizes, are considered equal.
+ *
+ *  \param[in] lhs, rhs Ranges we wish to compare
+ */
+#define atb_AnyRangeView_IsEqualTo(lhs, rhs)                                   \
+  _Generic((lhs), _ADD_GENERIC_ASSOCIATION(Const8, _IsEqualTo),                \
+           _ADD_GENERIC_ASSOCIATION(Const16, _IsEqualTo),                      \
+           _ADD_GENERIC_ASSOCIATION(Const32, _IsEqualTo),                      \
+           _ADD_GENERIC_ASSOCIATION(Const64, _IsEqualTo),                      \
+           _ADD_GENERIC_ASSOCIATION(Constu8, _IsEqualTo),                      \
+           _ADD_GENERIC_ASSOCIATION(Constu16, _IsEqualTo),                     \
+           _ADD_GENERIC_ASSOCIATION(Constu32, _IsEqualTo),                     \
+           _ADD_GENERIC_ASSOCIATION(Constu64, _IsEqualTo),                     \
+           _ADD_GENERIC_ASSOCIATION(ConstChar, _IsEqualTo))(lhs, rhs)
+
+#undef _ADD_GENERIC_ASSOCIATION_ALL_CV
+#undef _ADD_GENERIC_ASSOCIATION
 
 #if defined(__cplusplus)
 } /* extern "C" */

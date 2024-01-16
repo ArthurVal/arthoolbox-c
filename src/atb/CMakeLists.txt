@@ -6,6 +6,10 @@ add_library(${PROJECT_NAME}
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+target_compile_features(${PROJECT_NAME}
+  PUBLIC c_std_11
+)
+
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>

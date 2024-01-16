@@ -23,30 +23,78 @@ constexpr auto MakeArray(Others &&...others) {
       static_cast<T>(std::forward<Others>(others))...};
 }
 
-TEST(AtbRangeView, Shift) {}
+template <class T> struct RangeView : public ::testing::Test {
+  using PtrType = decltype(std::declval<T>().data);
+  using ValueType = std::decay_t<decltype(*std::declval<PtrType>())>;
 
-TEST(AtbRangeView, Shrink) {
-  // auto range = MakeArray<std::uint8_t>(0x01, 0x02, 0x03, 0x04);
+  static inline ValueType TestArray[10u] = {0};
+};
 
-  // auto view = atb_RangeView{range.data(), 2};
-  // EXPECT_EQ(atb_RangeView_Advance(view, 2),
-  //           (atb_RangeView{view.data + 2, view.size - 2}));
+TYPED_TEST_SUITE_P(RangeView);
 
-  // auto c_view = atb_ConstRangeView{range.data(), 2};
-  // EXPECT_EQ(atb_ConstRangeView_Advance(c_view, 1),
-  //           (atb_ConstRangeView{view.data + 1, view.size - 1}));
+TYPED_TEST_P(RangeView, INITIALIZER) {
+  TypeParam range = atb_AnyRangeView_INITIALIZER();
+  EXPECT_EQ(nullptr, range.data);
+  EXPECT_EQ(0u, range.size);
 }
 
-TEST(AtbRangeView, IsEqualTo) {
-  // const auto str_1 = std::string{"Coucou"};
-  // const auto str_2 = str_1;
+TYPED_TEST_P(RangeView, MapStaticArray) {
+  TypeParam range = atb_AnyRangeView_INITIALIZER();
 
-  // EXPECT_PRED2(atb_ConstRangeView_IsEqualTo,
-  //              (atb_ConstRangeView{str_1.data(), str_1.size()}),
-  //              (atb_ConstRangeView{str_2.data(), str_2.size()}));
+  atb_AnyRangeView_MapStaticArray(range, this->TestArray);
 
-  // EXPECT_PRED2(atb_ConstRangeView_IsEqualTo, &str_pool[0], &str_pool[1]);
+  EXPECT_EQ(std::begin(this->TestArray), range.data);
+  EXPECT_EQ(std::size(this->TestArray), range.size);
+  EXPECT_PRED3(IsEqual, range, std::cbegin(this->TestArray),
+               std::cend(this->TestArray));
+
+  EXPECT_EQ(std::begin(this->TestArray), atb_AnyRangeView_Begin(range));
+  EXPECT_EQ(std::end(this->TestArray), atb_AnyRangeView_End(range));
+
+  EXPECT_EQ(std::end(this->TestArray) - 1, atb_AnyRangeView_RBegin(range));
+  EXPECT_EQ(std::begin(this->TestArray) - 1, atb_AnyRangeView_REnd(range));
 }
+
+TYPED_TEST_P(RangeView, Shrink) {
+  TypeParam range = atb_AnyRangeView_INITIALIZER();
+
+  range.data = this->TestArray;
+  range.size = 2;
+
+  // auto shrinked_range = atb_AnyRangeView_Shrink(range, 1, true);
+}
+
+REGISTER_TYPED_TEST_SUITE_P(RangeView, INITIALIZER, MapStaticArray);
+
+using AllTestedRangeViewTypes =
+    meta::SwapContainer_t<meta::AllRangeView_t, ::testing::Types>;
+
+INSTANTIATE_TYPED_TEST_SUITE_P(All, RangeView, AllTestedRangeViewTypes);
+
+// TEST(AtbRangeView, Shift) {}
+
+// TEST(AtbRangeView, Shrink) {
+// auto range = MakeArray<std::uint8_t>(0x01, 0x02, 0x03, 0x04);
+
+// auto view = atb_RangeView{range.data(), 2};
+// EXPECT_EQ(atb_RangeView_Advance(view, 2),
+//           (atb_RangeView{view.data + 2, view.size - 2}));
+
+// auto c_view = atb_ConstRangeView{range.data(), 2};
+// EXPECT_EQ(atb_ConstRangeView_Advance(c_view, 1),
+//           (atb_ConstRangeView{view.data + 1, view.size - 1}));
+// }
+
+// TEST(AtbRangeView, IsEqualTo) {
+// const auto str_1 = std::string{"Coucou"};
+// const auto str_2 = str_1;
+
+// EXPECT_PRED2(atb_ConstRangeView_IsEqualTo,
+//              (atb_ConstRangeView{str_1.data(), str_1.size()}),
+//              (atb_ConstRangeView{str_2.data(), str_2.size()}));
+
+// EXPECT_PRED2(atb_ConstRangeView_IsEqualTo, &str_pool[0], &str_pool[1]);
+// }
 
 // test(AtbRangeView, CopyInto) {
 //   constexpr auto other_str = std::string_view{"Chocolatine"};
