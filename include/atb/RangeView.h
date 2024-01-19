@@ -13,7 +13,24 @@ extern "C" {
 #include "atb/MacroUtils.h"  /* ATB_COMPOUND_LITERAL */
 #include "atb/StaticArray.h" /* GetSize */
 
-#define _DECLARE_NEW_RANGEVIEW(prefix, type)                                   \
+/// This declare a CONVERSION function to swap from one range to an other
+/// It is suppose to be use for INTEGER TYPES only or the ToConst conversions
+#define _ATB_RANGEVIEW_DECLARE_CONVERSION(to, from)                            \
+  static inline struct atb_##to##RangeView atb_##to##RangeView_From##from(     \
+      struct atb_##from##RangeView range) {                                    \
+                                                                               \
+    struct atb_##to##RangeView out;                                            \
+    out.data = (__typeof(out.data))range.data;                                 \
+    out.size = (range.size * (sizeof(*range.data) / sizeof(*out.data)));       \
+    return out;                                                                \
+  }
+
+#define _ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(to, from)                        \
+  _ATB_RANGEVIEW_DECLARE_CONVERSION(to, from)                                  \
+  _ATB_RANGEVIEW_DECLARE_CONVERSION(Const##to, from)                           \
+  _ATB_RANGEVIEW_DECLARE_CONVERSION(Const##to, Const##from)
+
+#define ATB_RANGEVIEW_DECLARE_NEW(prefix, type)                                \
   struct atb_##prefix##RangeView {                                             \
     type *data;                                                                \
     size_t size;                                                               \
@@ -23,20 +40,6 @@ extern "C" {
     const type *data;                                                          \
     size_t size;                                                               \
   };                                                                           \
-                                                                               \
-  static inline struct atb_Const##prefix##RangeView                            \
-      atb_##prefix##RangeView_ToConst(struct atb_##prefix##RangeView range) {  \
-    return ATB_COMPOUND_LITERAL(atb_Const##prefix##RangeView){                 \
-        /* .data = */ (const type *)range.data,                                \
-        /* .size = */ range.size,                                              \
-    };                                                                         \
-  }                                                                            \
-                                                                               \
-  static inline struct atb_Const##prefix##RangeView                            \
-      atb_Const##prefix##RangeView_From##prefix##RangeView(                    \
-          struct atb_##prefix##RangeView range) {                              \
-    return atb_##prefix##RangeView_ToConst(range);                             \
-  }                                                                            \
                                                                                \
   static inline bool atb_Const##prefix##RangeView_IsOverlapping(               \
       struct atb_Const##prefix##RangeView lhs,                                 \
@@ -108,6 +111,8 @@ extern "C" {
     return range;                                                              \
   }                                                                            \
                                                                                \
+  _ATB_RANGEVIEW_DECLARE_CONVERSION(Const##prefix, prefix)                     \
+                                                                               \
   static inline struct atb_##prefix##RangeView                                 \
       atb_##prefix##RangeView_CopyInto(                                        \
           struct atb_##prefix##RangeView range,                                \
@@ -120,7 +125,7 @@ extern "C" {
       other.size = range.size;                                                 \
                                                                                \
     if (atb_Const##prefix##RangeView_IsOverlapping(                            \
-            atb_##prefix##RangeView_ToConst(range), other)) {                  \
+            atb_Const##prefix##RangeView_From##prefix(range), other)) {        \
       memmove(range.data, other.data, (other.size * sizeof(type)));            \
     } else {                                                                   \
       memcpy(range.data, other.data, (other.size * sizeof(type)));             \
@@ -143,6 +148,23 @@ extern "C" {
       return lhs.data == rhs.data;                                             \
     }                                                                          \
   }
+
+/**
+ * Custom macro helper to declare a single generic association for one
+ * RangeView, used inside _Generic()
+ */
+#define ATB_RANGEVIEW_GENERIC_ASSOCIATION(fn_prefix, fn_postfix, arg_type)     \
+  struct atb_##arg_type##RangeView : atb_##fn_prefix##RangeView##fn_postfix
+
+/**
+ * Custom macro helper to declare ALL generic association of generated
+ * RangeViews (NRangeView, ConstNRangeView), used inside _Generic() (all
+ * pointing to the same function)
+ */
+#define ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(fn_postfix, arg_type)            \
+  ATB_RANGEVIEW_GENERIC_ASSOCIATION(arg_type, fn_postfix, arg_type),           \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const##arg_type, fn_postfix,           \
+                                        Const##arg_type)
 
 /**
  *  \brief Statically initialize a atb_**RangeView data structure
@@ -246,20 +268,376 @@ extern "C" {
   for (elem = atb_AnyRangeView_RBegin(range);                                  \
        elem != atb_AnyRangeView_REnd(range); elem -= 1)
 
-_DECLARE_NEW_RANGEVIEW(8, int8_t)
-_DECLARE_NEW_RANGEVIEW(16, int16_t)
-_DECLARE_NEW_RANGEVIEW(32, int32_t)
-_DECLARE_NEW_RANGEVIEW(64, int64_t)
+ATB_RANGEVIEW_DECLARE_NEW(8, int8_t)
+ATB_RANGEVIEW_DECLARE_NEW(16, int16_t)
+ATB_RANGEVIEW_DECLARE_NEW(32, int32_t)
+ATB_RANGEVIEW_DECLARE_NEW(64, int64_t)
 
-_DECLARE_NEW_RANGEVIEW(u8, uint8_t)
-_DECLARE_NEW_RANGEVIEW(u16, uint16_t)
-_DECLARE_NEW_RANGEVIEW(u32, uint32_t)
-_DECLARE_NEW_RANGEVIEW(u64, uint64_t)
+ATB_RANGEVIEW_DECLARE_NEW(u8, uint8_t)
+ATB_RANGEVIEW_DECLARE_NEW(u16, uint16_t)
+ATB_RANGEVIEW_DECLARE_NEW(u32, uint32_t)
+ATB_RANGEVIEW_DECLARE_NEW(u64, uint64_t)
+
+ATB_RANGEVIEW_DECLARE_NEW(Flt, float)
+ATB_RANGEVIEW_DECLARE_NEW(Dbl, double)
+
+/**
+ *  \brief Shrink a range (reduce its size) from the front OR the
+ * back
+ *
+ *  \param[in] range Range we wish to shrink
+ *  \param[in] offset Number of elements we wish to remove
+ *  \param[in] front Shrink the range from the front if true, the
+ * back otherwise
+ *
+ *  \warning range is EXPECTED to be defined (non null data ptr)
+ *  \note If the offset is bigger than the range size, the range will
+ * be shrink by its size instead
+ *
+ *  \return atb_**RangeView corresponding to the same range, shrinked
+ * by the requested amount
+ */
+#define atb_AnyArithmeticRangeView_Shrink(range, offset, front)                \
+  _Generic((range), ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, 8),         \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, 16),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, 32),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, 64),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, u8),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, u16),                \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, u32),                \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, u64),                \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, Flt),                \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shrink, Dbl))(range, offset, \
+                                                                front)
+
+/**
+ *  \brief Shift/translate a range to the right or left
+ *
+ *  \param[in] range Range we wish to shift
+ *  \param[in] offset Number of elements we wish to shitf
+ *  \param[in] right Shift the range to the right if true, the left
+ * otherwise
+ *
+ *  \warning range is EXPECTED to be defined (non null data ptr)
+ *
+ *  \return atb_**RangeView corresponding to the same range, shifted
+ * by the requested amount
+ */
+#define atb_AnyArithmeticRangeView_Shift(range, offset, right)                 \
+  _Generic((range), ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, 8),          \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, 16),                  \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, 32),                  \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, 64),                  \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, u8),                  \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, u16),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, u32),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, u64),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, Flt),                 \
+           ATB_RANGEVIEW_ALL_GENERIC_ASSOCIATION(_Shift, Dbl))(range, offset,  \
+                                                               right)
+
+/**
+ *  \brief Copy other into range, up to the range size
+ *
+ *  \param[in] range Range we wish to copy value into
+ *  \param[in] other Range we wish to copy from
+ *
+ *  \warning range and other are EXPECTED to be defined (non null
+ * data ptr)
+ *
+ *  \return atb_**RangeView corresponding to the input range, shifted
+ * by the amount of elements written into it
+ */
+#define atb_AnyArithmeticRangeView_CopyInto(range, other)                      \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(8, _CopyInto, 8),        \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(16, _CopyInto, 16),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(32, _CopyInto, 32),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(64, _CopyInto, 64),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u8, _CopyInto, u8),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u16, _CopyInto, u16),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u32, _CopyInto, u32),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u64, _CopyInto, u64),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Flt, _CopyInto, Flt),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Dbl, _CopyInto, Dbl))(range,      \
+                                                                   other)
+
+/**
+ *  \return True when both range are equals (data), false otherwise.
+ *
+ *  \note If both ranges have NULL data, it actually compares the
+ * size of both ranges, hence 2 NULL ranges with the same sizes, are
+ * considered equal.
+ *
+ *  \param[in] lhs, rhs Ranges we wish to compare
+ */
+#define atb_AnyArithmeticRangeView_IsEqualTo(lhs, rhs)                         \
+  _Generic((lhs),                                                              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _IsEqualTo, Const8),      \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _IsEqualTo, Const16),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _IsEqualTo, Const32),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _IsEqualTo, Const64),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _IsEqualTo, Constu8),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _IsEqualTo, Constu16),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _IsEqualTo, Constu32),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _IsEqualTo, Constu64),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(ConstFlt, _IsEqualTo, ConstFlt),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(ConstDbl, _IsEqualTo, ConstDbl))( \
+      lhs, rhs)
+
+_ATB_RANGEVIEW_DECLARE_CONVERSION(8, 8)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Const8, Const8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(8, 16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(8, 32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(8, 64)
+
+/**
+ *  \return atb_8RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_8RangeView_From(range)                                             \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(8, _From8, 8),           \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(8, _From16, 16),                  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(8, _From32, 32),                  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(8, _From64, 64))(range)
+
+/**
+ *  \return atb_Const8RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_Const8RangeView_From(range)                                        \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _From8, 8),      \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _From16, 16),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _From32, 32),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _From64, 64),             \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _FromConst8, Const8),     \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _FromConst16, Const16),   \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _FromConst32, Const32),   \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const8, _FromConst64, Const64))(  \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(16, 8)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(16, 16)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Const16, Const16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(16, 32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(16, 64)
+
+/**
+ *  \return atb_16RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_16RangeView_From(range)                                            \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(16, _From8, 8),          \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(16, _From16, 16),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(16, _From32, 32),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(16, _From64, 64))(range)
+
+/**
+ *  \return atb_Const16RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_Const16RangeView_From(range)                                       \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _From8, 8),     \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _From16, 16),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _From32, 32),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _From64, 64),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _FromConst8, Const8),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _FromConst16, Const16),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _FromConst32, Const32),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const16, _FromConst64, Const64))( \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(32, 8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(32, 16)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(32, 32)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Const32, Const32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(32, 64)
+
+/**
+ *  \return atb_32RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_32RangeView_From(range)                                            \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(32, _From8, 8),          \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(32, _From16, 16),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(32, _From32, 32),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(32, _From64, 64))(range)
+
+/**
+ *  \return atb_Const32RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_Const32RangeView_From(range)                                       \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _From8, 8),     \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _From16, 16),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _From32, 32),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _From64, 64),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _FromConst8, Const8),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _FromConst16, Const16),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _FromConst32, Const32),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const32, _FromConst64, Const64))( \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(64, 8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(64, 16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(64, 32)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(64, 64)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Const64, Const64)
+
+/**
+ *  \return atb_64RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_64RangeView_From(range)                                            \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(64, _From8, 8),          \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(64, _From16, 16),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(64, _From32, 32),                 \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(64, _From64, 64))(range)
+
+/**
+ *  \return atb_Const64RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic SIGNED range we wish to convert
+ */
+#define atb_Const64RangeView_From(range)                                       \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _From8, 8),     \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _From16, 16),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _From32, 32),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _From64, 64),            \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _FromConst8, Const8),    \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _FromConst16, Const16),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _FromConst32, Const32),  \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(Const64, _FromConst64, Const64))( \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_CONVERSION(u8, u8)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Constu8, Constu8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u8, u16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u8, u32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u8, u64)
+
+/**
+ *  \return atb_u8RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_u8RangeView_From(range)                                            \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(u8, _Fromu8, u8),        \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u8, _Fromu16, u16),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u8, _Fromu32, u32),               \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u8, _Fromu64, u64))(range)
+
+/**
+ *  \return atb_Constu8RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_Constu8RangeView_From(range)                                       \
+  _Generic(                                                                    \
+      (range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _Fromu8, u8),        \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _Fromu16, u16),               \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _Fromu32, u32),               \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _Fromu64, u64),               \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _FromConstu8, Constu8),       \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _FromConstu16, Constu16),     \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _FromConstu32, Constu32),     \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu8, _FromConstu64, Constu64))(    \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u16, u8)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(u16, u16)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Constu16, Constu16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u16, u32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u16, u64)
+
+/**
+ *  \return atb_u16RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_u16RangeView_From(range)                                           \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(u16, _Fromu8, u8),       \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u16, _Fromu16, u16),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u16, _Fromu32, u32),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u16, _Fromu64, u64))(range)
+
+/**
+ *  \return atb_Constu16RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_Constu16RangeView_From(range)                                      \
+  _Generic(                                                                    \
+      (range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _Fromu8, u8),       \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _Fromu16, u16),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _Fromu32, u32),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _Fromu64, u64),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _FromConstu8, Constu8),      \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _FromConstu16, Constu16),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _FromConstu32, Constu32),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu16, _FromConstu64, Constu64))(   \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u32, u8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u32, u16)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(u32, u32)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Constu32, Constu32)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u32, u64)
+
+/**
+ *  \return atb_u32RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_u32RangeView_From(range)                                           \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(u32, _Fromu8, u8),       \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u32, _Fromu16, u16),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u32, _Fromu32, u32),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u32, _Fromu64, u64))(range)
+
+/**
+ *  \return atb_Constu32RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_Constu32RangeView_From(range)                                      \
+  _Generic(                                                                    \
+      (range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _Fromu8, u8),       \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _Fromu16, u16),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _Fromu32, u32),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _Fromu64, u64),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _FromConstu8, Constu8),      \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _FromConstu16, Constu16),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _FromConstu32, Constu32),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu32, _FromConstu64, Constu64))(   \
+      range)
+
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u64, u8)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u64, u16)
+_ATB_RANGEVIEW_DECLARE_ALL_CONVERSION(u64, u32)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(u64, u64)
+_ATB_RANGEVIEW_DECLARE_CONVERSION(Constu64, Constu64)
+
+/**
+ *  \return atb_u64RangeView from the given input range (non-const only)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_u64RangeView_From(range)                                           \
+  _Generic((range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(u64, _Fromu8, u8),       \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u64, _Fromu16, u16),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u64, _Fromu32, u32),              \
+           ATB_RANGEVIEW_GENERIC_ASSOCIATION(u64, _Fromu64, u64))(range)
+
+/**
+ *  \return atb_Constu64RangeView from the given input range (const or not)
+ *  \param[in] range Input arithmetic UNSIGNED range we wish to convert
+ */
+#define atb_Constu64RangeView_From(range)                                      \
+  _Generic(                                                                    \
+      (range), ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _Fromu8, u8),       \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _Fromu16, u16),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _Fromu32, u32),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _Fromu64, u64),              \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _FromConstu8, Constu8),      \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _FromConstu16, Constu16),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _FromConstu32, Constu32),    \
+      ATB_RANGEVIEW_GENERIC_ASSOCIATION(Constu64, _FromConstu64, Constu64))(   \
+      range)
 
 /* Used as string view */
-_DECLARE_NEW_RANGEVIEW(Char, char)
-
-#undef _DECLARE_NEW_RANGEVIEW
+ATB_RANGEVIEW_DECLARE_NEW(Char, char)
 
 /**
  *  \return atb_ConstRangeView From a STRING LITERAL
@@ -283,8 +661,8 @@ atb_CharRangeView_FromNullTerminatedStr(char *const str) {
 }
 
 /**
- *  \return struct atb_ConstCharRangeView From a given const null terminated str
- *  \param[in] str Const null terminated string
+ *  \return struct atb_ConstCharRangeView From a given const null
+ * terminated str \param[in] str Const null terminated string
  */
 static inline struct atb_ConstCharRangeView
 atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
@@ -294,114 +672,8 @@ atb_ConstCharRangeView_FromNullTerminatedStr(char const *const str) {
   };
 }
 
-/**
- * Custom macro helper to declare a single generic association for one
- * RangeViews, used inside _Generic()
- */
-#define ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix)                        \
-  struct atb_##prefix##RangeView : atb_##prefix##RangeView##fn_postfix
-
-/**
- * Custom macro helper to declare ALL generic association of generated
- * RangeViews (NRangeView, ConstNRangeView, const NRangeView and const
- * ConstNRangeView), used inside _Generic() (all pointing to the same function)
- */
-#define ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(prefix, fn_postfix)                 \
-  ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                             \
-      const ATB_ADD_GENERIC_ASSOCIATION(prefix, fn_postfix),                   \
-      ATB_ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)                   \
-          const ATB_ADD_GENERIC_ASSOCIATION(Const##prefix, fn_postfix)
-
-/**
- *  \brief Shrink a range (reduce it's size) from the front OR the back
- *
- *  \param[in] range Range we wish to shrink
- *  \param[in] offset Number of elements we wish to remove
- *  \param[in] front Shrink the range from the front if true, the back otherwise
- *
- *  \warning range is EXPECTED to be defined (non null data ptr)
- *  \note If the offset is bigger than the range size, the range will be shrink
- *        by its size instead
- *
- *  \return atb_**RangeView corresponding to the same range, shrinked by the
- *          requested amount
- */
-#define atb_AnyRangeView_Shrink(range, offset, front)                          \
-  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shrink),            \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shrink),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shrink),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shrink),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shrink),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shrink),                   \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shrink),                   \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shrink),                   \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shrink))(range, offset,   \
-                                                              front)
-
-/**
- *  \brief Shift/translate a range to the right or left
- *
- *  \param[in] range Range we wish to shift
- *  \param[in] offset Number of elements we wish to shitf
- *  \param[in] right Shift the range to the right if true, the left otherwise
- *
- *  \warning range is EXPECTED to be defined (non null data ptr)
- *
- *  \return atb_**RangeView corresponding to the same range, shifted by the
- *          requested amount
- */
-#define atb_AnyRangeView_Shift(range, offset, right)                           \
-  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(8, _Shift),             \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(16, _Shift),                     \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(32, _Shift),                     \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(64, _Shift),                     \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u8, _Shift),                     \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u16, _Shift),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u32, _Shift),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(u64, _Shift),                    \
-           ATB_ADD_GENERIC_ASSOCIATION_ALL_CV(Char, _Shift))(range, offset,    \
-                                                             right)
-
-/**
- *  \brief Copy other into range, up to the range size
- *
- *  \param[in] range Range we wish to copy value into
- *  \param[in] other Range we wish to copy from
- *
- *  \warning range and other are EXPECTED to be defined (non null data ptr)
- *
- *  \return atb_**RangeView corresponding to the input range, shifted by the
- *          amount of elements written into it
- */
-#define atb_AnyRangeView_CopyInto(range, other)                                \
-  _Generic((range), ATB_ADD_GENERIC_ASSOCIATION(8, _CopyInto),                 \
-           ATB_ADD_GENERIC_ASSOCIATION(16, _CopyInto),                         \
-           ATB_ADD_GENERIC_ASSOCIATION(32, _CopyInto),                         \
-           ATB_ADD_GENERIC_ASSOCIATION(64, _CopyInto),                         \
-           ATB_ADD_GENERIC_ASSOCIATION(u8, _CopyInto),                         \
-           ATB_ADD_GENERIC_ASSOCIATION(u16, _CopyInto),                        \
-           ATB_ADD_GENERIC_ASSOCIATION(u32, _CopyInto),                        \
-           ATB_ADD_GENERIC_ASSOCIATION(u64, _CopyInto),                        \
-           ATB_ADD_GENERIC_ASSOCIATION(Char, _CopyInto))(range, other)
-
-/**
- *  \return True when both range are equals (data), false otherwise.
- *
- *  \note If both ranges have NULL data, it actually compares the size of both
- * ranges, hence 2 NULL ranges with the same sizes, are considered equal.
- *
- *  \param[in] lhs, rhs Ranges we wish to compare
- */
-#define atb_AnyRangeView_IsEqualTo(lhs, rhs)                                   \
-  _Generic((lhs), ATB_ADD_GENERIC_ASSOCIATION(Const8, _IsEqualTo),             \
-           ATB_ADD_GENERIC_ASSOCIATION(Const16, _IsEqualTo),                   \
-           ATB_ADD_GENERIC_ASSOCIATION(Const32, _IsEqualTo),                   \
-           ATB_ADD_GENERIC_ASSOCIATION(Const64, _IsEqualTo),                   \
-           ATB_ADD_GENERIC_ASSOCIATION(Constu8, _IsEqualTo),                   \
-           ATB_ADD_GENERIC_ASSOCIATION(Constu16, _IsEqualTo),                  \
-           ATB_ADD_GENERIC_ASSOCIATION(Constu32, _IsEqualTo),                  \
-           ATB_ADD_GENERIC_ASSOCIATION(Constu64, _IsEqualTo),                  \
-           ATB_ADD_GENERIC_ASSOCIATION(ConstChar, _IsEqualTo))(lhs, rhs)
+#undef _ATB_RANGEVIEW_DECLARE_ALL_CONVERSION
+#undef _ATB_RANGEVIEW_DECLARE_CONVERSION
 
 #if defined(__cplusplus)
 } /* extern "C" */
