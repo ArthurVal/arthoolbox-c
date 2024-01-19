@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-#include <assert.h>
-
 #define atb_StaticArray_GetSize(array) (sizeof((array)) / sizeof(*(array)))
 
 #define atb_StaticArray_IsInRangeOf(array, idx)                                \
