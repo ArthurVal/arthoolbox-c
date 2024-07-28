@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-#include "atb/StaticArray.h" /* atb_StaticArray_IsInRangeOf */
-#include "atb/String.h"      /* atb_ConstStringView */
+#include "atb/container/array.h" /* atb_Array_IsInRangeOf */
+#include "atb/generic/String.h"  /* atb_ConstStringView */
 
 #include <assert.h>
 
@@ -190,7 +190,7 @@ atb_AnsiColor_GetCode(struct atb_AnsiColor const color) {
   };
 
   /* Checks for out of bound access */
-  assert(atb_StaticArray_IsInRangeOf(ANSI_COLOR_TABLE, color.value));
+  assert(atb_Array_IsInRangeOf(ANSI_COLOR_TABLE, color.value));
 
   return ANSI_COLOR_TABLE[color.value][color.property.bright]
                          [color.property.background];
