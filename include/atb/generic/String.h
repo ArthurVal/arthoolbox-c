@@ -4,8 +4,8 @@
 extern "C" {
 #endif
 
-#include "atb/MacroUtils.h"  /* ATB_COMPOUND_LITERAL */
-#include "atb/StaticArray.h" /* GetSize */
+#include "atb/container/array.h" /* GetSize */
+#include "atb/generic/Macro.h"   /* ATB_COMPOUND_LITERAL */
 
 #include <assert.h>
 #include <stdbool.h> /* bool */
@@ -77,7 +77,7 @@ struct atb_ConstStringView {
  */
 #define atb_ConstStringView_FromStaticString(str)                              \
   ATB_COMPOUND_LITERAL(atb_ConstStringView) {                                  \
-    /* .data =  */ str, /* .size =  */ (atb_StaticArray_GetSize(str) - 1)      \
+    /* .data =  */ str, /* .size =  */ (atb_Array_GetSize(str) - 1)            \
   }
 
 /**
