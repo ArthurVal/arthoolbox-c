@@ -1,5 +1,5 @@
-add_library(${PROJECT_NAME}
-  String.c
+add_library(${PROJECT_NAME} INTERFACE
+  # String.c
   # FdUtils.c
   # Process.c
   )
@@ -7,49 +7,52 @@ add_library(${PROJECT_NAME}
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_compile_features(${PROJECT_NAME}
-  PUBLIC c_std_11
+  PUBLIC
+  INTERFACE
+  c_std_11
 )
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC
+  INTERFACE
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 
-  PRIVATE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+  # PRIVATE
+  # $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+  # $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
   )
 
-target_compile_options(${PROJECT_NAME}
-  PRIVATE
-  -Wall
-  -Wextra
-  -Wpedantic
-  -Wshadow
-  -Wdouble-promotion
-  -Wundef
-  -Wconversion
-  # -Werror
-  )
+# target_compile_options(${PROJECT_NAME}
+#   PRIVATE
+#   -Wall
+#   -Wextra
+#   -Wpedantic
+#   -Wshadow
+#   -Wdouble-promotion
+#   -Wundef
+#   -Wconversion
+#   # -Werror
+#   )
 
-set_target_properties(${PROJECT_NAME}
-  PROPERTIES
-  SOVERSION ${PROJECT_VERSION_MAJOR}
-  VERSION ${PROJECT_VERSION}
-  INTERFACE_${PROJECT_NAME}_MAJOR_VERSION ${PROJECT_VERSION_MAJOR}
-  COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR}
-  DEBUG_POSTFIX "-debug"
-  )
+# set_target_properties(${PROJECT_NAME}
+#   PROPERTIES
+#   SOVERSION ${PROJECT_VERSION_MAJOR}
+#   VERSION ${PROJECT_VERSION}
+#   INTERFACE_${PROJECT_NAME}_MAJOR_VERSION ${PROJECT_VERSION_MAJOR}
+#   COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR}
+#   DEBUG_POSTFIX "-debug"
+#   )
 
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}Main
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  )
+# install(
+#   TARGETS ${PROJECT_NAME}
+#   EXPORT ${PROJECT_NAME}Main
+#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#   )
 
-install(EXPORT ${PROJECT_NAME}Main
-  NAMESPACE ${PROJECT_NAME}::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-  )
+# install(EXPORT ${PROJECT_NAME}Main
+#   NAMESPACE ${PROJECT_NAME}::
+#   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+#   )

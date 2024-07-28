@@ -1,3 +1,5 @@
+project(${PROJECT_NAME}-test DESCRIPTION "ATB UnitTests")
+
 message(STATUS "Building unittests ...")
 
 message(STATUS "Finding GTest: ...")
