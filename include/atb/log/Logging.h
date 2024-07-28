@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-#include "atb/StaticArray.h" /* atb_StaticArray_IsInRangeOf */
-#include "atb/String.h"      /* atb_ConstStringView */
+#include "atb/container/array.h" /* atb_StaticArray_IsInRangeOf */
+#include "atb/generic/String.h"  /* atb_ConstStringView */
 
 #include <assert.h>
 #include <stdint.h> /* uintmax_t */
@@ -162,14 +162,14 @@ atb_AnsiColor_GetCode(struct atb_AnsiColor color) {
                   atb_ConstStringView_FromStaticString("47"),
               },
               {
-                 atb_ConstStringView_FromStaticString("97"),
+                  atb_ConstStringView_FromStaticString("97"),
                   atb_ConstStringView_FromStaticString("107"),
               },
           },
   };
 
   /* Checks for out of bound access */
-  assert(atb_StaticArray_IsInRangeOf(ANSI_COLOR_TABLE, color.value));
+  assert(atb_Array_IsInRangeOf(ANSI_COLOR_TABLE, color.value));
 
   return ANSI_COLOR_TABLE[color.value][color.property.bright]
                          [color.property.background];

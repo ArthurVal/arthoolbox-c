@@ -9,8 +9,8 @@ extern "C" {
 #include <stddef.h>  /* size_t */
 #include <string.h>  /* strlen, memcmp */
 
-#include "atb/generic/MacroUtils.h"  /* ATB_COMPOUND_LITERAL */
-#include "atb/generic/StaticArray.h" /* GetSize */
+#include "atb/container/array.h" /* GetSize */
+#include "atb/generic/Macro.h"   /* ATB_COMPOUND_LITERAL */
 
 #define ATB_SPAN_DECLARE_NEW_FROM(to, from)                                    \
   static inline struct atb_##to##Span atb_##to##Span_From##from(               \
@@ -177,7 +177,7 @@ extern "C" {
 #define atb_AnySpan_MapStaticArray(range, array)                               \
   do {                                                                         \
     (range).data = array;                                                      \
-    (range).size = atb_StaticArray_GetSize(array);                             \
+    (range).size = atb_Array_GetSize(array);                                   \
   } while (0)
 
 /**
@@ -188,7 +188,7 @@ extern "C" {
  */
 #define atb_Span_FromStaticArray(prefix, array)                                \
   ATB_COMPOUND_LITERAL(atb_##prefix##Span) {                                   \
-    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
+    /* .data = */ array, /* .size = */ atb_Array_GetSize(array),               \
   }
 
 /**
@@ -200,7 +200,7 @@ extern "C" {
  */
 #define atb_ConstSpan_FromStaticArray(prefix, array)                           \
   ATB_COMPOUND_LITERAL(atb_##prefix##ConstSpan) {                              \
-    /* .data = */ array, /* .size = */ atb_StaticArray_GetSize(array),         \
+    /* .data = */ array, /* .size = */ atb_Array_GetSize(array),               \
   }
 
 /**
