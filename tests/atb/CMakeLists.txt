@@ -1,6 +1,7 @@
 add_executable(${PROJECT_NAME}-test
     container/test_list.cpp
     container/test_array.cpp
+    test_str_view.cpp
   )
 
 target_include_directories(${PROJECT_NAME}-test
