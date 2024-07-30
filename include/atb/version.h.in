@@ -1,0 +1,16 @@
+#pragma once
+
+// clang-format off
+/// Major version - Incompatible API changes
+#define @PROJECT_NAME@_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+
+/// Minor version - New functionnality (backward compatible)
+#define @PROJECT_NAME@_VERSION_MINOR @PROJECT_VERSION_MINOR@
+
+/// Patch version - Bug fixes (backward compatible)
+#define @PROJECT_NAME@_VERSION_PATCH @PROJECT_VERSION_PATCH@
+// clang-format on
+
+/// Complete version number as string literal ("MAJOR.MINOR.PATCH")
+#define @PROJECT_NAME@_VERSION_STR "@PROJECT_VERSION@"
+// clang-format on
