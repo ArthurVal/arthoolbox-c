@@ -9,7 +9,6 @@
 #  ${PROJECT_NAME}_ENABLE_TESTING    - BOOL   - Enable unittests
 #  ${PROJECT_NAME}_TESTING_GTEST_URL - STRING - GTest URL location
 
-
 include(CMakePrintHelpers)
 
 message(STATUS "${PROJECT_NAME} Testing Options:")

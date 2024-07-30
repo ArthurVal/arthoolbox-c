@@ -3,8 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-struct atb_StrView atb_StrView_MakeFromCString(const char *c_str,
-                                                 size_t max) {
+struct atb_StrView atb_StrView_MakeFromCString(const char *c_str, size_t max) {
   return (struct atb_StrView){
       .data = c_str,
       .size = (c_str != NULL ? strnlen(c_str, max) : 0),
@@ -12,7 +11,7 @@ struct atb_StrView atb_StrView_MakeFromCString(const char *c_str,
 }
 
 atb_StrView_Compare_Result atb_StrView_Compare(struct atb_StrView lhs,
-                                                 struct atb_StrView rhs) {
+                                               struct atb_StrView rhs) {
   assert(!atb_StrView_IsCorrupted(lhs));
   assert(!atb_StrView_IsCorrupted(rhs));
 
@@ -35,7 +34,7 @@ atb_StrView_Compare_Result atb_StrView_Compare(struct atb_StrView lhs,
 }
 
 struct atb_StrView atb_StrView_Find(struct atb_StrView str,
-                                      struct atb_StrView substr) {
+                                    struct atb_StrView substr) {
   assert(!atb_StrView_IsCorrupted(str));
   assert(!atb_StrView_IsCorrupted(substr));
 
@@ -43,7 +42,7 @@ struct atb_StrView atb_StrView_Find(struct atb_StrView str,
   if ((0 < substr.size) && (substr.size <= str.size)) {
     const char *where = NULL;
     while ((where = memchr(str.data, substr.data[0], str.size)) != NULL) {
-      str = atb_StrView_SliceFront(str, where - str.data);
+      str = atb_StrView_SliceFront(str, (size_t)(where - str.data));
       if (atb_StrView_Eq(substr, atb_StrView_Slice(str, 0, substr.size))) {
         return str;
       } else {
@@ -57,7 +56,7 @@ struct atb_StrView atb_StrView_Find(struct atb_StrView str,
 }
 
 struct atb_StrView atb_StrView_FindR(struct atb_StrView str,
-                                       struct atb_StrView substr) {
+                                     struct atb_StrView substr) {
   assert(!atb_StrView_IsCorrupted(str));
   assert(!atb_StrView_IsCorrupted(substr));
 
@@ -74,10 +73,10 @@ struct atb_StrView atb_StrView_FindR(struct atb_StrView str,
 
       if (*c == substr.data[0]) {
         struct atb_StrView sliced_str =
-            atb_StrView_SliceFront(str, (c - str.data));
+          atb_StrView_SliceFront(str, (size_t)(c - str.data));
 
         if (atb_StrView_Eq(substr,
-                            atb_StrView_Slice(sliced_str, 0, substr.size))) {
+                           atb_StrView_Slice(sliced_str, 0, substr.size))) {
           return sliced_str;
         }
       }
