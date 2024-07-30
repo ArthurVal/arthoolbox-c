@@ -103,7 +103,7 @@ struct atb_List {
  *  \brief Statically initialize an atb_List (set prev & next to itself)
  */
 #define atb_List_INITIALIZER(node)                                             \
-  { .next = &(node), .prev = &(node), }
+  { .next = &(node), .prev = &(node) }
 
 /**
  *  \brief Initialize an atb_List (set prev & next to itself)

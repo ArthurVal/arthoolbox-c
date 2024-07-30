@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-#include "internal/macro.h"
-
 #include "assert.h"
 #include "stdbool.h"
 #include "stddef.h" /* NULL */
@@ -40,7 +38,7 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
  *  \param[in] str a string literal (e.g.: "foo")
  */
 #define atb_StrView_MakeFromLiteral(str)                                       \
-  (atb_internal_COMPOUND_LITERAL(atb_StrView){(str), (sizeof((str)) - 1)})
+  ((struct atb_StrView){(str), (sizeof((str)) - 1)})
 
 /**
  *  \return An empty string view
