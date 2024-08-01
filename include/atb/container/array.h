@@ -4,8 +4,10 @@
 extern "C" {
 #endif
 
+#include "atb/macro.h"
+
 /**
- *  \return The size N of a static array a[N].
+ *  \return The size N of a static \a array[N].
  *
  *  Example:
  *
@@ -33,7 +35,13 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_GetSize(array) (sizeof((array)) / sizeof(array[0]))
+#define atb_Array_GetSize(array)                                               \
+  (atb_STATIC_ASSERT(atb_IS_ARRAY(array),                                      \
+                     "\"" #array                                               \
+                     "\" is expected to be a static C array (size known "      \
+                     "at compile time)"),                                      \
+   (sizeof((array)) / sizeof(*(array))))
+
 
 /**
  *  \return True if idx is in the range of the given static array (i.e. 0 <= idx
