@@ -4,6 +4,9 @@
 extern "C" {
 #endif
 
+#include "atb/macro.h"
+#include "atb/array.h"
+
 #include "assert.h"
 #include "stdbool.h"
 #include "stddef.h" /* NULL */
@@ -38,7 +41,10 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
  *  \param[in] str a string literal (e.g.: "foo")
  */
 #define atb_StrView_MakeFromLiteral(str)                                       \
-  ((struct atb_StrView){(str), (sizeof((str)) - 1)})
+  atb_COMPOUND_LITERAL(atb_StrView) {                                          \
+      /* .data =  */ atb_Array_Begin(str),                                     \
+      /* .size =  */ (atb_Array_GetSize(str) - 1),                             \
+  }
 
 /**
  *  \return An empty string view
