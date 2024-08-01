@@ -1,4 +1,5 @@
 add_library(${PROJECT_NAME}
+  memory/view.c
   str_view.c
   )
 
