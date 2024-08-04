@@ -118,8 +118,6 @@ static inline bool atb_timespec_Le(struct timespec lhs, struct timespec rhs);
  *
  *    return 0;
  *  }
- *
-
  *  \endcode
  */
 #define atb_Time_RetryCallExpr(predicate, count, delay)                        \
