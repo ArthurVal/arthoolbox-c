@@ -4,10 +4,9 @@
 extern "C" {
 #endif
 
-#include "atb/macro.h"
-#include "atb/array.h"
-
 #include "assert.h"
+#include "atb/container/array.h"
+#include "atb/macro.h"
 #include "stdbool.h"
 #include "stddef.h" /* NULL */
 
@@ -40,10 +39,10 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
  *
  *  \param[in] str a string literal (e.g.: "foo")
  */
-#define atb_StrView_MakeFromLiteral(str)                                       \
-  atb_COMPOUND_LITERAL(atb_StrView) {                                          \
-      /* .data =  */ atb_Array_Begin(str),                                     \
-      /* .size =  */ (atb_Array_GetSize(str) - 1),                             \
+#define atb_StrView_MakeFromLiteral(str)          \
+  atb_COMPOUND_LITERAL(atb_StrView) {             \
+    /* .data =  */ atb_Array_Begin(str),          \
+        /* .size =  */ (atb_Array_Size(str) - 1), \
   }
 
 /**
@@ -102,7 +101,7 @@ static inline const char *atb_StrView_End(struct atb_StrView str);
  *
  *  \important Asserts when str is corrupted
  */
-#define atb_StrView_ForEachChar(c, str)                                        \
+#define atb_StrView_ForEachChar(c, str) \
   for ((c) = atb_StrView_Begin(str); c < atb_StrView_End(str); ++(c))
 
 /**
@@ -127,7 +126,7 @@ static inline const char *atb_StrView_EndR(struct atb_StrView str);
  *
  *  \important Asserts when str is corrupted
  */
-#define atb_StrView_ForEachCharR(c, str)                                       \
+#define atb_StrView_ForEachCharR(c, str) \
   for ((c) = atb_StrView_BeginR(str); c > atb_StrView_EndR(str); --(c))
 
 /* Slicing *****************************************************************/
@@ -376,10 +375,10 @@ static inline bool atb_StrView_Eq(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_EQUAL:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_EQUAL:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -389,11 +388,11 @@ static inline bool atb_StrView_Ne(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_LESS:
-  case atb_StrView_Compare_GREATER:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_LESS:
+    case atb_StrView_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -403,10 +402,10 @@ static inline bool atb_StrView_Gt(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_GREATER:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -416,10 +415,10 @@ static inline bool atb_StrView_Lt(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_LESS:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -429,11 +428,11 @@ static inline bool atb_StrView_Ge(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_EQUAL:
-  case atb_StrView_Compare_GREATER:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_EQUAL:
+    case atb_StrView_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
@@ -443,11 +442,11 @@ static inline bool atb_StrView_Le(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-  case atb_StrView_Compare_EQUAL:
-  case atb_StrView_Compare_LESS:
-    return true;
-  default:
-    return false;
+    case atb_StrView_Compare_EQUAL:
+    case atb_StrView_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }
 

@@ -1,11 +1,9 @@
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
-#include "helper/StrView.hpp"
+#include <string_view>
 
 #include "atb/str_view.h"
-
-#include <string_view>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "helper/StrView.hpp"
 
 namespace {
 
@@ -17,7 +15,7 @@ class TestAtbStrView : public ::testing::Test {
     atb_StrView empty;
   };
 
-protected:
+ protected:
   void SetUp() {
     {
       constexpr auto str = atb_StrView_MakeFromLiteral("foo");
@@ -51,11 +49,11 @@ TEST_F(TestAtbStrView, MakeEmpty) {
 }
 
 TEST_F(TestAtbStrView, MakeFromLiteral) {
-  EXPECT_EQ(atb_StrView_MakeFromLiteral("Foo"), "Foo");
+  auto view = atb_StrView_MakeFromLiteral("Foo");
+  EXPECT_EQ(view, "Foo");
 }
 
 TEST_F(TestAtbStrView, MakeFromCString) {
-
   EXPECT_THAT(atb_StrView_MakeFromCString(nullptr, -1),
               helper::FieldsMatch({nullptr, 0u}));
 
@@ -85,12 +83,11 @@ TEST_F(TestAtbStrView, IsCorrupted) {
 }
 
 TEST_F(TestAtbStrView, IsOverlapping) {
-
   const auto str = atb_StrView_MakeFromLiteral("ABCDEF");
 
-  const auto left = atb_StrView_SliceBack(str, 3);   // ABC
-  const auto middle = atb_StrView_Slice(str, 1, 4);  // BCDE
-  const auto right = atb_StrView_SliceFront(str, 3); // DEF
+  const auto left = atb_StrView_SliceBack(str, 3);    // ABC
+  const auto middle = atb_StrView_Slice(str, 1, 4);   // BCDE
+  const auto right = atb_StrView_SliceFront(str, 3);  // DEF
 
   EXPECT_PRED2(atb_StrView_IsOverlapping, str, str);
 
@@ -161,14 +158,14 @@ TEST_F(TestAtbStrView, Slicing) {
 
   EXPECT_EQ(atb_StrView_Slice(atb_StrView_MakeFromLiteral("baz"), 1, 1), "a");
 
-  EXPECT_DEBUG_DEATH({ atb_StrView_SliceBack(str_example.corrupted, 0); },
-                     "Assertion");
+  EXPECT_DEBUG_DEATH(
+      { atb_StrView_SliceBack(str_example.corrupted, 0); }, "Assertion");
 
-  EXPECT_DEBUG_DEATH({ atb_StrView_SliceFront(str_example.corrupted, 0); },
-                     "Assertion");
+  EXPECT_DEBUG_DEATH(
+      { atb_StrView_SliceFront(str_example.corrupted, 0); }, "Assertion");
 
-  EXPECT_DEBUG_DEATH({ atb_StrView_Slice(str_example.corrupted, 0, 0); },
-                     "Assertion");
+  EXPECT_DEBUG_DEATH(
+      { atb_StrView_Slice(str_example.corrupted, 0, 0); }, "Assertion");
 }
 
 /* Comparison **************************************************************/
@@ -194,7 +191,6 @@ TEST_F(TestAtbStrView, Compare) {
            str_example.empty,
            str_example.null,
        }) {
-
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(str_example.valid, smaller_str));
 
     EXPECT_EQ(atb_StrView_Compare(smaller_str, str_example.valid),
@@ -478,4 +474,4 @@ TEST_F(TestAtbStrView, FindR) {
       "Assertion");
 }
 
-} // namespace
+}  // namespace

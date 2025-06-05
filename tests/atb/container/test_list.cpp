@@ -1,6 +1,5 @@
-#include "gtest/gtest.h"
-
 #include "atb/container/list.h"
+#include "gtest/gtest.h"
 
 namespace {
 
@@ -15,6 +14,25 @@ TEST(AtbList, Init) {
   atb_List_Init(&list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
+}
+
+TEST(AtbList, IsCorrupted) {
+  atb_List list;
+
+  atb_List_Init(&list);
+  EXPECT_FALSE(atb_List_IsCorrupted(&list));
+
+  list.next = nullptr;
+  EXPECT_TRUE(atb_List_IsCorrupted(&list));
+  atb_List_Init(&list);
+
+  list.prev = nullptr;
+  EXPECT_TRUE(atb_List_IsCorrupted(&list));
+  atb_List_Init(&list);
+
+  list.prev = nullptr;
+  list.next = nullptr;
+  EXPECT_TRUE(atb_List_IsCorrupted(&list));
 }
 
 TEST(AtbList, InsertAfter) {
@@ -198,27 +216,27 @@ TEST(AtbList, FindIf) {
 
   EXPECT_EQ(atb_List_FindIf(&head,
                             atb_List_UnaryOp{
-                                .data = &some_data,
-                                .op = IsEq3,
+                                IsEq3,
+                                &some_data,
                             }),
             &head);
   EXPECT_EQ(atb_List_FindIf(&head,
                             atb_List_UnaryOp{
-                                .data = &some_data,
-                                .op = IsEq0,
+                                IsEq0,
+                                &some_data,
                             }),
             &first.list);
 
   EXPECT_EQ(atb_List_FindIfR(&head,
                              atb_List_UnaryOp{
-                                 .data = &some_data,
-                                 .op = IsEq3,
+                                 IsEq3,
+                                 &some_data,
                              }),
             &head);
   EXPECT_EQ(atb_List_FindIfR(&head,
                              atb_List_UnaryOp{
-                                 .data = &some_data,
-                                 .op = IsEq0,
+                                 IsEq0,
+                                 &some_data,
                              }),
             &first.list);
 
@@ -239,4 +257,4 @@ TEST(AtbList, FindIf) {
             &third.list);
 }
 
-} // namespace
+}  // namespace

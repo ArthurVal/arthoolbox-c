@@ -29,7 +29,7 @@ extern "C" {
  *  struct atb_List my_list = atb_List_INITIALIZER(my_list);
  *
  *  struct Toto toto_0 = {};
- *  atb_List_Init(&toto_0);
+ *  atb_List_Init(&(toto_0.linked_list));
  *
  *  // We can insert into the list, using the list head.
  *  // This is the only way (using the head), when the list is empty, to insert
@@ -42,7 +42,7 @@ extern "C" {
  *  //             *--- [toto_0] <--*
  *
  *  struct Toto toto_1 = {};
- *  atb_List_Init(&toto_1);
+ *  atb_List_Init(&(toto_1.linked_list));
  *
  *  // We can insert into the list, using other nodes
  *  atb_List_Insert(&(toto_1.linked_list), After, &(toto_0.linked_list));
@@ -53,7 +53,8 @@ extern "C" {
  *  //          [toto_1] <----- [toto_0]
  *
  *  struct Toto toto_2 = {};
- *  atb_List_Init(&toto_2);
+ *  atb_List_Init(&(toto_2.linked_list));
+ *
  *  atb_List_Insert(&(toto_2.linked_list), Before, &(my_list));
  *
  *  //             *------> [HEAD] -------*
@@ -95,80 +96,111 @@ struct atb_List {
  *
  *  \return type* The parent struct ptr containing node_ptr
  */
-#define atb_List_Entry(node_ptr, type, member)                                 \
-  ((type *)((char *)(node_ptr)-offsetof(type, member)))
+#define atb_List_Entry(node_ptr, type, member) \
+  ((type *)((char *)(node_ptr) - offsetof(type, member)))
 
 /* Init *********************************************************************/
 /**
  *  \brief Statically initialize an atb_List (set prev & next to itself)
  */
-#define atb_List_INITIALIZER(node)                                             \
-  { .next = &(node), .prev = &(node) }
+#define atb_List_INITIALIZER(node) \
+  { &(node), &(node) }
 
 /**
  *  \brief Initialize an atb_List (set prev & next to itself)
+ *
+ *  \warning A node should never be pointing towards NULL prev/next nodes
+ *
+ *  \pre self != NULL
  */
-static inline void atb_List_Init(struct atb_List *const node);
+static inline void atb_List_Init(struct atb_List *const self);
 
 /**
- *  \return The size of the a list
+ *  \return True when one of self->prev or self->next are NULL
+ *  \pre self != NULL
+ */
+static inline bool atb_List_IsCorrupted(struct atb_List const *const self);
+
+/**
+ *  \return The size of the list
+ *  \pre self != NULL
+ *  \pre The list is not corrupted
+ *
  *  \note Complexity: O(n)
  */
-static inline size_t atb_List_GetSize(struct atb_List const *const list_head);
+static inline size_t atb_List_Size(struct atb_List const *const self);
 
 /* Mutation *****************************************************************/
 /**
- *  \brief Connects second as the next node of first (and vice versa)
+ *  \brief Connects lhs as the prev node of rhs (and vice versa)
+ *  \pre lhs != NULL
+ *  \pre rhs != NULL
  *
  *  \warning This is not meant to be used directly as an INSERTION into
  *           a list, use the _Insert* function for this
  */
-static inline void atb_List_Connect(struct atb_List *const first,
-                                    struct atb_List *const second);
+static inline void atb_List_Connect(struct atb_List *const lhs,
+                                    struct atb_List *const rhs);
 /**
- *  \brief Insert new_node AFTER node (node->next)
+ *  \brief Insert self AFTER other (as other->next)
  *
  * Given the following list:
- * ... <==> A <==> node <==> B <==> ...
+ * ... <==> A <==> other <==> B <==> ...
  *
  * The list will transform to:
- * ... <==> A <==> node <==> new_node <==> B <==> ...
+ * ... <==> A <==> other <==> self <==> B <==> ...
  *
- *  \param[in] new_node New node we wish to insert
- *  \param[in] node Node part of a list where the insertion take place
+ *  \param[in] self New node we wish to insert
+ *  \param[in] other Node part of a list where the insertion take place
+ *
+ *  \pre self != NULL
+ *  \pre other != NULL
+ *  \pre other->next != NULL
  */
-static inline void atb_List_InsertAfter(struct atb_List *const new_node,
-                                        struct atb_List *const node);
+static inline void atb_List_InsertAfter(struct atb_List *const self,
+                                        struct atb_List *const other);
 
 /**
- *  \brief Insert new_node BEFORE node (node->prev)
+ *  \brief Insert self BEFORE other (other->prev)
  *
  * Given the following list:
- * ... <==> A <==> node <==> B <==> ...
+ * ... <==> A <==> other <==> B <==> ...
  *
  * The list will transform to:
- * ... <==> A <==> new_node <==> node <==> B <==> ...
+ * ... <==> A <==> self <==> node <==> B <==> ...
  *
- *  \param[in] new_node New node we wish to insert
- *  \param[in] node Node part of a list where the insertion take place
+ *  \param[in] self New node we wish to insert
+ *  \param[in] other Node part of a list where the insertion take place
+ *
+ *  \pre self != NULL
+ *  \pre other != NULL
+ *  \pre other->prev != NULL
  */
-static inline void atb_List_InsertBefore(struct atb_List *const new_node,
-                                         struct atb_List *const node);
+static inline void atb_List_InsertBefore(struct atb_List *const self,
+                                         struct atb_List *const other);
 
 /**
- *  \brief Insert new_node Before/After node
+ *  \brief Insert self Before/After other
  *
- *  \param[in] new_node New node we wish to insert
- *  \param[in] Where One of [Before, After]
- *  \param[in] node Node part of a list where the insertion take place
+ *  \param[in] self New node we wish to insert
+ *  \param[in] where One of [Before, After]
+ *  \param[in] other Node part of a list where the insertion take place
+ *
+ *  \pre self != NULL
+ *  \pre other != NULL
+ *  \pre other->next != NULL when using After
+ *  \pre other->prev != NULL when using Before
  */
-#define atb_List_Insert(new_node, Where, node)                                 \
-  atb_List_Insert##Where((new_node), (node))
+#define atb_List_Insert(self, where, other) \
+  atb_List_Insert##where((self), (other))
 
 /**
- *  \brief Pop a node from a list
+ *  \brief Pop self from a list
+ *
+ *  \pre self != NULL
+ *  \pre !atb_List_IsCorrupted(self)
  */
-static inline void atb_List_Pop(struct atb_List *const node);
+static inline void atb_List_Pop(struct atb_List *const self);
 
 /* Iterate *****************************************************************/
 /**
@@ -177,11 +209,14 @@ static inline void atb_List_Pop(struct atb_List *const node);
  *  \param[in] node_it A atb_DLinkedlist ptr variable used as an iterator
  *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node
+ *
  *  \note This ForEach function iterates over all nodes EXCEPT the list_head
  *  \note Complexity: O(n)
  */
-#define atb_List_ForEach(node_it, list_head)                                   \
-  for ((node_it) = (list_head)->next; (node_it) != (list_head);                \
+#define atb_List_ForEach(node_it, list_head)                    \
+  for ((node_it) = (list_head)->next; (node_it) != (list_head); \
        (node_it) = (node_it)->next)
 
 /**
@@ -192,23 +227,26 @@ static inline void atb_List_Pop(struct atb_List *const node);
  *  \param[in] member Name of the atb_DLinkedlist inside the type of entry_it
  *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node
+ *
  *  \note This ForEach function iterates over all nodes EXCEPT the list_head
  *  \note Complexity: O(n)
  *  \note Use the parent data struct as iterator
  */
-#define atb_List_ForEachEntry(entry_it, member, list_head)                     \
-  for ((entry_it) =                                                            \
-           atb_List_Entry((list_head)->next, typeof(*(entry_it)), member);     \
-       (&(entry_it)->member) != (list_head);                                   \
-       (entry_it) =                                                            \
+#define atb_List_ForEachEntry(entry_it, member, list_head)                 \
+  for ((entry_it) =                                                        \
+           atb_List_Entry((list_head)->next, typeof(*(entry_it)), member); \
+       (&(entry_it)->member) != (list_head);                               \
+       (entry_it) =                                                        \
            atb_List_Entry((list_head)->next, typeof(*(entry_it)), member))
 
 /**
  *  \brief List Unary Operator
  */
 struct atb_List_UnaryOp {
+  bool (*f)(void *, struct atb_List const *const); /*!< Function predicate */
   void *data; /*!< Opaque internal data forwarded to each fn call */
-  bool (*op)(void *, struct atb_List const *); /*!< Function predicate */
 };
 
 /**
@@ -218,14 +256,17 @@ struct atb_List_UnaryOp {
  *  \param[in] predicate An Unary operator use to stop the iteration over the
  *                       list
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node *
+ *  \pre predicate.f != NULL
+ *
  *  \note Complexity: O(n), forward iterates
  *
  *  \return struct atb_List * corresponding to the first node for which
  *          the predicate returns true, list_head otherwise
  */
-static inline struct atb_List *
-atb_List_FindIf(struct atb_List const *const list_head,
-                struct atb_List_UnaryOp predicate);
+static inline struct atb_List *atb_List_FindIf(
+    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
 
 /**
  *  \return node when predicate(node) returns true, for each node in list_head,
@@ -235,19 +276,23 @@ atb_List_FindIf(struct atb_List const *const list_head,
  *  \param[in] predicate An Unary operator with the following signature:
  *                       bool (struct atb_List const * const);
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node *
+ *  \pre predicate is callable
+ *
  *  \note Complexity: O(n), forward iterates
  *  \warning Use of non-standard GNU statement expression
  */
-#define atb_List_FindIfExpr(list_head, predicate)                              \
-  ({                                                                           \
-    struct atb_List const *const __list_head = (list_head);                    \
-    struct atb_List *__node = NULL;                                            \
-    atb_List_ForEach(__node, (__list_head)) {                                  \
-      if (predicate(__node)) {                                                 \
-        break;                                                                 \
-      }                                                                        \
-    }                                                                          \
-    __node;                                                                    \
+#define atb_List_FindIfExpr(list_head, predicate)           \
+  ({                                                        \
+    struct atb_List const *const __list_head = (list_head); \
+    struct atb_List *__node = NULL;                         \
+    atb_List_ForEach(__node, (__list_head)) {               \
+      if (predicate(__node)) {                              \
+        break;                                              \
+      }                                                     \
+    }                                                       \
+    __node;                                                 \
   })
 
 /**
@@ -256,11 +301,14 @@ atb_List_FindIf(struct atb_List const *const list_head,
  *  \param[in] node_it A atb_DLinkedlist ptr variable used as an iterator
  *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node *
+ *
  *  \note This ForEach function iterates over all nodes EXCEPT the list_head
  *  \note Complexity: O(n)
  */
-#define atb_List_ForEachR(node_it, list_head)                                  \
-  for ((node_it) = (list_head)->prev; (node_it) != (list_head);                \
+#define atb_List_ForEachR(node_it, list_head)                   \
+  for ((node_it) = (list_head)->prev; (node_it) != (list_head); \
        (node_it) = (node_it)->prev)
 
 /**
@@ -270,14 +318,17 @@ atb_List_FindIf(struct atb_List const *const list_head,
  *  \param[in] predicate An Unary operator use to stop the iteration over the
  *                       list
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node *
+ *  \pre predicate.f != NULL
+ *
  *  \note Complexity: O(n), backward iterates
  *
  *  \return struct atb_List * corresponding to the first node for which
  *          the predicate returns true, list_head otherwise
  */
-static inline struct atb_List *
-atb_List_FindIfR(struct atb_List const *const list_head,
-                 struct atb_List_UnaryOp predicate);
+static inline struct atb_List *atb_List_FindIfR(
+    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
 
 /**
  *  \brief Find the first node for which the predicate returns true
@@ -286,87 +337,104 @@ atb_List_FindIfR(struct atb_List const *const list_head,
  *  \param[in] predicate An Unary operator with the following signature:
  *                       bool (struct atb_List const * const);
  *
+ *  \pre list_head != NULL
+ *  \pre list_head doesn't contained any corrupted node *
+ *  \pre predicate is callable
+ *
  *  \return struct atb_List * corresponding to the first node for which
  *          the predicate returns true, list_head otherwise
  */
-#define atb_List_FindIfRExpr(list_head, predicate)                             \
-  ({                                                                           \
-    struct atb_List const *const __list_head = (list_head);                    \
-    struct atb_List *__node = NULL;                                            \
-    atb_List_ForEachR(__node, (__list_head)) {                                 \
-      if (predicate(__node)) {                                                 \
-        break;                                                                 \
-      }                                                                        \
-    }                                                                          \
-    __node;                                                                    \
+#define atb_List_FindIfRExpr(list_head, predicate)          \
+  ({                                                        \
+    struct atb_List const *const __list_head = (list_head); \
+    struct atb_List *__node = NULL;                         \
+    atb_List_ForEachR(__node, (__list_head)) {              \
+      if (predicate(__node)) {                              \
+        break;                                              \
+      }                                                     \
+    }                                                       \
+    __node;                                                 \
   })
 
 /***************************************************************************/
-/*                           Inline definitions */
+/*                           Inline definitions                            */
 /***************************************************************************/
-static inline void atb_List_Init(struct atb_List *const node) {
-  assert(node != NULL);
+static inline void atb_List_Init(struct atb_List *const self) {
+  assert(self != NULL);
 
-  node->next = node;
-  node->prev = node;
+  self->next = self;
+  self->prev = self;
 }
 
-static inline size_t atb_List_GetSize(struct atb_List const *const list_head) {
-  size_t size = 0;
-  struct atb_List *node = NULL;
-  atb_List_ForEach(node, list_head) { size += 1; }
+static inline bool atb_List_IsCorrupted(struct atb_List const *const self) {
+  assert(self != NULL);
+
+  return (self->next == NULL) || (self->prev == NULL);
+}
+
+static inline size_t atb_List_Size(struct atb_List const *const self) {
+  assert(self != NULL);
+
+  size_t size = 0u;
+  struct atb_List *_not_used = NULL;
+
+  atb_List_ForEach(_not_used, self) { size += 1; }
+
   return size;
 }
 
-static inline void atb_List_Connect(struct atb_List *const first,
-                                    struct atb_List *const second) {
-  assert(first != NULL);
-  assert(second != NULL);
+static inline void atb_List_Connect(struct atb_List *const lhs,
+                                    struct atb_List *const rhs) {
+  assert(lhs != NULL);
+  assert(rhs != NULL);
 
-  first->next = second;
-  second->prev = first;
+  lhs->next = rhs;
+  rhs->prev = lhs;
 }
 
-static inline void atb_List_InsertAfter(struct atb_List *const new_node,
-                                        struct atb_List *const node) {
-  atb_List_Connect(new_node, node->next);
-  atb_List_Connect(node, new_node);
+static inline void atb_List_InsertAfter(struct atb_List *const self,
+                                        struct atb_List *const other) {
+  atb_List_Connect(self, other->next);
+  atb_List_Connect(other, self);
 }
 
-static inline void atb_List_InsertBefore(struct atb_List *const new_node,
-                                         struct atb_List *const node) {
-  atb_List_InsertAfter(new_node, node->prev);
+static inline void atb_List_InsertBefore(struct atb_List *const self,
+                                         struct atb_List *const other) {
+  atb_List_Connect(other->prev, self);
+  atb_List_Connect(self, other);
+  /* atb_List_InsertAfter(self, other->prev); */
 }
 
-static inline void atb_List_Pop(struct atb_List *const node) {
-  atb_List_Connect(node->prev, node->next);
-  atb_List_Init(node);
+static inline void atb_List_Pop(struct atb_List *const self) {
+  assert(self != NULL);
+  assert(!atb_List_IsCorrupted(self));
+
+  atb_List_Connect(self->prev, self->next);
+  atb_List_Init(self);
 }
 
-static inline struct atb_List *
-atb_List_FindIf(struct atb_List const *const list_head,
-                struct atb_List_UnaryOp predicate) {
+static inline struct atb_List *atb_List_FindIf(
+    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate) {
   assert(list_head != NULL);
-  assert(predicate.op != NULL);
+  assert(predicate.f != NULL);
 
   struct atb_List *node = NULL;
   atb_List_ForEach(node, list_head) {
-    if (predicate.op(predicate.data, node)) {
+    if (predicate.f(predicate.data, node)) {
       break;
     }
   }
   return node;
 }
 
-static inline struct atb_List *
-atb_List_FindIfR(struct atb_List const *const list_head,
-                 struct atb_List_UnaryOp predicate) {
+static inline struct atb_List *atb_List_FindIfR(
+    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate) {
   assert(list_head != NULL);
-  assert(predicate.op != NULL);
+  assert(predicate.f != NULL);
 
   struct atb_List *node = NULL;
   atb_List_ForEachR(node, list_head) {
-    if (predicate.op(predicate.data, node)) {
+    if (predicate.f(predicate.data, node)) {
       break;
     }
   }
