@@ -233,12 +233,12 @@ static inline bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) {
 
 static inline bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
                                       size_t count, struct timespec delay) {
-  if(predicate.function == NULL) 
+  if(predicate.function == NULL)
     return false;
-  
-  /* We use retryCallExpr here in order to avoid code duplication... 
-   * TODO: Find a way to re-use the GNU style stuff without triggering 
-   *       warnings ? 
+
+  /* We use retryCallExpr here in order to avoid code duplication...
+   * TODO: Find a way to re-use the GNU style stuff without triggering
+   *       warnings ?
    */
   return atb_Time_RetryCallExpr(predicate.function(predicate.args), count,
                                 delay);

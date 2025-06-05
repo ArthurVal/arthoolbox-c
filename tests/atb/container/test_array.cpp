@@ -1,28 +1,26 @@
-#include "gtest/gtest.h"
-
 #include "atb/container/array.h"
+#include "gtest/gtest.h"
 
 namespace {
 
-TEST(AtbArray, GetSize) {
+TEST(AtbArray, Size) {
   {
-    int toto[20] = {0};
-    EXPECT_EQ(20, atb_Array_GetSize(toto));
+    int toto[20] = {};
+    EXPECT_EQ(20, atb_Array_Size(toto));
   }
 
   {
     char toto[1] = {0};
-    EXPECT_EQ(1, atb_Array_GetSize(toto));
+    EXPECT_EQ(1, atb_Array_Size(toto));
   }
 
   {
     float toto[200] = {0};
-    EXPECT_EQ(200, atb_Array_GetSize(toto));
+    EXPECT_EQ(200, atb_Array_Size(toto));
   }
 }
 
 TEST(AtbArray, IsInRangeOf) {
-
   int toto[20] = {0};
   EXPECT_TRUE(atb_Array_IsInRangeOf(toto, 0));
   EXPECT_TRUE(atb_Array_IsInRangeOf(toto, 5));

@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-#include "atb/macro.h"
-
 /**
  *  \return The size N of a static \a array[N].
  *
@@ -18,8 +16,8 @@ extern "C" {
  *    float some_floats[10];
  *
  *    puts("- Begin");
- *    printf("Size ints   = %d\n", atb_Array_GetSize(some_ints));
- *    printf("Size floats = %d\n", atb_Array_GetSize(some_floats));
+ *    printf("Size ints   = %d\n", atb_Array_Size(some_ints));
+ *    printf("Size floats = %d\n", atb_Array_Size(some_floats));
  *    puts("- End");
  *
  *    return 0;
@@ -35,13 +33,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_GetSize(array)                                               \
-  (atb_STATIC_ASSERT(atb_IS_ARRAY(array),                                      \
-                     "\"" #array                                               \
-                     "\" is expected to be a static C array (size known "      \
-                     "at compile time)"),                                      \
-   (sizeof((array)) / sizeof(*(array))))
-
+#define atb_Array_Size(array) (sizeof((array)) / sizeof(*(array)))
 
 /**
  *  \return True if idx is in the range of the given static array (i.e. 0 <= idx
@@ -80,8 +72,8 @@ extern "C" {
  *                   raw pointers)
  *  \param[in] idx Index we wish to check for
  */
-#define atb_Array_IsInRangeOf(array, idx)                                      \
-  ((0 <= (idx)) && ((idx) < atb_Array_GetSize(array)))
+#define atb_Array_IsInRangeOf(array, idx) \
+  ((0 <= (idx)) && ((idx) < atb_Array_Size(array)))
 
 /**
  *  \return The address of the FIRST element of a static array
@@ -103,7 +95,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_End(array) atb_Array_Begin(array) + atb_Array_GetSize(array)
+#define atb_Array_End(array) atb_Array_Begin(array) + atb_Array_Size(array)
 
 /**
  *  \brief Alias used to do a for loop on all elements of a static C array
@@ -137,7 +129,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_ForEach(elem, array)                                         \
+#define atb_Array_ForEach(elem, array) \
   for (elem = atb_Array_Begin(array); elem != atb_Array_End(array); ++elem)
 
 /**
@@ -160,7 +152,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_EndR(array) atb_Array_BeginR(array) - atb_Array_GetSize(array)
+#define atb_Array_EndR(array) atb_Array_BeginR(array) - atb_Array_Size(array)
 
 /**
  *  \brief Same as _ForEach but in REVERSE order
@@ -194,7 +186,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_ForEachR(elem, array)                                        \
+#define atb_Array_ForEachR(elem, array) \
   for (elem = atb_Array_BeginR(array); elem != atb_Array_EndR(array); --elem)
 
 #if defined(__cplusplus)

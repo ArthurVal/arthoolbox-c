@@ -1,7 +1,7 @@
 add_library(${PROJECT_NAME}
   memory/view.c
   str_view.c
-  )
+)
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -12,13 +12,14 @@ target_include_directories(${PROJECT_NAME}
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 
   PRIVATE
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
-  )
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
 
 target_compile_features(${PROJECT_NAME}
   PUBLIC
   c_std_11
-  )
+)
 
 target_compile_options(${PROJECT_NAME}
   PRIVATE
@@ -30,26 +31,35 @@ target_compile_options(${PROJECT_NAME}
   -Wundef
   -Wconversion
   # -Werror
-  )
+)
 
-set_target_properties(${PROJECT_NAME}
-  PROPERTIES
-  SOVERSION ${PROJECT_VERSION_MAJOR}
-  VERSION ${PROJECT_VERSION}
-  # INTERFACE_${PROJECT_NAME}_VERSION ${PROJECT_VERSION}
-  COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR}
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  # All symbols are NO_EXPORT by default
+  CXX_VISIBILITY_PRESET hidden
+
+  # Add the '-debug' when compiled in CMAKE_BUILD_TYPE=DEBUG
   DEBUG_POSTFIX "-debug"
-  )
+
+  # Name used when exporting (otherwise will be the target name)
+  # EXPORT_NAME "${PROJECT_NAME}"
+
+  # Version stuff for the export lib names, that handles symlinks
+  # like:
+  # libtoto.so -> libtoto.1.so -> libtoto.1.0.2.so
+  VERSION ${PROJECT_VERSION}
+  SOVERSION ${PROJECT_VERSION_MAJOR}
+  COMPATIBLE_INTERFACE_STRING ${PROJECT_VERSION_MAJOR}
+)
 
 install(
   TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}Core
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  )
+)
 
 install(
   EXPORT ${PROJECT_NAME}Core
   NAMESPACE ${PROJECT_NAME}::
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-  )
+)
