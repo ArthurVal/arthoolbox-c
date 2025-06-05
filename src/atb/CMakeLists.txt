@@ -35,7 +35,7 @@ target_compile_options(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
   # All symbols are NO_EXPORT by default
-  CXX_VISIBILITY_PRESET hidden
+  C_VISIBILITY_PRESET hidden
 
   # Add the '-debug' when compiled in CMAKE_BUILD_TYPE=DEBUG
   DEBUG_POSTFIX "-debug"
