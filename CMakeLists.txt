@@ -138,13 +138,6 @@ configure_file(
   @ONLY
 )
 
-# Construct the project global export.h
-configure_file(
-  include/${PROJECT_NAME}/export.h.in
-  include/${PROJECT_NAME}/export.h
-  @ONLY
-)
-
 ###############################################################################
 #                                   INSTALL                                   #
 ###############################################################################
