@@ -4,20 +4,20 @@
 extern "C" {
 #endif
 
-#include "assert.h"
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h> /* NULL */
+
 #include "atb/container/array.h"
-#include "atb/macro.h"
-#include "stdbool.h"
-#include "stddef.h" /* NULL */
 
 /**
  *  \brief Represents a non-owning view of a string (i.e. doesn't end with '\0')
  *  \note This view is not mutable
  */
-struct atb_StrView {
+typedef struct atb_StrView {
   const char *data; /*!< Begin of the view */
   size_t size;      /*!< Size of the view */
-};
+} atb_StrView;
 
 #define atb_StrView_Fmt "{.data=%p, .size=%zu}"
 #define atb_StrView_FmtVaArg(str) ((void *)(str).data), ((str).size)
@@ -40,7 +40,7 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
  *  \param[in] str a string literal (e.g.: "foo")
  */
 #define atb_StrView_MakeFromLiteral(str)          \
-  atb_COMPOUND_LITERAL(atb_StrView) {             \
+  atb_StrView {                                   \
     /* .data =  */ atb_Array_Begin(str),          \
         /* .size =  */ (atb_Array_Size(str) - 1), \
   }
@@ -375,10 +375,8 @@ static inline bool atb_StrView_Eq(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-    case atb_StrView_Compare_EQUAL:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_EQUAL: return true;
+    default: return false;
   }
 }
 
@@ -389,10 +387,8 @@ static inline bool atb_StrView_Ne(struct atb_StrView lhs,
 
   switch (atb_StrView_Compare(lhs, rhs)) {
     case atb_StrView_Compare_LESS:
-    case atb_StrView_Compare_GREATER:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_GREATER: return true;
+    default: return false;
   }
 }
 
@@ -402,10 +398,8 @@ static inline bool atb_StrView_Gt(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-    case atb_StrView_Compare_GREATER:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_GREATER: return true;
+    default: return false;
   }
 }
 
@@ -415,10 +409,8 @@ static inline bool atb_StrView_Lt(struct atb_StrView lhs,
   assert(!atb_StrView_IsCorrupted(rhs));
 
   switch (atb_StrView_Compare(lhs, rhs)) {
-    case atb_StrView_Compare_LESS:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_LESS: return true;
+    default: return false;
   }
 }
 
@@ -429,10 +421,8 @@ static inline bool atb_StrView_Ge(struct atb_StrView lhs,
 
   switch (atb_StrView_Compare(lhs, rhs)) {
     case atb_StrView_Compare_EQUAL:
-    case atb_StrView_Compare_GREATER:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_GREATER: return true;
+    default: return false;
   }
 }
 
@@ -443,10 +433,8 @@ static inline bool atb_StrView_Le(struct atb_StrView lhs,
 
   switch (atb_StrView_Compare(lhs, rhs)) {
     case atb_StrView_Compare_EQUAL:
-    case atb_StrView_Compare_LESS:
-      return true;
-    default:
-      return false;
+    case atb_StrView_Compare_LESS: return true;
+    default: return false;
   }
 }
 

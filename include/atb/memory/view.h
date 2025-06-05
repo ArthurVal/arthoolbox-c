@@ -4,19 +4,17 @@
 extern "C" {
 #endif
 
-#include "atb/macro.h"
-
-#include "assert.h"
-#include "stdbool.h"
-#include "stddef.h" /* NULL */
+#include <assert.h>
+#include <stdbool.h>
+#include <stddef.h> /* NULL */
 
 /**
  *  \brief Represents a memory block view (constant data)
  */
-struct atb_MemView {
+typedef struct atb_MemView {
   const void *data; /*!< Begin mem addr of the view */
   size_t size;      /*!< Size in bytes of the view */
-};
+} atb_MemView;
 
 #define atb_MemView_Fmt "{.data=%p, .size=%zu}"
 #define atb_MemView_FmtVaArg(mem) ((mem).data), ((mem).size)
@@ -38,8 +36,8 @@ static inline struct atb_MemView atb_MemView_MakeEmpty();
 /**
  *  \return A memory view that maps an entire static C array
  */
-#define atb_MemView_MakeFromStaticArray(arr)                                   \
-  atb_COMPOUND_LITERAL(atb_MemView) { (arr), sizeof((arr)) }
+#define atb_MemView_MakeFromStaticArray(arr) \
+  atb_MemView { (arr), sizeof((arr)) }
 
 /***************************************************************************/
 /*                                Operations                               */
@@ -62,7 +60,7 @@ static inline struct atb_MemView atb_MemView_MakeEmpty();
  *
  *  \note This ptr is not dereferenceable
  */
-#define atb_MemView_EndAs(T, mem)                                              \
+#define atb_MemView_EndAs(T, mem) \
   (atb_MemView_BeginAs(T, mem) + atb_MemView_SizeAs(T, mem))
 
 /**
@@ -72,8 +70,8 @@ static inline struct atb_MemView atb_MemView_MakeEmpty();
  *  \param[inout] elem An iterator of type 'const T*'
  *  \param[in] mem The mem view we wish to iterator over
  */
-#define atb_MemView_ForEachAs(T, elem, mem)                                    \
-  for ((elem) = atb_MemView_BeginAs(T, mem);                                   \
+#define atb_MemView_ForEachAs(T, elem, mem)  \
+  for ((elem) = atb_MemView_BeginAs(T, mem); \
        (elem) != atb_MemView_EndAs(T, mem); ++(elem))
 
 // Backward
@@ -87,7 +85,7 @@ static inline struct atb_MemView atb_MemView_MakeEmpty();
  *
  *  \note This ptr is not dereferenceable
  */
-#define atb_MemView_EndAsR(T, mem)                                             \
+#define atb_MemView_EndAsR(T, mem) \
   (atb_MemView_BeginAsR(T, mem) - atb_MemView_SizeAs(T, mem))
 
 /**
@@ -97,8 +95,8 @@ static inline struct atb_MemView atb_MemView_MakeEmpty();
  *  \param[inout] elem An iterator of type 'const T*'
  *  \param[in] mem The mem view we wish to iterator over
  */
-#define atb_MemView_ForEachAsR(T, elem, mem)                                   \
-  for ((elem) = atb_MemView_BeginAsR(T, mem);                                  \
+#define atb_MemView_ForEachAsR(T, elem, mem)  \
+  for ((elem) = atb_MemView_BeginAsR(T, mem); \
        (elem) != atb_MemView_EndAsR(T, mem); --(elem))
 
 /* Checks ******************************************************************/
@@ -158,9 +156,9 @@ struct atb_MemViewPair {
  *  \param[in] predicate A predicate function use to sort lhs/rhs
  *  \param[in] lhs, rhs Mem view to compare
  */
-static inline struct atb_MemViewPair
-atb_MemView_Sort(bool (*predicate)(struct atb_MemView, struct atb_MemView),
-                 struct atb_MemView lhs, struct atb_MemView rhs);
+static inline struct atb_MemViewPair atb_MemView_Sort(
+    bool (*predicate)(struct atb_MemView, struct atb_MemView),
+    struct atb_MemView lhs, struct atb_MemView rhs);
 
 /**
  *  \return True if the given views overlap each other memory-wise
@@ -225,16 +223,15 @@ static inline bool atb_MemView_IsLowerOrEqual(struct atb_MemView lhs,
 
 static inline bool atb_MemView_IsHigherOrEqual(struct atb_MemView lhs,
                                                struct atb_MemView rhs) {
-
   assert(!atb_MemView_IsInvalid(lhs));
   assert(!atb_MemView_IsInvalid(rhs));
 
   return !atb_MemView_IsLower(lhs, rhs);
 }
 
-static inline struct atb_MemViewPair
-atb_MemView_Sort(bool (*predicate)(struct atb_MemView, struct atb_MemView),
-                 struct atb_MemView lhs, struct atb_MemView rhs) {
+static inline struct atb_MemViewPair atb_MemView_Sort(
+    bool (*predicate)(struct atb_MemView, struct atb_MemView),
+    struct atb_MemView lhs, struct atb_MemView rhs) {
   assert(predicate != NULL);
   assert(!atb_MemView_IsInvalid(lhs));
   assert(!atb_MemView_IsInvalid(rhs));
