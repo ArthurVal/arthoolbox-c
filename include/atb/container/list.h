@@ -107,6 +107,12 @@ typedef struct atb_List {
   { &(node), &(node) }
 
 /**
+ *  \brief Declare a new HEAD variable named \a name
+ */
+#define atb_List_DECLARE_HEAD(name) \
+  struct atb_List name = atb_List_INITIALIZE(name)
+
+/**
  *  \brief Initialize an atb_List (set prev & next to itself)
  *
  *  \warning A node should never be pointing towards NULL prev/next nodes
