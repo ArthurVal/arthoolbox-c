@@ -65,7 +65,7 @@ TEST(AtbList, InsertAfter) {
 
   EXPECT_EQ(first.prev, &(third));
 
-  atb_List fourth = atb_List_INITIALIZE(third);
+  atb_List fourth = atb_List_INITIALIZE(fourth);
   atb_List_InsertAfter(&(fourth), &(third));
 
   EXPECT_EQ(first.next, &(second));
@@ -106,7 +106,7 @@ TEST(AtbList, InsertBefore) {
 
   EXPECT_EQ(first.prev, &(second));
 
-  atb_List fourth = atb_List_INITIALIZE(third);
+  atb_List fourth = atb_List_INITIALIZE(fourth);
   atb_List_InsertBefore(&(fourth), &(third));
 
   EXPECT_EQ(first.next, &(fourth));
