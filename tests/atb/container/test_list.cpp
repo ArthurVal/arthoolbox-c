@@ -9,6 +9,12 @@ TEST(AtbList, Initialize) {
   EXPECT_EQ(list.prev, &list);
 }
 
+TEST(AtbList, DeclareHead) {
+  atb_List_DECLARE_HEAD(list);
+  EXPECT_EQ(list.next, &list);
+  EXPECT_EQ(list.prev, &list);
+}
+
 TEST(AtbList, Init) {
   atb_List list;
   atb_List_Init(&list);
