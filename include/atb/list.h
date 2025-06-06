@@ -85,10 +85,12 @@ extern "C" {
  *  }
  *
  */
-typedef struct atb_List {
+struct atb_List {
   struct atb_List *next;
   struct atb_List *prev;
-} atb_List;
+};
+
+typedef struct atb_List atb_List;
 
 /**
  *  \brief Retreive the ptr of the data structure containing the give node_ptr,

@@ -15,10 +15,12 @@ extern "C" {
  *  \brief Represents a non-owning view of a string (i.e. doesn't end with '\0')
  *  \note This view is not mutable
  */
-typedef struct atb_StrView {
+struct atb_StrView {
   const char *data; /*!< Begin of the view */
   size_t size;      /*!< Size of the view */
-} atb_StrView;
+};
+
+typedef struct atb_StrView atb_StrView;
 
 #define atb_StrView_Fmt "{.data=%p, .size=%zu}"
 #define atb_StrView_FmtVaArg(str) ((void *)(str).data), ((str).size)

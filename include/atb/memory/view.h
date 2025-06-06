@@ -8,13 +8,17 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h> /* NULL */
 
+#include "atb/export.h"
+
 /**
  *  \brief Represents a memory block view (constant data)
  */
-typedef struct atb_MemView {
+struct atb_MemView {
   const void *data; /*!< Begin mem addr of the view */
   size_t size;      /*!< Size in bytes of the view */
-} atb_MemView;
+};
+
+typedef struct atb_MemView atb_MemView;
 
 #define atb_MemView_Fmt "{.data=%p, .size=%zu}"
 #define atb_MemView_FmtVaArg(mem) ((mem).data), ((mem).size)
