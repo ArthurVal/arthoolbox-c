@@ -109,6 +109,35 @@ typedef struct atb_List {
 
 /**
  *  \brief Statically initialize an atb_List (set prev & next to itself)
+ *
+ *  This should always be used as an rvalue with node being the lvalue
+ *  variable's name like this:
+ *
+ *  struct atb_List foo = atb_List_INITIALIZE(foo);
+ *  struct atb_List bar = atb_List_INITIALIZE(bar);
+ *
+ *  you can use it to initialize static variables like so:
+ *
+ *  struct Foo {
+ *    int a;
+ *    int b;
+ *    atb_List l;
+ *    double c;
+ *  };
+ *
+ *  static struct Foo foo = {
+ *    .a = 0,
+ *    .b = 42,
+ *    .l = atb_List_INITIALIZE(foo.l),
+ *    .c = 3.141592,
+ *  };
+ *
+ *  static struct Foo bar = {
+ *    .a = 1,
+ *    .b = -42,
+ *    .l = atb_List_INITIALIZE(bar.l),
+ *    .c = 2.718281,
+ *  };
  */
 #define atb_List_INITIALIZE(node) \
   { &(node), &(node) }
