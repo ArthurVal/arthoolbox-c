@@ -39,11 +39,8 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
  *
  *  \param[in] str a string literal (e.g.: "foo")
  */
-#define atb_StrView_MakeFromLiteral(str)          \
-  atb_StrView {                                   \
-    /* .data =  */ atb_Array_Begin(str),          \
-        /* .size =  */ (atb_Array_Size(str) - 1), \
-  }
+#define atb_StrView_MakeFromLiteral(str) \
+  atb_StrView { atb_Array_Begin(str), (atb_Array_Size(str) - 1) }
 
 /**
  *  \return An empty string view
