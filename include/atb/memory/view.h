@@ -169,7 +169,8 @@ static inline struct atb_MemViewPair atb_MemView_Sort(
  *
  *  \note Asserts on invalid mem view
  */
-bool atb_MemView_IsOverlapping(struct atb_MemView lhs, struct atb_MemView rhs);
+ATB_PUBLIC bool atb_MemView_IsOverlapping(struct atb_MemView lhs,
+                                          struct atb_MemView rhs);
 
 /**
  *  \brief Merge 2 OVERLAPPING memory view into one
@@ -180,8 +181,8 @@ bool atb_MemView_IsOverlapping(struct atb_MemView lhs, struct atb_MemView rhs);
  *
  *  \return atb_MemView of merge operation result
  */
-struct atb_MemView atb_MemView_Merge(struct atb_MemView lhs,
-                                     struct atb_MemView rhs);
+ATB_PUBLIC struct atb_MemView atb_MemView_Merge(struct atb_MemView lhs,
+                                                struct atb_MemView rhs);
 
 /***************************************************************************/
 /*                            Static definitions                           */
