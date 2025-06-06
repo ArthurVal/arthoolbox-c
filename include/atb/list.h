@@ -114,16 +114,15 @@ typedef struct atb_List {
   { &(node), &(node) }
 
 /**
- *  \brief Declare a new HEAD variable named \a name
+ *  \brief Declare a new list HEAD variable with name 'n'
  */
-#define atb_List_DECLARE_HEAD(name) \
-  struct atb_List name = atb_List_INITIALIZE(name)
+#define atb_List_DECLARE_HEAD(n) struct atb_List n = atb_List_INITIALIZE(n)
 
 /**
  *  \brief Initialize an atb_List (set prev & next to itself)
  *
  *  \pre self != NULL
- *  \post atb_List_IsCorrupted(self) returns false
+ *  \post !atb_List_IsCorrupted(self)
  */
 static inline void atb_List_Init(struct atb_List *const self);
 
@@ -171,7 +170,7 @@ static inline void atb_List_Connect(struct atb_List *const lhs,
  *
  *  \pre self != NULL
  *  \pre other != NULL
- *  \pre other->next != NULL
+ *  \pre !atb_List_IsCorrupted(other)
  */
 static inline void atb_List_InsertAfter(struct atb_List *const self,
                                         struct atb_List *const other);
@@ -190,7 +189,7 @@ static inline void atb_List_InsertAfter(struct atb_List *const self,
  *
  *  \pre self != NULL
  *  \pre other != NULL
- *  \pre other->prev != NULL
+ *  \pre !atb_List_IsCorrupted(other)
  */
 static inline void atb_List_InsertBefore(struct atb_List *const self,
                                          struct atb_List *const other);
@@ -204,8 +203,7 @@ static inline void atb_List_InsertBefore(struct atb_List *const self,
  *
  *  \pre self != NULL
  *  \pre other != NULL
- *  \pre other->next != NULL when using After
- *  \pre other->prev != NULL when using Before
+ *  \pre !atb_List_IsCorrupted(other)
  */
 #define atb_List_Insert(self, where, other) \
   atb_List_Insert##where((self), (other))
@@ -273,7 +271,7 @@ struct atb_List_UnaryOp {
  *                       list
  *
  *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node *
+ *  \pre list_head doesn't contained any corrupted node
  *  \pre predicate.f != NULL
  *
  *  \note Complexity: O(n), forward iterates
@@ -291,7 +289,7 @@ static inline struct atb_List *atb_List_FindIf(
  *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
  *
  *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node *
+ *  \pre list_head doesn't contained any corrupted
  *
  *  \note This ForEach function iterates over all nodes EXCEPT the list_head
  *  \note Complexity: O(n)
@@ -308,7 +306,7 @@ static inline struct atb_List *atb_List_FindIf(
  *                       list
  *
  *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node *
+ *  \pre list_head doesn't contained any corrupted node
  *  \pre predicate.f != NULL
  *
  *  \note Complexity: O(n), backward iterates
