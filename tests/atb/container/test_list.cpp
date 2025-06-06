@@ -1,4 +1,4 @@
-#include "atb/container/list.h"
+#include "atb/list.h"
 #include "gtest/gtest.h"
 
 namespace {

@@ -1,4 +1,4 @@
-#include "atb/container/array.h"
+#include "atb/array.h"
 #include "gtest/gtest.h"
 
 namespace {

@@ -8,7 +8,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h> /* NULL */
 
-#include "atb/container/array.h"
+#include "atb/array.h"
 
 /**
  *  \brief Represents a non-owning view of a string (i.e. doesn't end with '\0')

@@ -8,6 +8,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h> /* NULL */
 
+#include "atb/export.h"
+
 /**
  *  \brief Double linked list pointing towards next/prev elements
  *
