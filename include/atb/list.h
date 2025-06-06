@@ -284,32 +284,6 @@ static inline void atb_List_Pop(struct atb_List *const node);
        (entry_it) =                                                        \
            atb_List_Entry((list_head)->next, typeof(*(entry_it)), member))
 
-/**
- *  \brief List Unary Operator
- */
-struct atb_List_UnaryOp {
-  bool (*f)(void *, struct atb_List const *const); /*!< Function predicate */
-  void *data; /*!< Opaque internal data forwarded to each fn call */
-};
-
-/**
- *  \brief Find the first node for which the predicate returns true
- *
- *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
- *  \param[in] predicate An Unary operator use to stop the iteration over the
- *                       list
- *
- *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node
- *  \pre predicate.f != NULL
- *
- *  \note Complexity: O(n), forward iterates
- *
- *  \return struct atb_List * corresponding to the first node for which
- *          the predicate returns true, list_head otherwise
- */
-static inline struct atb_List *atb_List_FindIf(
-    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
 
 /**
  *  \brief Backward iterate (using ->prev) over the double linked list
@@ -326,25 +300,6 @@ static inline struct atb_List *atb_List_FindIf(
 #define atb_List_ForEachR(node_it, list_head)                   \
   for ((node_it) = (list_head)->prev; (node_it) != (list_head); \
        (node_it) = (node_it)->prev)
-
-/**
- *  \brief Find the first node for which the predicate returns true
- *
- *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
- *  \param[in] predicate An Unary operator use to stop the iteration over the
- *                       list
- *
- *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node
- *  \pre predicate.f != NULL
- *
- *  \note Complexity: O(n), backward iterates
- *
- *  \return struct atb_List * corresponding to the first node for which
- *          the predicate returns true, list_head otherwise
- */
-static inline struct atb_List *atb_List_FindIfR(
-    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
 
 /***************************************************************************/
 /*                           Inline definitions                            */
@@ -401,34 +356,6 @@ static inline void atb_List_Pop(struct atb_List *const node) {
 
   atb_List_Connect(node->prev, node->next);
   atb_List_Init(node);
-}
-
-static inline struct atb_List *atb_List_FindIf(
-    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate) {
-  assert(list_head != NULL);
-  assert(predicate.f != NULL);
-
-  struct atb_List *node = NULL;
-  atb_List_ForEach(node, list_head) {
-    if (predicate.f(predicate.data, node)) {
-      break;
-    }
-  }
-  return node;
-}
-
-static inline struct atb_List *atb_List_FindIfR(
-    struct atb_List const *const list_head, struct atb_List_UnaryOp predicate) {
-  assert(list_head != NULL);
-  assert(predicate.f != NULL);
-
-  struct atb_List *node = NULL;
-  atb_List_ForEachR(node, list_head) {
-    if (predicate.f(predicate.data, node)) {
-      break;
-    }
-  }
-  return node;
 }
 
 #if defined(__cplusplus)

@@ -196,57 +196,6 @@ TEST(AtbList, ForEach) {
   }
 }
 
-static int some_data = 3;
-
-static bool IsEq0(void *data, atb_List const *node) {
-  EXPECT_EQ(data, &some_data);
-  return atb_List_Entry(node, Toto, list)->useless_0 == 0;
-}
-
-static bool IsEq3(void *data, atb_List const *node) {
-  EXPECT_EQ(data, &some_data);
-  return atb_List_Entry(node, Toto, list)->useless_0 == 3;
-}
-
-TEST(AtbList, FindIf) {
-  atb_List head = atb_List_INITIALIZE(head);
-
-  Toto first{0, atb_List_INITIALIZE(first.list), 0};
-  atb_List_Insert(&(first.list), After, &(head));
-
-  Toto second{1, atb_List_INITIALIZE(second.list), 1};
-  atb_List_Insert(&(second.list), After, &(first.list));
-
-  Toto third{2, atb_List_INITIALIZE(third.list), 2};
-  atb_List_Insert(&(third.list), After, &(second.list));
-
-  EXPECT_EQ(atb_List_FindIf(&head,
-                            atb_List_UnaryOp{
-                                IsEq3,
-                                &some_data,
-                            }),
-            &head);
-  EXPECT_EQ(atb_List_FindIf(&head,
-                            atb_List_UnaryOp{
-                                IsEq0,
-                                &some_data,
-                            }),
-            &first.list);
-
-  EXPECT_EQ(atb_List_FindIfR(&head,
-                             atb_List_UnaryOp{
-                                 IsEq3,
-                                 &some_data,
-                             }),
-            &head);
-  EXPECT_EQ(atb_List_FindIfR(&head,
-                             atb_List_UnaryOp{
-                                 IsEq0,
-                                 &some_data,
-                             }),
-            &first.list);
-}
-
 TEST(AtbList, Size) {
   atb_List_DECLARE_HEAD(head);
 
