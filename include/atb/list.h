@@ -285,34 +285,6 @@ static inline struct atb_List *atb_List_FindIf(
     struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
 
 /**
- *  \return node when predicate(node) returns true, for each node in list_head,
- *          otherwise returns list_head
- *
- *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
- *  \param[in] predicate An Unary operator with the following signature:
- *                       bool (struct atb_List const * const);
- *
- *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node *
- *  \pre predicate is callable
- *
- *  \note Complexity: O(n), forward iterates
- *
- *  \warning Use of non-standard GNU statement expression
- */
-#define atb_List_FindIfExpr(list_head, predicate)           \
-  ({                                                        \
-    struct atb_List const *const __list_head = (list_head); \
-    struct atb_List *__node = NULL;                         \
-    atb_List_ForEach(__node, (__list_head)) {               \
-      if (predicate(__node)) {                              \
-        break;                                              \
-      }                                                     \
-    }                                                       \
-    __node;                                                 \
-  })
-
-/**
  *  \brief Backward iterate (using ->prev) over the double linked list
  *
  *  \param[in] node_it A atb_DLinkedlist ptr variable used as an iterator
@@ -346,32 +318,6 @@ static inline struct atb_List *atb_List_FindIf(
  */
 static inline struct atb_List *atb_List_FindIfR(
     struct atb_List const *const list_head, struct atb_List_UnaryOp predicate);
-
-/**
- *  \brief Find the first node for which the predicate returns true
- *
- *  \param[in] list_head A atb_DLinkedlist* List head we wish to iterate over
- *  \param[in] predicate An Unary operator with the following signature:
- *                       bool (struct atb_List const * const);
- *
- *  \pre list_head != NULL
- *  \pre list_head doesn't contained any corrupted node *
- *  \pre predicate is callable
- *
- *  \return struct atb_List * corresponding to the first node for which
- *          the predicate returns true, list_head otherwise
- */
-#define atb_List_FindIfRExpr(list_head, predicate)          \
-  ({                                                        \
-    struct atb_List const *const __list_head = (list_head); \
-    struct atb_List *__node = NULL;                         \
-    atb_List_ForEachR(__node, (__list_head)) {              \
-      if (predicate(__node)) {                              \
-        break;                                              \
-      }                                                     \
-    }                                                       \
-    __node;                                                 \
-  })
 
 /***************************************************************************/
 /*                           Inline definitions                            */
