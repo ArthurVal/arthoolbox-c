@@ -123,6 +123,7 @@ typedef struct atb_List {
  */
 static inline void atb_List_Init(struct atb_List *const self);
 
+/* Introspect **************************************************************/
 /**
  *  \return True when one of self->prev or self->next are NULL
  *  \pre self != NULL
