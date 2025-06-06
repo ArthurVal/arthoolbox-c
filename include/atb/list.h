@@ -121,28 +121,28 @@ typedef struct atb_List {
 /**
  *  \brief Initialize an atb_List (set prev & next to itself)
  *
- *  \pre self != NULL
- *  \post !atb_List_IsCorrupted(self)
+ *  \pre node != NULL
+ *  \post !atb_List_IsCorrupted(node)
  */
-static inline void atb_List_Init(struct atb_List *const self);
+static inline void atb_List_Init(struct atb_List *const node);
 
 /* Introspect **************************************************************/
 /**
- *  \return true when one of self->prev or self->next are NULL, false otherwise
+ *  \return true when one of node->prev or node->next are NULL, false otherwise
  *
- *  \pre self != NULL
+ *  \pre node != NULL
  */
-static inline bool atb_List_IsCorrupted(struct atb_List const *const self);
+static inline bool atb_List_IsCorrupted(struct atb_List const *const node);
 
 /**
  *  \return The size of the list
  *
- *  \pre self != NULL
+ *  \pre list_head != NULL
  *  \pre The list is not corrupted
  *
  *  \note Complexity: O(n)
  */
-static inline size_t atb_List_Size(struct atb_List const *const self);
+static inline size_t atb_List_Size(struct atb_List const *const list_head);
 
 /* Mutation *****************************************************************/
 /**
@@ -157,64 +157,64 @@ static inline size_t atb_List_Size(struct atb_List const *const self);
 static inline void atb_List_Connect(struct atb_List *const lhs,
                                     struct atb_List *const rhs);
 /**
- *  \brief Insert self AFTER other (as other->next)
+ *  \brief Insert new_node AFTER other (as other->next)
  *
  * Given the following list:
  * ... <==> A <==> other <==> B <==> ...
  *
  * The list will transform to:
- * ... <==> A <==> other <==> self <==> B <==> ...
+ * ... <==> A <==> other <==> new_node <==> B <==> ...
  *
- *  \param[in] self New node we wish to insert
+ *  \param[in] new_node New node we wish to insert
  *  \param[in] other Node part of a list where the insertion take place
  *
- *  \pre self != NULL
+ *  \pre new_node != NULL
  *  \pre other != NULL
  *  \pre !atb_List_IsCorrupted(other)
  */
-static inline void atb_List_InsertAfter(struct atb_List *const self,
+static inline void atb_List_InsertAfter(struct atb_List *const new_node,
                                         struct atb_List *const other);
 
 /**
- *  \brief Insert self BEFORE other (other->prev)
+ *  \brief Insert new_node BEFORE other (other->prev)
  *
  * Given the following list:
  * ... <==> A <==> other <==> B <==> ...
  *
  * The list will transform to:
- * ... <==> A <==> self <==> node <==> B <==> ...
+ * ... <==> A <==> new_node <==> node <==> B <==> ...
  *
- *  \param[in] self New node we wish to insert
+ *  \param[in] new_node New node we wish to insert
  *  \param[in] other Node part of a list where the insertion take place
  *
- *  \pre self != NULL
+ *  \pre new_node != NULL
  *  \pre other != NULL
  *  \pre !atb_List_IsCorrupted(other)
  */
-static inline void atb_List_InsertBefore(struct atb_List *const self,
+static inline void atb_List_InsertBefore(struct atb_List *const new_node,
                                          struct atb_List *const other);
 
 /**
- *  \brief Insert self Before/After other
+ *  \brief Insert new_node Before/After other
  *
- *  \param[in] self New node we wish to insert
+ *  \param[in] new_node New node we wish to insert
  *  \param[in] where One of [Before, After]
  *  \param[in] other Node part of a list where the insertion take place
  *
- *  \pre self != NULL
+ *  \pre new_node != NULL
  *  \pre other != NULL
  *  \pre !atb_List_IsCorrupted(other)
  */
-#define atb_List_Insert(self, where, other) \
-  atb_List_Insert##where((self), (other))
+#define atb_List_Insert(new_node, where, other) \
+  atb_List_Insert##where((new_node), (other))
 
 /**
- *  \brief Pop self from a list
+ *  \brief Pop node from a list
  *
- *  \pre self != NULL
- *  \pre !atb_List_IsCorrupted(self)
+ *  \pre node != NULL
+ *  \pre !atb_List_IsCorrupted(node)
  */
-static inline void atb_List_Pop(struct atb_List *const self);
+static inline void atb_List_Pop(struct atb_List *const node);
 
 /* Iterate *****************************************************************/
 /**
@@ -320,26 +320,26 @@ static inline struct atb_List *atb_List_FindIfR(
 /***************************************************************************/
 /*                           Inline definitions                            */
 /***************************************************************************/
-static inline void atb_List_Init(struct atb_List *const self) {
-  assert(self != NULL);
+static inline void atb_List_Init(struct atb_List *const node) {
+  assert(node != NULL);
 
-  self->next = self;
-  self->prev = self;
+  node->next = node;
+  node->prev = node;
 }
 
-static inline bool atb_List_IsCorrupted(struct atb_List const *const self) {
-  assert(self != NULL);
+static inline bool atb_List_IsCorrupted(struct atb_List const *const node) {
+  assert(node != NULL);
 
-  return (self->next == NULL) || (self->prev == NULL);
+  return (node->next == NULL) || (node->prev == NULL);
 }
 
-static inline size_t atb_List_Size(struct atb_List const *const self) {
-  assert(self != NULL);
+static inline size_t atb_List_Size(struct atb_List const *const list_head) {
+  assert(list_head != NULL);
 
   size_t size = 0u;
   struct atb_List *_not_used = NULL;
 
-  atb_List_ForEach(_not_used, self) { size += 1; }
+  atb_List_ForEach(_not_used, list_head) { size += 1; }
 
   return size;
 }
@@ -353,25 +353,25 @@ static inline void atb_List_Connect(struct atb_List *const lhs,
   rhs->prev = lhs;
 }
 
-static inline void atb_List_InsertAfter(struct atb_List *const self,
+static inline void atb_List_InsertAfter(struct atb_List *const new_node,
                                         struct atb_List *const other) {
-  atb_List_Connect(self, other->next);
-  atb_List_Connect(other, self);
+  atb_List_Connect(new_node, other->next);
+  atb_List_Connect(other, new_node);
 }
 
-static inline void atb_List_InsertBefore(struct atb_List *const self,
+static inline void atb_List_InsertBefore(struct atb_List *const new_node,
                                          struct atb_List *const other) {
-  atb_List_Connect(other->prev, self);
-  atb_List_Connect(self, other);
-  /* atb_List_InsertAfter(self, other->prev); */
+  atb_List_Connect(other->prev, new_node);
+  atb_List_Connect(new_node, other);
+  /* atb_List_InsertAfter(new_node, other->prev); */
 }
 
-static inline void atb_List_Pop(struct atb_List *const self) {
-  assert(self != NULL);
-  assert(!atb_List_IsCorrupted(self));
+static inline void atb_List_Pop(struct atb_List *const node) {
+  assert(node != NULL);
+  assert(!atb_List_IsCorrupted(node));
 
-  atb_List_Connect(self->prev, self->next);
-  atb_List_Init(self);
+  atb_List_Connect(node->prev, node->next);
+  atb_List_Init(node);
 }
 
 static inline struct atb_List *atb_List_FindIf(
