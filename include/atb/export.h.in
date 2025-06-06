@@ -35,7 +35,7 @@
 // Define @PROJECT_NAME_UPPERCASE@_[PUBLIC, PRIVATE] based the following
 // definitions forwarded by the build system:
 // - @PROJECT_NAME_UPPERCASE@_IS_SHARED (If the project is a shared lib)
-// - @PROJECT_NAME_UPPERCASE@_EXPORT (If we are building it directly)
+// - @PROJECT_NAME_UPPERCASE@_DO_EXPORT (If we are building it directly)
 #ifdef @PROJECT_NAME_UPPERCASE@_IS_SHARED
 
 // @PROJECT_NAME_UPPERCASE@ lib is shared (.so)

@@ -33,6 +33,11 @@ target_compile_options(${PROJECT_NAME}
   # -Werror
 )
 
+target_compile_definitions(${PROJECT_NAME}
+  PUBLIC $<$<STREQUAL:$<TARGET_PROPERTY:${PROJECT_NAME},TYPE>,SHARED_LIBRARY>:-D${PROJECT_NAME_UPPERCASE}_IS_SHARED>
+  PRIVATE -D${PROJECT_NAME_UPPERCASE}_DO_EXPORT
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
   # All symbols are NO_EXPORT by default
   C_VISIBILITY_PRESET hidden
