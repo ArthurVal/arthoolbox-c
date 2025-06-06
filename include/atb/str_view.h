@@ -9,6 +9,7 @@ extern "C" {
 #include <stddef.h> /* NULL */
 
 #include "atb/array.h"
+#include "atb/export.h"
 
 /**
  *  \brief Represents a non-owning view of a string (i.e. doesn't end with '\0')
@@ -53,7 +54,8 @@ static inline struct atb_StrView atb_StrView_MakeEmpty(void);
  *  \param[in] c_str A NULL terminated string
  *  \param[in] max Maximum size (in case c_str is not NULL terminated)
  */
-struct atb_StrView atb_StrView_MakeFromCString(const char *c_str, size_t max);
+ATB_PUBLIC struct atb_StrView atb_StrView_MakeFromCString(const char *c_str,
+                                                          size_t max);
 
 /***************************************************************************/
 /*                                Operations                               */
@@ -184,8 +186,8 @@ typedef enum {
  *
  *  \return One of [LESS, EQUAL, GREATER] based on the comparison result
  */
-atb_StrView_Compare_Result atb_StrView_Compare(struct atb_StrView lhs,
-                                               struct atb_StrView rhs);
+ATB_PUBLIC atb_StrView_Compare_Result
+atb_StrView_Compare(struct atb_StrView lhs, struct atb_StrView rhs);
 
 /**
  *  \return True when both lhs and rhs are equal
@@ -246,8 +248,8 @@ static inline bool atb_StrView_Le(struct atb_StrView lhs,
  *  \return A view of str starting at the location where substr has been found
  *          or an empty view pointing at the end of str if lookup failed
  */
-struct atb_StrView atb_StrView_Find(struct atb_StrView str,
-                                    struct atb_StrView substr);
+ATB_PUBLIC struct atb_StrView atb_StrView_Find(struct atb_StrView str,
+                                               struct atb_StrView substr);
 
 /**
  *  \brief Try to find the LAST appearence of substr inside str
@@ -260,8 +262,8 @@ struct atb_StrView atb_StrView_Find(struct atb_StrView str,
  *  \return A view of str starting at the location where substr has been found
  *          or an empty view pointing at the end of str if lookup failed
  */
-struct atb_StrView atb_StrView_FindR(struct atb_StrView str,
-                                     struct atb_StrView substr);
+ATB_PUBLIC struct atb_StrView atb_StrView_FindR(struct atb_StrView str,
+                                                struct atb_StrView substr);
 
 /***************************************************************************/
 /*                            Static definitions                           */
