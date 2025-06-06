@@ -4,7 +4,7 @@
 namespace {
 
 TEST(AtbList, StaticInit) {
-  atb_List list = atb_List_INITIALIZER(list);
+  atb_List list = atb_List_INITIALIZE(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
@@ -36,9 +36,9 @@ TEST(AtbList, IsCorrupted) {
 }
 
 TEST(AtbList, InsertAfter) {
-  atb_List first = atb_List_INITIALIZER(first);
+  atb_List first = atb_List_INITIALIZE(first);
 
-  atb_List second = atb_List_INITIALIZER(second);
+  atb_List second = atb_List_INITIALIZE(second);
   atb_List_InsertAfter(&(second), &(first));
   EXPECT_EQ(first.next, &(second));
 
@@ -47,7 +47,7 @@ TEST(AtbList, InsertAfter) {
 
   EXPECT_EQ(first.prev, &(second));
 
-  atb_List third = atb_List_INITIALIZER(third);
+  atb_List third = atb_List_INITIALIZE(third);
   atb_List_InsertAfter(&(third), &(second));
   EXPECT_EQ(first.next, &(second));
 
@@ -59,7 +59,7 @@ TEST(AtbList, InsertAfter) {
 
   EXPECT_EQ(first.prev, &(third));
 
-  atb_List fourth = atb_List_INITIALIZER(third);
+  atb_List fourth = atb_List_INITIALIZE(third);
   atb_List_InsertAfter(&(fourth), &(third));
 
   EXPECT_EQ(first.next, &(second));
@@ -77,9 +77,9 @@ TEST(AtbList, InsertAfter) {
 }
 
 TEST(AtbList, InsertBefore) {
-  atb_List first = atb_List_INITIALIZER(first);
+  atb_List first = atb_List_INITIALIZE(first);
 
-  atb_List second = atb_List_INITIALIZER(second);
+  atb_List second = atb_List_INITIALIZE(second);
   atb_List_InsertBefore(&(second), &(first));
   EXPECT_EQ(first.next, &(second));
 
@@ -88,7 +88,7 @@ TEST(AtbList, InsertBefore) {
 
   EXPECT_EQ(first.prev, &(second));
 
-  atb_List third = atb_List_INITIALIZER(third);
+  atb_List third = atb_List_INITIALIZE(third);
   atb_List_InsertBefore(&(third), &(second));
   EXPECT_EQ(first.next, &(third));
 
@@ -100,7 +100,7 @@ TEST(AtbList, InsertBefore) {
 
   EXPECT_EQ(first.prev, &(second));
 
-  atb_List fourth = atb_List_INITIALIZER(third);
+  atb_List fourth = atb_List_INITIALIZE(third);
   atb_List_InsertBefore(&(fourth), &(third));
 
   EXPECT_EQ(first.next, &(fourth));
@@ -118,7 +118,7 @@ TEST(AtbList, InsertBefore) {
 }
 
 TEST(AtbList, Pop) {
-  atb_List first = atb_List_INITIALIZER(first);
+  atb_List first = atb_List_INITIALIZE(first);
 
   // Poping an empty list does nothing
   EXPECT_EQ(first.prev, &(first));
@@ -127,10 +127,10 @@ TEST(AtbList, Pop) {
   EXPECT_EQ(first.prev, &(first));
   EXPECT_EQ(first.next, &(first));
 
-  atb_List second = atb_List_INITIALIZER(second);
+  atb_List second = atb_List_INITIALIZE(second);
   atb_List_Insert(&(second), After, &(first));
 
-  atb_List third = atb_List_INITIALIZER(third);
+  atb_List third = atb_List_INITIALIZE(third);
   atb_List_Insert(&(third), After, &(second));
 
   atb_List_Pop(&(second));
@@ -155,7 +155,7 @@ struct Toto {
 TEST(AtbList, Entry) {
   Toto toto = {
       0,
-      atb_List_INITIALIZER(toto.list),
+      atb_List_INITIALIZE(toto.list),
       1,
   };
 
@@ -164,15 +164,15 @@ TEST(AtbList, Entry) {
 }
 
 TEST(AtbList, ForEach) {
-  atb_List head = atb_List_INITIALIZER(head);
+  atb_List head = atb_List_INITIALIZE(head);
 
-  Toto first{0, atb_List_INITIALIZER(first.list), 0};
+  Toto first{0, atb_List_INITIALIZE(first.list), 0};
   atb_List_Insert(&(first.list), After, &(head));
 
-  Toto second{1, atb_List_INITIALIZER(second.list), 1};
+  Toto second{1, atb_List_INITIALIZE(second.list), 1};
   atb_List_Insert(&(second.list), After, &(first.list));
 
-  Toto third{2, atb_List_INITIALIZER(third.list), 2};
+  Toto third{2, atb_List_INITIALIZE(third.list), 2};
   atb_List_Insert(&(third.list), After, &(second.list));
 
   const atb_List *elem = nullptr;
@@ -203,15 +203,15 @@ static bool IsEq3(void *data, atb_List const *node) {
 }
 
 TEST(AtbList, FindIf) {
-  atb_List head = atb_List_INITIALIZER(head);
+  atb_List head = atb_List_INITIALIZE(head);
 
-  Toto first{0, atb_List_INITIALIZER(first.list), 0};
+  Toto first{0, atb_List_INITIALIZE(first.list), 0};
   atb_List_Insert(&(first.list), After, &(head));
 
-  Toto second{1, atb_List_INITIALIZER(second.list), 1};
+  Toto second{1, atb_List_INITIALIZE(second.list), 1};
   atb_List_Insert(&(second.list), After, &(first.list));
 
-  Toto third{2, atb_List_INITIALIZER(third.list), 2};
+  Toto third{2, atb_List_INITIALIZE(third.list), 2};
   atb_List_Insert(&(third.list), After, &(second.list));
 
   EXPECT_EQ(atb_List_FindIf(&head,
