@@ -3,7 +3,7 @@
 
 namespace {
 
-TEST(AtbList, StaticInit) {
+TEST(AtbList, Initialize) {
   atb_List list = atb_List_INITIALIZE(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
