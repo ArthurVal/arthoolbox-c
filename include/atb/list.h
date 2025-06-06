@@ -20,6 +20,10 @@ extern "C" {
  *  - As a NODE, inside any other data structure that should be part of a double
  *    linked list.
  *
+ *  Be aware that list HEADs or when a NODE is inside a list, it is expected to
+ *  ALWAYS points towards next/prev elements. Having any of its attributs
+ *  prev/next equal to NULL inside a list means that the node is 'Corrupted'.
+ *
  *  Example:
  *  struct Toto {
  *    int a;
