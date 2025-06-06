@@ -102,6 +102,7 @@ typedef struct atb_List {
   ((type *)((char *)(node_ptr) - offsetof(type, member)))
 
 /* Init *********************************************************************/
+
 /**
  *  \brief Statically initialize an atb_List (set prev & next to itself)
  */
@@ -117,21 +118,22 @@ typedef struct atb_List {
 /**
  *  \brief Initialize an atb_List (set prev & next to itself)
  *
- *  \warning A node should never be pointing towards NULL prev/next nodes
- *
  *  \pre self != NULL
+ *  \post atb_List_IsCorrupted(self) returns false
  */
 static inline void atb_List_Init(struct atb_List *const self);
 
 /* Introspect **************************************************************/
 /**
- *  \return True when one of self->prev or self->next are NULL
+ *  \return true when one of self->prev or self->next are NULL, false otherwise
+ *
  *  \pre self != NULL
  */
 static inline bool atb_List_IsCorrupted(struct atb_List const *const self);
 
 /**
  *  \return The size of the list
+ *
  *  \pre self != NULL
  *  \pre The list is not corrupted
  *
@@ -142,6 +144,7 @@ static inline size_t atb_List_Size(struct atb_List const *const self);
 /* Mutation *****************************************************************/
 /**
  *  \brief Connects lhs as the prev node of rhs (and vice versa)
+ *
  *  \pre lhs != NULL
  *  \pre rhs != NULL
  *
@@ -290,6 +293,7 @@ static inline struct atb_List *atb_List_FindIf(
  *  \pre predicate is callable
  *
  *  \note Complexity: O(n), forward iterates
+ *
  *  \warning Use of non-standard GNU statement expression
  */
 #define atb_List_FindIfExpr(list_head, predicate)           \
