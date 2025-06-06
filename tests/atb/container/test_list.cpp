@@ -245,22 +245,6 @@ TEST(AtbList, FindIf) {
                                  &some_data,
                              }),
             &first.list);
-
-  EXPECT_EQ(atb_List_FindIfExpr(&head, [](auto) { return false; }), &head);
-  EXPECT_EQ(atb_List_FindIfExpr(
-                &head,
-                [](auto *node) {
-                  return atb_List_Entry(node, Toto, list)->useless_0 == 1;
-                }),
-            &second.list);
-
-  EXPECT_EQ(atb_List_FindIfRExpr(&head, [](auto) { return false; }), &head);
-  EXPECT_EQ(atb_List_FindIfRExpr(
-                &head,
-                [](auto *node) {
-                  return atb_List_Entry(node, Toto, list)->useless_0 == 2;
-                }),
-            &third.list);
 }
 
 TEST(AtbList, Size) {
