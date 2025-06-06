@@ -45,7 +45,7 @@ static inline void atb_StrView_Init(struct atb_StrView *const self);
 /**
  *  \return An empty string view
  */
-static inline struct atb_StrView atb_StrView_MakeEmpty();
+static inline struct atb_StrView atb_StrView_MakeEmpty(void);
 
 /**
  *  \return A string view from the given NULL terminated string
@@ -271,7 +271,7 @@ static inline void atb_StrView_Init(struct atb_StrView *const self) {
   self->size = 0;
 }
 
-static inline struct atb_StrView atb_StrView_MakeEmpty() {
+static inline struct atb_StrView atb_StrView_MakeEmpty(void) {
   struct atb_StrView out;
   atb_StrView_Init(&out);
   return out;
