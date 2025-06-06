@@ -263,4 +263,24 @@ TEST(AtbList, FindIf) {
             &third.list);
 }
 
-}  // namespace
+TEST(AtbList, Size) {
+  atb_List_DECLARE_HEAD(head);
+
+  EXPECT_EQ(atb_List_Size(&head), 0);
+
+  atb_List a;
+  atb_List_Insert(&a, After, &head);
+  EXPECT_EQ(atb_List_Size(&head), 1);
+
+  atb_List b;
+  atb_List_Insert(&b, After, &head);
+  EXPECT_EQ(atb_List_Size(&head), 2);
+
+  atb_List_Pop(&a);
+  EXPECT_EQ(atb_List_Size(&head), 1);
+
+  atb_List_Pop(&b);
+  EXPECT_EQ(atb_List_Size(&head), 0);
+}
+
+} // namespace
