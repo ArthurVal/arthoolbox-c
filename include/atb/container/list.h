@@ -26,7 +26,7 @@ extern "C" {
  *  };
  *
  *  // This is the list HEAD, used to points to the begin/end of the list
- *  struct atb_List my_list = atb_List_INITIALIZER(my_list);
+ *  struct atb_List my_list = atb_List_INITIALIZE(my_list);
  *
  *  struct Toto toto_0 = {};
  *  atb_List_Init(&(toto_0.linked_list));
@@ -103,7 +103,7 @@ typedef struct atb_List {
 /**
  *  \brief Statically initialize an atb_List (set prev & next to itself)
  */
-#define atb_List_INITIALIZER(node) \
+#define atb_List_INITIALIZE(node) \
   { &(node), &(node) }
 
 /**
