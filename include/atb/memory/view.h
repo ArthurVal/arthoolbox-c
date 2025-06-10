@@ -20,8 +20,8 @@ struct atb_MemView {
 
 typedef struct atb_MemView atb_MemView;
 
-#define atb_MemView_Fmt "{.data=%p, .size=%zu}"
-#define atb_MemView_FmtVaArg(mem) ((mem).data), ((mem).size)
+#define atb_MemView_FMT "{.data=%p, .size=%zu}"
+#define atb_MemView_FMT_VA_ARG(mem) ((mem).data), ((mem).size)
 
 /***************************************************************************/
 /*                                Construct                                */

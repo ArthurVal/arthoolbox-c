@@ -22,11 +22,11 @@ struct atb_StrView {
 
 typedef struct atb_StrView atb_StrView;
 
-#define atb_StrView_Fmt "{.data=%p, .size=%zu}"
-#define atb_StrView_FmtVaArg(str) ((void *)(str).data), ((str).size)
+#define atb_StrView_FMT "{.data=%p, .size=%zu}"
+#define atb_StrView_FMT_VA_ARG(str) ((void *)(str).data), ((str).size)
 
-#define atb_Str_Fmt "%.*s"
-#define atb_Str_FmtVaArg(str) ((int)(str).size), ((str).data)
+#define atb_Str_FMT "%.*s"
+#define atb_Str_FMT_VA_ARG(str) ((int)(str).size), ((str).data)
 
 /***************************************************************************/
 /*                                Construct                                */
