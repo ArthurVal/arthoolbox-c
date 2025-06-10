@@ -9,11 +9,11 @@
 #include <type_traits>
 
 inline std::ostream &operator<<(std::ostream &os, atb_StrView str) noexcept {
-  os << helper::MakeStringFromFmt(atb_StrView_Fmt, atb_StrView_FmtVaArg(str));
+  os << helper::MakeStringFromFmt(atb_StrView_FMT, atb_StrView_FMT_VA_ARG(str));
   if (str.data != nullptr) {
     os << " => "
-       << helper::MakeStringFromFmt("\"" atb_Str_Fmt "\"",
-                                    atb_Str_FmtVaArg(str));
+       << helper::MakeStringFromFmt("\"" atb_Str_FMT "\"",
+                                    atb_Str_FMT_VA_ARG(str));
   }
   return os;
 }

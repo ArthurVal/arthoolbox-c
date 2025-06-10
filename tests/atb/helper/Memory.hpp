@@ -10,7 +10,7 @@
 
 inline std::ostream &operator<<(std::ostream &os, atb_MemView mem) noexcept {
 
-  os << helper::MakeStringFromFmt(atb_MemView_Fmt, atb_MemView_FmtVaArg(mem));
+  os << helper::MakeStringFromFmt(atb_MemView_FMT, atb_MemView_FMT_VA_ARG(mem));
 
   if (atb_MemView_IsInvalid(mem)) {
     os << " => /!\\ INVALID";

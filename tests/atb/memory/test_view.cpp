@@ -25,7 +25,7 @@ TEST(TestAtbMemView, Fmt) {
   };
 
   const auto fmt_str =
-      helper::MakeStringFromFmt(atb_MemView_Fmt, atb_MemView_FmtVaArg(mem));
+      helper::MakeStringFromFmt(atb_MemView_FMT, atb_MemView_FMT_VA_ARG(mem));
 
   EXPECT_EQ(fmt_str, "{.data=0x1234, .size=42}")
       << (const void *)mem.data << " " << mem.size;
