@@ -1,6 +1,7 @@
 add_executable(${PROJECT_NAME}-test
     test_list.cpp
     test_array.cpp
+    test_arithmetic.cpp
     test_str_view.cpp
 )
 
