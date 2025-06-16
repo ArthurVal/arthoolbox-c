@@ -726,8 +726,10 @@ constexpr auto IsOverflowing_Mul(T lhs, T rhs) -> bool {
 
 TYPED_TEST(AtbArithmetic, IsOverflowing_Mul) {
   REPEAT(1000) {
-    EXPECT_PRED2(Not(IsOverflowing_Mul<TypeParam>), this->MakeRndValue(),
-                 static_cast<TypeParam>(0));
+    for (TypeParam v : {0, 1}) {
+      EXPECT_PRED2(Not(IsOverflowing_Mul<TypeParam>), this->MakeRndValue(), v);
+      EXPECT_PRED2(Not(IsOverflowing_Mul<TypeParam>), v, this->MakeRndValue());
+    }
   }
 
   REPEAT(1000) {
@@ -792,8 +794,10 @@ constexpr auto IsUnderflowing_Mul(T lhs, T rhs) -> bool {
 
 TYPED_TEST(AtbArithmetic, IsUnderflowing_Mul) {
   REPEAT(1000) {
-    EXPECT_PRED2(Not(IsUnderflowing_Mul<TypeParam>), this->MakeRndValue(),
-                 static_cast<TypeParam>(0));
+    for (TypeParam v : {0, 1}) {
+      EXPECT_PRED2(Not(IsUnderflowing_Mul<TypeParam>), this->MakeRndValue(), v);
+      EXPECT_PRED2(Not(IsUnderflowing_Mul<TypeParam>), v, this->MakeRndValue());
+    }
   }
 
   REPEAT(1000) {
