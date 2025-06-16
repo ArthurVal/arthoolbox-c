@@ -378,13 +378,13 @@ constexpr auto TieOneToNDistributionTo(AnyDistribution &d) noexcept {
 }
 
 template <class T>
-struct AtbArithmetic : testing::Test {
+struct TestAtbArithmetic : testing::Test {
   using engine_t = std::mt19937;
   using distrib_t = decltype(MakeUniformDistribution(Interval<T>()));
 
   static void SetUpTestSuite() {}
 
-  AtbArithmetic()
+  TestAtbArithmetic()
       : m_rnd_gen(std::random_device{}()),
         m_all_possible_values_uniform(MakeUniformDistribution(Interval<T>())){};
 
@@ -408,7 +408,7 @@ struct AtbArithmetic : testing::Test {
 
   void TearDown() override {}
 
-  virtual ~AtbArithmetic() {}
+  virtual ~TestAtbArithmetic() {}
 
   static void TearDownTestSuite() {}
 
@@ -422,7 +422,7 @@ using AllInts =
                    std::intmax_t, std::uint8_t, std::uint16_t, std::uint32_t,
                    std::uint64_t, std::uintmax_t>;
 
-TYPED_TEST_SUITE(AtbArithmetic, AllInts);
+TYPED_TEST_SUITE(TestAtbArithmetic, AllInts);
 
 template <class T>
 constexpr auto IsOverflowing_Add(T lhs, T rhs) -> bool {
@@ -452,7 +452,7 @@ constexpr auto IsOverflowing_Add(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsOverflowing_Add) {
+TYPED_TEST(TestAtbArithmetic, IsOverflowing_Add) {
   REPEAT(1000) {
     EXPECT_PRED2(Not(IsOverflowing_Add<TypeParam>), static_cast<TypeParam>(0),
                  this->MakeRndValue());
@@ -521,7 +521,7 @@ constexpr auto IsUnderflowing_Add(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsUnderflowing_Add) {
+TYPED_TEST(TestAtbArithmetic, IsUnderflowing_Add) {
   REPEAT(1000) {
     EXPECT_PRED2(Not(IsUnderflowing_Add<TypeParam>), static_cast<TypeParam>(0),
                  this->MakeRndValue());
@@ -590,7 +590,7 @@ constexpr auto IsOverflowing_Sub(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsOverflowing_Sub) {
+TYPED_TEST(TestAtbArithmetic, IsOverflowing_Sub) {
   REPEAT(1000) {
     EXPECT_PRED2(Not(IsOverflowing_Sub<TypeParam>), this->MakeRndValue(),
                  static_cast<TypeParam>(0));
@@ -657,7 +657,7 @@ constexpr auto IsUnderflowing_Sub(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsUnderflowing_Sub) {
+TYPED_TEST(TestAtbArithmetic, IsUnderflowing_Sub) {
   REPEAT(1000) {
     EXPECT_PRED2(Not(IsUnderflowing_Sub<TypeParam>), this->MakeRndValue(),
                  static_cast<TypeParam>(0));
@@ -724,7 +724,7 @@ constexpr auto IsOverflowing_Mul(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsOverflowing_Mul) {
+TYPED_TEST(TestAtbArithmetic, IsOverflowing_Mul) {
   REPEAT(1000) {
     for (TypeParam v : {0, 1}) {
       EXPECT_PRED2(Not(IsOverflowing_Mul<TypeParam>), this->MakeRndValue(), v);
@@ -792,7 +792,7 @@ constexpr auto IsUnderflowing_Mul(T lhs, T rhs) -> bool {
   }
 }
 
-TYPED_TEST(AtbArithmetic, IsUnderflowing_Mul) {
+TYPED_TEST(TestAtbArithmetic, IsUnderflowing_Mul) {
   REPEAT(1000) {
     for (TypeParam v : {0, 1}) {
       EXPECT_PRED2(Not(IsUnderflowing_Mul<TypeParam>), this->MakeRndValue(), v);
