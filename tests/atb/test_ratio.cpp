@@ -1,28 +1,6 @@
 #include "atb/ratio.h"
 #include "gtest/gtest.h"
-
-constexpr auto operator==(atb_Ratio lhs, atb_Ratio rhs) -> bool {
-  return (lhs.num == rhs.num) && (lhs.den == rhs.den);
-}
-
-constexpr auto operator!=(atb_Ratio lhs, atb_Ratio rhs) -> bool {
-  return !(lhs == rhs);
-}
-
-auto operator<<(std::ostream &os, atb_Ratio ratio) -> std::ostream & {
-  return os << "Ratio{" << ratio.num << ", " << ratio.den << "}";
-}
-
-auto operator<<(std::ostream &os,
-                atb_Ratio_Compare_Result cmp_res) -> std::ostream & {
-  switch (cmp_res) {
-    case atb_Ratio_Compare_EQUAL: return os << "EQUAL";
-    case atb_Ratio_Compare_LESS: return os << "LESS";
-    case atb_Ratio_Compare_GREATER: return os << "GREATER";
-  }
-
-  return os << "UNKNOWN";
-}
+#include "helper/Ratio.hpp"
 
 namespace {
 
@@ -111,7 +89,7 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{-3, 2}, atb_Ratio{3, -2}},
            std::array{atb_Ratio{-3, -2}, atb_Ratio{-3, -2}},
        }) {
-    SCOPED_TRACE((testing::Message() << "lhs: " << lhs << " | rhs: " << rhs));
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
     EXPECT_EQ(atb_Ratio_Compare_EQUAL, atb_Ratio_Compare(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Eq(lhs, rhs));
@@ -128,7 +106,7 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{2, 4}, atb_Ratio{-10, 23939}},
            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
        }) {
-    SCOPED_TRACE((testing::Message() << "lhs: " << lhs << " | rhs: " << rhs));
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
     EXPECT_NE(atb_Ratio_Compare_EQUAL, atb_Ratio_Compare(lhs, rhs));
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
@@ -146,7 +124,8 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{-1, 4}, atb_Ratio{1, -2}},
            std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
        }) {
-    SCOPED_TRACE((testing::Message() << "lhs: " << lhs << " | rhs: " << rhs));
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
 
@@ -169,7 +148,8 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, 4}},
            std::array{atb_Ratio{-20, 40}, atb_Ratio{-1, 4}},
        }) {
-    SCOPED_TRACE((testing::Message() << "lhs: " << lhs << " | rhs: " << rhs));
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
 
