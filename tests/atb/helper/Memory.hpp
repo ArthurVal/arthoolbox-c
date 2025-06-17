@@ -5,8 +5,6 @@
 #include "atb/memory/view.h"
 
 #include <ostream>
-#include <string_view>
-#include <type_traits>
 
 inline std::ostream &operator<<(std::ostream &os, atb_MemView mem) noexcept {
 
