@@ -6,7 +6,6 @@
 
 #include <ostream>
 #include <string_view>
-#include <type_traits>
 
 inline std::ostream &operator<<(std::ostream &os, atb_StrView str) noexcept {
   os << helper::MakeStringFromFmt(atb_StrView_FMT, atb_StrView_FMT_VA_ARG(str));
