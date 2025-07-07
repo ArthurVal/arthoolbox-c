@@ -160,14 +160,14 @@ static inline struct timespec atb_timespec_From(intmax_t stamp,
   assert(to_sec.den != 0);
 
   struct timespec out;
-  stamp *= to_sec.num;
 
+  stamp *= to_sec.num;
   out.tv_sec = (stamp / to_sec.den);
   out.tv_nsec = (stamp % to_sec.den);
 
   to_sec = atb_Ratio_Div(to_sec, atb_ns());
-  out.tv_nsec /= to_sec.den;
   out.tv_nsec *= to_sec.num;
+  out.tv_nsec /= to_sec.den;
 
   return out;
 }
