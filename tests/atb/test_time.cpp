@@ -21,7 +21,8 @@ TEST(TestAtbTime, From) {
            atb_years(),
        }) {
     EXPECT_THAT(atb_timespec_From(0, ratio),
-                helper::FieldsMatch(timespec{0, 0})) << "ratio = " << ratio;
+                helper::FieldsMatch(timespec{0, 0}))
+        << "ratio = " << ratio;
   }
 
   EXPECT_THAT(atb_timespec_From(100, atb_ns()),
@@ -47,89 +48,89 @@ TEST(DeathTestAtbTime, From) {
   EXPECT_DEBUG_DEATH({ atb_timespec_From(0, {1, 0}); }, "!= 0");
 }
 
-// TEST(TestAtbRatio, Comparisons) {
-//   // TESTS EQ
-//   for (auto [lhs, rhs] : std::array{
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 2}},
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{2, 4}},
-//            std::array{atb_Ratio{2, 4}, atb_Ratio{10, 20}},
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{-1, -2}},
-//            std::array{atb_Ratio{3, 2}, atb_Ratio{3, 2}},
-//            std::array{atb_Ratio{-3, 2}, atb_Ratio{-3, 2}},
-//            std::array{atb_Ratio{-3, 2}, atb_Ratio{3, -2}},
-//            std::array{atb_Ratio{-3, -2}, atb_Ratio{-3, -2}},
-//        }) {
-//     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+TEST(TestAtbTime, Compare) {
+  // TESTS EQ
+  for (auto [lhs, rhs] : std::array{
+           std::array{timespec{1, 2}, timespec{1, 2}},
+           std::array{timespec{3, 2}, timespec{3, 2}},
+           std::array{timespec{-3, 2}, timespec{-3, 2}},
+           std::array{timespec{-3, -2}, timespec{-3, -2}},
+           std::array{atb_timespec_From(10, atb_sec()),
+                      atb_timespec_From(10000, atb_ms())},
+       }) {
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-//     EXPECT_EQ(atb_Ratio_Compare_EQUAL, atb_Ratio_Compare(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Eq(lhs, rhs));
-//     EXPECT_FALSE(atb_Ratio_Ne(lhs, rhs));
+    EXPECT_EQ(atb_timespec_Compare_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Eq(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Ne(lhs, rhs));
 
-//     EXPECT_TRUE(atb_Ratio_Ge(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Le(lhs, rhs));
-//   }
+    EXPECT_TRUE(atb_timespec_Ge(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Le(lhs, rhs));
+  }
 
-//   // TESTS NE
-//   for (auto [lhs, rhs] : std::array{
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 3}},
-//            std::array{atb_Ratio{394, 2}, atb_Ratio{2, 4}},
-//            std::array{atb_Ratio{2, 4}, atb_Ratio{-10, 23939}},
-//            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
-//        }) {
-//     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+  // TESTS NE
+  for (auto [lhs, rhs] : std::array{
+           std::array{timespec{1, 2}, timespec{1, 3}},
+           std::array{timespec{394, 2}, timespec{2, 4}},
+           std::array{timespec{2, 4}, timespec{-10, 23939}},
+           std::array{timespec{1, -2}, timespec{-1, -2}},
+           std::array{atb_timespec_From(10, atb_sec()),
+                      atb_timespec_From(10, atb_ms())},
+       }) {
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-//     EXPECT_NE(atb_Ratio_Compare_EQUAL, atb_Ratio_Compare(lhs, rhs));
-//     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
-//   }
+    EXPECT_NE(atb_timespec_Compare_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
+  }
 
-//   // TESTS GREATER
-//   for (auto [lhs, rhs] : std::array{
-//            std::array{atb_Ratio{3, 2}, atb_Ratio{1, 2}},
-//            std::array{atb_Ratio{3, 4}, atb_Ratio{1, 2}},
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{-1, 2}},
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{1, -2}},
-//            std::array{atb_Ratio{-1, -2}, atb_Ratio{1, -2}},
-//            std::array{atb_Ratio{1, -4}, atb_Ratio{-1, 2}},
-//            std::array{atb_Ratio{-1, 4}, atb_Ratio{1, -2}},
-//            std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
-//        }) {
-//     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+  // TESTS GREATER
+  for (auto [lhs, rhs] : std::array{
+           std::array{timespec{3, 2}, timespec{1, 2}},
+           std::array{timespec{3, 4}, timespec{1, 2}},
+           std::array{timespec{1, 2}, timespec{-1, 2}},
+           std::array{timespec{1, 2}, timespec{1, -2}},
+           std::array{timespec{1, -4}, timespec{-1, 2}},
+           std::array{timespec{-1, 4}, timespec{-20, 40}},
+           std::array{atb_timespec_From(10, atb_sec()),
+                      atb_timespec_From(10, atb_ms())},
+       }) {
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-//     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-//     EXPECT_EQ(atb_Ratio_Compare_GREATER, atb_Ratio_Compare(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Ge(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Gt(lhs, rhs));
+    EXPECT_EQ(atb_timespec_Compare_GREATER, atb_timespec_Compare(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Ge(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Gt(lhs, rhs));
 
-//     EXPECT_FALSE(atb_Ratio_Le(lhs, rhs));
-//     EXPECT_FALSE(atb_Ratio_Lt(lhs, rhs));
-//   }
+    EXPECT_FALSE(atb_timespec_Le(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Lt(lhs, rhs));
+  }
 
-//   // TESTS LESS
-//   for (auto [lhs, rhs] : std::array{
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 2}},
-//            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 4}},
-//            std::array{atb_Ratio{-1, 2}, atb_Ratio{1, 2}},
-//            std::array{atb_Ratio{1, -2}, atb_Ratio{1, 2}},
-//            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
-//            std::array{atb_Ratio{-1, 2}, atb_Ratio{1, -4}},
-//            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, 4}},
-//            std::array{atb_Ratio{-20, 40}, atb_Ratio{-1, 4}},
-//        }) {
-//     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+  // TESTS LESS
+  for (auto [lhs, rhs] : std::array{
+           std::array{timespec{1, 2}, timespec{3, 2}},
+           std::array{timespec{1, 2}, timespec{3, 4}},
+           std::array{timespec{-1, 2}, timespec{1, 2}},
+           std::array{timespec{1, -2}, timespec{1, 2}},
+           std::array{timespec{-1, 2}, timespec{1, -4}},
+           std::array{timespec{-20, 40}, timespec{-1, 4}},
+           std::array{atb_timespec_From(10, atb_us()),
+                      atb_timespec_From(10, atb_ms())},
+       }) {
+    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-//     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-//     EXPECT_EQ(atb_Ratio_Compare_LESS, atb_Ratio_Compare(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Le(lhs, rhs));
-//     EXPECT_TRUE(atb_Ratio_Lt(lhs, rhs));
+    EXPECT_EQ(atb_timespec_Compare_LESS, atb_timespec_Compare(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Le(lhs, rhs));
+    EXPECT_TRUE(atb_timespec_Lt(lhs, rhs));
 
-//     EXPECT_FALSE(atb_Ratio_Ge(lhs, rhs));
-//     EXPECT_FALSE(atb_Ratio_Gt(lhs, rhs));
-//   }
-// }
+    EXPECT_FALSE(atb_timespec_Ge(lhs, rhs));
+    EXPECT_FALSE(atb_timespec_Gt(lhs, rhs));
+  }
+}
 
 } // namespace

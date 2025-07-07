@@ -44,7 +44,6 @@ static inline struct timespec atb_timespec_From(intmax_t stamp,
                                                 struct atb_Ratio to_sec);
 
 /* Comparisons *************************************************************/
-
 /**
  *  \brief Enum representing the result of the _Compare function
  */
