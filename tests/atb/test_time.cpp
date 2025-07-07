@@ -8,17 +8,18 @@ using namespace std::chrono_literals;
 
 namespace {
 
+constexpr auto ToChronoDuration(timespec ts) {
+  return std::chrono::seconds{ts.tv_sec} + std::chrono::nanoseconds{ts.tv_nsec};
+}
+
 TEST(TestAtbTime, Now) {
   const auto now = atb_timespec_Now(CLOCK_REALTIME);
 
   const std::chrono::nanoseconds expected =
       std::chrono::system_clock::now().time_since_epoch();
 
-  const std::chrono::nanoseconds now_ts =
-      (std::chrono::seconds{now.tv_sec} +
-       std::chrono::nanoseconds{now.tv_nsec});
-
-  EXPECT_LE(abs(now_ts - expected), 5us) << SCOPE_LOOP_MSG_2(now, expected);
+  EXPECT_LE(abs(ToChronoDuration(now) - expected), 5us)
+      << SCOPE_LOOP_MSG_2(now, expected);
 }
 
 TEST(TestAtbTime, From) {
@@ -229,9 +230,7 @@ TEST(TestAtbTime, RetryCall) {
   atb_Time_RetryCall(MakePredicate(count + 1), count, delay);
   const auto elapsed = clock::now() - begin;
 
-  const clock::duration expected =
-      (count * (std::chrono::seconds{delay.tv_sec} +
-                std::chrono::nanoseconds{delay.tv_nsec}));
+  const clock::duration expected = (count * ToChronoDuration(delay));
 
   // 10%
   EXPECT_LE(abs(elapsed - expected), (expected * 0.1))
