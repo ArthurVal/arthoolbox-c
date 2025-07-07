@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-#include "Ratio.hpp"
+#include "Core.hpp"
 #include "atb/time.h"
 
 inline auto operator<<(std::ostream &os, timespec ts) -> std::ostream & {
