@@ -17,10 +17,11 @@ TEST(TestAtbTime, From) {
            atb_hours(),
            atb_days(),
            atb_weeks(),
+           atb_months(),
            atb_years(),
        }) {
     EXPECT_THAT(atb_timespec_From(0, ratio),
-                helper::FieldsMatch(timespec{0, 0}));
+                helper::FieldsMatch(timespec{0, 0})) << "ratio = " << ratio;
   }
 
   EXPECT_THAT(atb_timespec_From(100, atb_ns()),
