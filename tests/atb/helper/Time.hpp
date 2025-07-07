@@ -18,6 +18,23 @@ constexpr auto operator!=(timespec lhs, timespec rhs) -> bool {
   return !(lhs == rhs);
 }
 
+constexpr auto ToString(atb_timespec_Compare_Result cmp_res)
+    -> std::string_view {
+  switch (cmp_res) {
+    case atb_timespec_Compare_EQUAL: return "EQUAL";
+    case atb_timespec_Compare_LESS: return "LESS";
+    case atb_timespec_Compare_GREATER: return "GREATER";
+  }
+  return "UNKNOWN";
+}
+
+inline auto operator<<(std::ostream &os,
+                       atb_timespec_Compare_Result cmp_res) -> std::ostream & {
+  os << std::quoted(ToString(cmp_res)) << " (" << static_cast<int>(cmp_res)
+     << ")";
+  return os;
+}
+
 namespace helper {
 
 DefineFieldsMatchFor(timespec, 2, tv_sec, tv_nsec);
