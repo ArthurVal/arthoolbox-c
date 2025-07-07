@@ -60,7 +60,7 @@ TEST(TestAtbTime, From) {
 }
 
 TEST(DeathTestAtbTime, From) {
-  EXPECT_DEBUG_DEATH({ atb_timespec_From(0, {1, 0}); }, "!= 0");
+  EXPECT_DEBUG_DEATH({ atb_timespec_From(0, {1, 0}); }, "den != 0");
 }
 
 TEST(TestAtbTime, Compare) {
