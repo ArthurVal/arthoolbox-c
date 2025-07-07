@@ -32,8 +32,8 @@ else()
 
   include(FetchContent)
   FetchContent_Declare(googletest
-    DOWNLOAD_EXTRACT_TIMESTAMP
     URL "${${PROJECT_NAME_UPPERCASE}_TESTING_GTEST_URL}"
+    DOWNLOAD_EXTRACT_TIMESTAMP
   )
 
   # GTest customizations ######################################################
