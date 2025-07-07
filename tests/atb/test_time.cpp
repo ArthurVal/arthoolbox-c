@@ -1,3 +1,5 @@
+#include <chrono>
+using namespace std::chrono_literals;
 
 #include "atb/time.h"
 #include "gtest/gtest.h"
@@ -132,6 +134,102 @@ TEST(TestAtbTime, Compare) {
     EXPECT_FALSE(atb_timespec_Ge(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Gt(lhs, rhs));
   }
+}
+
+std::size_t g_MyPredicate_count_before_success = 0;
+void *g_MyPredicate_last_args = nullptr;
+
+auto MyPredicate(void *args) -> bool {
+  g_MyPredicate_last_args = args;
+  if (g_MyPredicate_count_before_success == 0) {
+    return true;
+  } else {
+    --g_MyPredicate_count_before_success;
+    return false;
+  }
+}
+
+constexpr auto MakePredicate(std::size_t succeed_at = 0,
+                             void *expected_args = nullptr)
+    -> struct atb_Time_RetryPredicate {
+  g_MyPredicate_count_before_success = succeed_at;
+  g_MyPredicate_last_args = expected_args;
+
+  return {MyPredicate, expected_args};
+}
+
+TEST(TestAtbTime, RetryCall) {
+  const auto small_delay = atb_timespec_From(2, atb_ms());
+
+  // Count == 0
+  EXPECT_TRUE(
+      atb_Time_RetryCall(MakePredicate(0), 0, atb_timespec_From(0, atb_ms())));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_FALSE(
+      atb_Time_RetryCall(MakePredicate(2), 0, atb_timespec_From(0, atb_ms())));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 1);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  // Count > 0
+  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(0), 20, small_delay));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(10), 20, small_delay));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(20), 20, small_delay));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(25), 20, small_delay));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 25 - 20 - 1);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  // Negative delay clamp count to 0
+  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{-1, 0}));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{0, -1}));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{-1, -1}));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
+  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+
+  // Args is correctly forwarded
+  int i = 0;
+  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(5, &i), 10, small_delay));
+  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
+  EXPECT_EQ(g_MyPredicate_last_args, &i);
+
+  // Measure delay is respected
+  using clock = std::chrono::high_resolution_clock;
+
+  constexpr auto count = 100;
+  const auto delay = atb_timespec_From(50, atb_ms());
+
+  const auto begin = clock::now();
+  atb_Time_RetryCall(MakePredicate(count + 1), count, delay);
+  const auto elapsed = clock::now() - begin;
+
+  const clock::duration expected =
+      (count * (std::chrono::seconds{delay.tv_sec} +
+                std::chrono::nanoseconds{delay.tv_nsec}));
+
+  // 10%
+  EXPECT_LE(abs(elapsed - expected), (expected * 0.1))
+      << SCOPE_LOOP_MSG_2(elapsed, expected);
+}
+
+TEST(DeathTestAtbTime, RetryCall) {
+  EXPECT_DEBUG_DEATH(atb_Time_RetryCall({nullptr, nullptr}, 0, {});
+                     , "function != NULL");
 }
 
 } // namespace
