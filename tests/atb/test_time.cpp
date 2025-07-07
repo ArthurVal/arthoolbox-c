@@ -28,19 +28,19 @@ TEST(TestAtbTime, From) {
               helper::FieldsMatch(timespec{0, 100}));
 
   EXPECT_THAT(atb_timespec_From(100, atb_us()),
-              helper::FieldsMatch(timespec{0, 100000}));
+              helper::FieldsMatch(timespec{0, 100'000}));
 
   EXPECT_THAT(atb_timespec_From(100, atb_ms()),
-              helper::FieldsMatch(timespec{0, 100000000}));
+              helper::FieldsMatch(timespec{0, 100'000'000}));
 
   EXPECT_THAT(atb_timespec_From(1000, atb_ms()),
               helper::FieldsMatch(timespec{1, 0}));
 
   EXPECT_THAT(atb_timespec_From(1300, atb_ms()),
-              helper::FieldsMatch(timespec{1, 300000000}));
+              helper::FieldsMatch(timespec{1, 300'000'000}));
 
   EXPECT_THAT(atb_timespec_From(-10300, atb_ms()),
-              helper::FieldsMatch(timespec{-10, -300000000}));
+              helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
 TEST(DeathTestAtbTime, From) {
