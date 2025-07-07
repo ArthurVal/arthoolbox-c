@@ -73,6 +73,7 @@ if(
   set(CMAKE_BUILD_TYPE RELEASE
     CACHE STRING
     "Build optimizations. One of Debug, Release, RelWithDebInfo or MinSizeRel."
+    FORCE
   )
 endif()
 cmake_print_variables(CMAKE_BUILD_TYPE)
