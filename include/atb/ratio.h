@@ -147,6 +147,13 @@ static inline struct atb_Ratio atb_one(void) {
   return res;
 }
 
+static inline struct atb_Ratio atb_zero(void) {
+  struct atb_Ratio res;
+  res.num = 0;
+  res.den = 1;
+  return res;
+}
+
 /***************************************************************************/
 /*                           Inline definitions                            */
 /***************************************************************************/
