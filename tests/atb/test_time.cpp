@@ -8,7 +8,18 @@ using namespace std::chrono_literals;
 
 namespace {
 
-TEST(TestAtbTime, Now) { GTEST_SKIP(); }
+TEST(TestAtbTime, Now) {
+  const auto now = atb_timespec_Now(CLOCK_REALTIME);
+
+  const std::chrono::nanoseconds expected =
+      std::chrono::system_clock::now().time_since_epoch();
+
+  const std::chrono::nanoseconds now_ts =
+      (std::chrono::seconds{now.tv_sec} +
+       std::chrono::nanoseconds{now.tv_nsec});
+
+  EXPECT_LE(abs(now_ts - expected), 5us) << SCOPE_LOOP_MSG_2(now, expected);
+}
 
 TEST(TestAtbTime, From) {
   for (auto ratio : {
