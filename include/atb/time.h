@@ -8,6 +8,20 @@ extern "C" {
 #include <stdint.h>  /* intmax_t */
 #include <time.h>    /* clock_getime */
 
+#include "atb/ratio.h"
+
+/* Pre-defined ratios ********************************************************/
+static inline struct atb_Ratio atb_ns(void);
+static inline struct atb_Ratio atb_us(void);
+static inline struct atb_Ratio atb_ms(void);
+static inline struct atb_Ratio atb_sec(void);
+static inline struct atb_Ratio atb_min(void);
+static inline struct atb_Ratio atb_hours(void);
+static inline struct atb_Ratio atb_days(void);
+static inline struct atb_Ratio atb_weeks(void);
+static inline struct atb_Ratio atb_months(void);
+static inline struct atb_Ratio atb_years(void);
+
 /* Constructors **************************************************************/
 /**
  *  \return struct timespec of the current time. On failure, returns -1
@@ -19,22 +33,15 @@ extern "C" {
 static inline struct timespec atb_timespec_Now(clockid_t clk);
 
 /**
- *  \return struct timespec Of the duration provided in NANOSECONDS
- *  \param[in] stamp_ns The duration we wish to convert in NANOSECONDS
+ *  \brief Create a timespec given a raw stamp and its ratio to seconds
+ *
+ *  \param[in] stamp Raw timestamps
+ *  \param[in] to_sec Ratio to seconds of the given raw timestamp
+ *
+ *  \return struct timespec A timespec created from the given stamp/ratio
  */
-static inline struct timespec atb_timespec_FromNs(intmax_t stamp_ns);
-
-/**
- *  \return struct timespec Of the duration provided in MICROSECONDS
- *  \param[in] stamp_us The duration we wish to convert in MICROSECONDS
- */
-static inline struct timespec atb_timespec_FromUs(intmax_t stamp_us);
-
-/**
- *  \return struct timespec Of the duration provided in MILLISECONDS
- *  \param[in] stamp_ms The duration we wish to convert in MILLISECONDS
- */
-static inline struct timespec atb_timespec_FromMs(intmax_t stamp_ms);
+static inline struct timespec atb_timespec_From(intmax_t stamp,
+                                                struct atb_Ratio to_sec);
 
 /* Operators *****************************************************************/
 /// Returns true when lhs == rhs
@@ -168,39 +175,79 @@ static inline bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
 /***************************************************************************/
 /*                           Inline definitions                            */
 /***************************************************************************/
+
+static inline struct atb_Ratio atb_ns(void) { return atb_nano(); }
+
+static inline struct atb_Ratio atb_us(void) { return atb_micro(); }
+
+static inline struct atb_Ratio atb_ms(void) { return atb_milli(); }
+
+static inline struct atb_Ratio atb_sec(void) { return atb_one(); }
+
+static inline struct atb_Ratio atb_minutes(void) {
+  struct atb_Ratio r = atb_sec();
+  r.num *= 60;
+  return r;
+}
+
+static inline struct atb_Ratio atb_hours(void) {
+  struct atb_Ratio r = atb_min();
+  r.num *= 60;
+  return r;
+}
+
+static inline struct atb_Ratio atb_days(void) {
+  struct atb_Ratio r = atb_hours();
+  r.num *= 24;
+  return r;
+}
+
+static inline struct atb_Ratio atb_weeks(void) {
+  struct atb_Ratio r = atb_days();
+  r.num *= 7;
+  return r;
+}
+
+static inline struct atb_Ratio atb_months(void) {
+  struct atb_Ratio r;
+  r.num = 2629746;
+  r.den = 1;
+  return r;
+}
+
+static inline struct atb_Ratio atb_years(void) {
+  struct atb_Ratio r;
+  r.num = 31556952;
+  r.den = 1;
+  return r;
+}
+
 static inline struct timespec atb_timespec_Now(clockid_t clk) {
   struct timespec now;
 
   if (clock_gettime(clk, &now)) {
-    now.tv_sec  = -1;
+    now.tv_sec = -1;
     now.tv_nsec = -1;
   }
 
   return now;
 }
 
-static inline struct timespec atb_timespec_FromNs(intmax_t stamp_ns) {
-  const intmax_t NSEC_PER_SECONDS = 1e9;
-  return (struct timespec){
-      .tv_sec = stamp_ns / NSEC_PER_SECONDS,
-      .tv_nsec = stamp_ns % NSEC_PER_SECONDS,
-  };
-}
+static inline struct timespec atb_timespec_From(intmax_t stamp,
+                                                struct atb_Ratio to_sec) {
+  assert(to_sec.den != 0);
 
-static inline struct timespec atb_timespec_FromUs(intmax_t stamp_us) {
-  const intmax_t USEC_PER_SECONDS = 1e6;
-  return (struct timespec){
-      .tv_sec = stamp_us / USEC_PER_SECONDS,
-      .tv_nsec = (stamp_us % USEC_PER_SECONDS) * 1e3,
-  };
-}
+  struct timespec out;
+  stamp *= to_sec.num;
 
-static inline struct timespec atb_timespec_FromMs(intmax_t stamp_ms) {
-  const intmax_t MSEC_PER_SECONDS = 1e3;
-  return (struct timespec){
-      .tv_sec = stamp_ms / MSEC_PER_SECONDS,
-      .tv_nsec = (stamp_ms % MSEC_PER_SECONDS) * 1e6,
-  };
+  out.tv_sec = (stamp / to_sec.den);
+  out.tv_nsec = (stamp % to_sec.den);
+
+  to_sec = atb_Ratio_Div(to_sec, atb_ns());
+  out.tv_nsec /= to_sec.den;
+  out.tv_nsec *= to_sec.num;
+
+  return out;
 }
 
 static inline bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs) {
