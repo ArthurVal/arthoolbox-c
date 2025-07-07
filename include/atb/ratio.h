@@ -124,13 +124,18 @@ static inline bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs);
                                                           \
   static_assert(true, "")
 
-/* Require 64 bits */
+/* Require at least 64 bits */
 /* atb_internal_DECLARE_RATIO(1e15, peta, fempto); */
 /* atb_internal_DECLARE_RATIO(1e12, tera, pico); */
 
+/* Require at least 32 bits */
 atb_internal_DECLARE_RATIO(1e9, giga, nano);
 atb_internal_DECLARE_RATIO(1e6, mega, micro);
+
+/* Require at least 16 bits */
 atb_internal_DECLARE_RATIO(1e3, kilo, milli);
+
+/* Require at least 8 bits */
 atb_internal_DECLARE_RATIO(1e2, hecto, centi);
 atb_internal_DECLARE_RATIO(1e1, deca, deci);
 
