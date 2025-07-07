@@ -10,12 +10,12 @@ extern "C" {
 
 #include "atb/ratio.h"
 
-/* Pre-defined ratios ********************************************************/
+/* Pre-defined time related ratios *******************************************/
 static inline struct atb_Ratio atb_ns(void);
 static inline struct atb_Ratio atb_us(void);
 static inline struct atb_Ratio atb_ms(void);
 static inline struct atb_Ratio atb_sec(void);
-static inline struct atb_Ratio atb_min(void);
+static inline struct atb_Ratio atb_minutes(void);
 static inline struct atb_Ratio atb_hours(void);
 static inline struct atb_Ratio atb_days(void);
 static inline struct atb_Ratio atb_weeks(void);
@@ -113,7 +113,7 @@ static inline struct atb_Ratio atb_minutes(void) {
 }
 
 static inline struct atb_Ratio atb_hours(void) {
-  struct atb_Ratio r = atb_min();
+  struct atb_Ratio r = atb_minutes();
   r.num *= 60;
   return r;
 }
