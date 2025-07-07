@@ -1,6 +1,7 @@
 
 #include "atb/time.h"
 #include "gtest/gtest.h"
+#include "helper/Ratio.hpp"
 #include "helper/Time.hpp"
 
 namespace {
