@@ -43,23 +43,28 @@ static inline struct timespec atb_timespec_Now(clockid_t clk);
 static inline struct timespec atb_timespec_From(intmax_t stamp,
                                                 struct atb_Ratio to_sec);
 
-/* Operators *****************************************************************/
-/// Returns true when lhs == rhs
+/* Comparisons *************************************************************/
+
+/**
+ *  \brief Enum representing the result of the _Compare function
+ */
+typedef enum {
+  atb_timespec_Compare_LESS,    /*!< LHS is LESS than RHS */
+  atb_timespec_Compare_EQUAL,   /*!< LHS is EQUAL to RHS */
+  atb_timespec_Compare_GREATER, /*!< LHS is GREATER than RHS */
+} atb_timespec_Compare_Result;
+
+/**
+ *  \brief Compare 2 timespecs with each other
+ */
+static inline atb_timespec_Compare_Result atb_timespec_Compare(
+    struct timespec lhs, struct timespec rhs);
+
 static inline bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs);
-
-/// Returns true when lhs != rhs
 static inline bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs);
-
-/// Returns true when lhs > rhs
 static inline bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs);
-
-/// Returns true when lhs < rhs
 static inline bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs);
-
-/// Returns true when lhs >= rhs
 static inline bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs);
-
-/// Returns true when lhs <= rhs
 static inline bool atb_timespec_Le(struct timespec lhs, struct timespec rhs);
 
 /* Utils functions ***********************************************************/
@@ -172,8 +177,25 @@ static inline struct timespec atb_timespec_From(intmax_t stamp,
   return out;
 }
 
+static inline atb_timespec_Compare_Result atb_timespec_Compare(
+    struct timespec lhs, struct timespec rhs) {
+  if (lhs.tv_sec < rhs.tv_sec) {
+    return atb_timespec_Compare_LESS;
+  } else if (lhs.tv_sec > rhs.tv_sec) {
+    return atb_timespec_Compare_GREATER;
+  } else {
+    if (lhs.tv_nsec == rhs.tv_nsec) {
+      return atb_timespec_Compare_EQUAL;
+    } else if (lhs.tv_nsec > rhs.tv_nsec) {
+      return atb_timespec_Compare_GREATER;
+    } else {
+      return atb_timespec_Compare_LESS;
+    }
+  }
+}
+
 static inline bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs) {
-  return (lhs.tv_sec == rhs.tv_sec) && (lhs.tv_nsec == rhs.tv_nsec);
+  return atb_timespec_Compare(lhs, rhs) == atb_timespec_Compare_EQUAL;
 }
 
 static inline bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) {
@@ -181,23 +203,33 @@ static inline bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) {
 }
 
 static inline bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs) {
-  if (lhs.tv_sec == rhs.tv_sec) {
-    return lhs.tv_nsec > rhs.tv_nsec;
-  } else {
-    return lhs.tv_sec > rhs.tv_sec;
+  switch (atb_timespec_Compare(lhs, rhs)) {
+    case atb_timespec_Compare_GREATER: return true;
+    default: return false;
   }
 }
 
 static inline bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs) {
-  return atb_timespec_Gt(rhs, lhs);
+  switch (atb_timespec_Compare(lhs, rhs)) {
+    case atb_timespec_Compare_LESS: return true;
+    default: return false;
+  }
 }
 
 static inline bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs) {
-  return !atb_timespec_Lt(lhs, rhs);
+  switch (atb_timespec_Compare(lhs, rhs)) {
+    case atb_timespec_Compare_EQUAL:
+    case atb_timespec_Compare_GREATER: return true;
+    default: return false;
+  }
 }
 
 static inline bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) {
-  return !atb_timespec_Gt(lhs, rhs);
+  switch (atb_timespec_Compare(lhs, rhs)) {
+    case atb_timespec_Compare_EQUAL:
+    case atb_timespec_Compare_LESS: return true;
+    default: return false;
+  }
 }
 
 static inline bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
