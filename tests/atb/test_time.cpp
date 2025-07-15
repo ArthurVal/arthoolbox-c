@@ -202,7 +202,7 @@ TEST(TestAtbTime, RetryCall) {
   EXPECT_TRUE(
       atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_us())));
 
-  // Test delay
+  // Test delays in between calls
   using clk = std::chrono::high_resolution_clock;
   using time_point = clk::time_point;
 
@@ -217,14 +217,13 @@ TEST(TestAtbTime, RetryCall) {
       .RetiresOnSaturation();
 
   const auto delay = atb_timespec_From(50, atb_ms());
-  auto expected = (count * ToChronoDuration(delay));
 
   const auto begin = clk::now();
   auto succeed = atb_Time_RetryCall({mock_fn, nullptr}, count, delay);
   auto elapsed = clk::now() - begin;
-
   EXPECT_FALSE(succeed);
 
+  auto expected = (count * ToChronoDuration(delay));
   EXPECT_LE(abs(elapsed - expected), expected * 0.05) // 5% error ?
       << SCOPE_LOOP_MSG_2(elapsed, expected);
 
@@ -232,11 +231,11 @@ TEST(TestAtbTime, RetryCall) {
   EXPECT_EQ(stamps.size(), count + 1);
 
   {
-    auto stamp_t_0 = std::cbegin(stamps);
-    auto stamp_t_1 = std::next(stamp_t_0);
-
     // Compute the mean
     elapsed = 0ms;
+
+    auto stamp_t_0 = std::cbegin(stamps);
+    auto stamp_t_1 = std::next(stamp_t_0);
     for (; stamp_t_1 != std::cend(stamps); ++stamp_t_0, ++stamp_t_1) {
       elapsed += (*stamp_t_1 - *stamp_t_0);
     }
