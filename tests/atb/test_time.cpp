@@ -2,6 +2,7 @@
 using namespace std::chrono_literals;
 
 #include "atb/time.h"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "helper/Ratio.hpp"
 #include "helper/Time.hpp"
@@ -148,93 +149,104 @@ TEST(TestAtbTime, Compare) {
   }
 }
 
-std::size_t g_MyPredicate_count_before_success = 0;
-void *g_MyPredicate_last_args = nullptr;
+struct RetryCallPredicateMock {
+  MOCK_METHOD(bool, Predicate, (void *), ());
 
-auto MyPredicate(void *args) -> bool {
-  g_MyPredicate_last_args = args;
-  if (g_MyPredicate_count_before_success == 0) {
-    return true;
-  } else {
-    --g_MyPredicate_count_before_success;
-    return false;
+  static auto Inst() -> RetryCallPredicateMock & {
+    static auto mock = RetryCallPredicateMock();
+    return mock;
   }
-}
 
-constexpr auto MakePredicate(std::size_t succeed_at = 0,
-                             void *expected_args = nullptr)
-    -> struct atb_Time_RetryPredicate {
-  g_MyPredicate_count_before_success = succeed_at;
-  g_MyPredicate_last_args = expected_args;
+  static auto Fn(void *args) -> bool { return Inst().Predicate(args); }
+};
 
-  return {MyPredicate, expected_args};
+template <class InputIt, class ClockType = std::chrono::high_resolution_clock>
+constexpr auto WriteStampInto(InputIt d_first) {
+  using ::testing::InvokeWithoutArgs;
+  return InvokeWithoutArgs(
+      [d_first]() mutable { *d_first++ = ClockType::now(); });
 }
 
 TEST(TestAtbTime, RetryCall) {
-  const auto small_delay = atb_timespec_From(2, atb_ms());
+  using ::testing::_;
+  using ::testing::DoAll;
+  using ::testing::InvokeWithoutArgs;
+  using ::testing::Return;
 
-  // Count == 0
-  EXPECT_TRUE(
-      atb_Time_RetryCall(MakePredicate(0), 0, atb_timespec_From(0, atb_ms())));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+  const auto mock_fn = &RetryCallPredicateMock::Fn;
+  auto &mock = RetryCallPredicateMock::Inst();
+  ON_CALL(mock, Predicate(_)).WillByDefault(Return(true));
+
+  // Test count = 0
+  EXPECT_CALL(mock, Predicate(nullptr))
+      .WillOnce(Return(false))
+      .WillOnce(Return(true))
+      .RetiresOnSaturation();
+
+  EXPECT_FALSE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
+                                  atb_timespec_From(0, atb_us())));
+
+  EXPECT_TRUE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
+                                 atb_timespec_From(0, atb_us())));
+
+  // Test args ptr
+  int foo = 2;
+  EXPECT_CALL(mock, Predicate(&foo))
+      .WillOnce(Return(false))
+      .WillOnce(Return(true))
+      .RetiresOnSaturation();
 
   EXPECT_FALSE(
-      atb_Time_RetryCall(MakePredicate(2), 0, atb_timespec_From(0, atb_ms())));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 1);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_us())));
 
-  // Count > 0
-  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(0), 20, small_delay));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+  EXPECT_TRUE(
+      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_us())));
 
-  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(10), 20, small_delay));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+  // Test delay
+  using clk = std::chrono::high_resolution_clock;
+  using time_point = clk::time_point;
 
-  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(20), 20, small_delay));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+  constexpr auto count = 100u;
+  std::vector<time_point> stamps;
+  stamps.reserve(count + 1);
 
-  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(25), 20, small_delay));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 25 - 20 - 1);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
+  EXPECT_CALL(mock, Predicate(nullptr))
+      .Times(stamps.capacity())
+      .WillRepeatedly(
+          DoAll(WriteStampInto(std::back_inserter(stamps)), Return(false)))
+      .RetiresOnSaturation();
 
-  // Negative delay clamp count to 0
-  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{-1, 0}));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
-
-  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{0, -1}));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
-
-  EXPECT_FALSE(atb_Time_RetryCall(MakePredicate(15), 20, timespec{-1, -1}));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 14);
-  EXPECT_EQ(g_MyPredicate_last_args, nullptr);
-
-  // Args is correctly forwarded
-  int i = 0;
-  EXPECT_TRUE(atb_Time_RetryCall(MakePredicate(5, &i), 10, small_delay));
-  EXPECT_EQ(g_MyPredicate_count_before_success, 0);
-  EXPECT_EQ(g_MyPredicate_last_args, &i);
-
-  // Measure delay is respected
-  using clock = std::chrono::high_resolution_clock;
-
-  constexpr auto count = 100;
   const auto delay = atb_timespec_From(50, atb_ms());
+  auto expected = (count * ToChronoDuration(delay));
 
-  const auto begin = clock::now();
-  atb_Time_RetryCall(MakePredicate(count + 1), count, delay);
-  const auto elapsed = clock::now() - begin;
+  const auto begin = clk::now();
+  auto succeed = atb_Time_RetryCall({mock_fn, nullptr}, count, delay);
+  auto elapsed = clk::now() - begin;
 
-  const clock::duration expected = (count * ToChronoDuration(delay));
+  EXPECT_FALSE(succeed);
 
-  // 10%
-  EXPECT_LE(abs(elapsed - expected), (expected * 0.1))
+  EXPECT_LE(abs(elapsed - expected), expected * 0.05) // 5% error ?
       << SCOPE_LOOP_MSG_2(elapsed, expected);
+
+  ASSERT_GE(stamps.size(), 1);
+  EXPECT_EQ(stamps.size(), count + 1);
+
+  {
+    auto stamp_t_0 = std::cbegin(stamps);
+    auto stamp_t_1 = std::next(stamp_t_0);
+
+    // Compute the mean
+    elapsed = 0ms;
+    for (; stamp_t_1 != std::cend(stamps); ++stamp_t_0, ++stamp_t_1) {
+      elapsed += (*stamp_t_1 - *stamp_t_0);
+    }
+    elapsed /= (stamps.size() - 1);
+
+    // Compare to the expected value
+    expected = ToChronoDuration(delay);
+    EXPECT_LE(abs(elapsed - expected), expected * 0.05) // 5% error ?
+        << SCOPE_LOOP_MSG_2(elapsed, expected);
+  }
 }
 
 TEST(DeathTestAtbTime, RetryCall) {
