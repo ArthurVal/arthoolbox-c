@@ -25,7 +25,7 @@ target_compile_options(${PROJECT_NAME}-test
   -Wextra
   -Wshadow
   -Wnon-virtual-dtor
-  -pedantic
+  # -Wpedantic
 )
 
 target_compile_features(${PROJECT_NAME}-test

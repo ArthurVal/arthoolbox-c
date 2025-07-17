@@ -14,13 +14,13 @@ extern "C" {
 #define atb_NS atb_Ratio_NANO
 #define atb_US atb_Ratio_MICRO
 #define atb_MS atb_Ratio_MILLI
-#define atb_SEC atb_Ratio_1
-#define atb_MINUTES atb_Ratio_K(60)
-#define atb_HOURS atb_Ratio_K(60 * 60)
-#define atb_DAYS atb_Ratio_K(60 * 60 * 24)
-#define atb_WEEKS atb_Ratio_K(60 * 60 * 24 * 7)
-#define atb_MONTHS atb_Ratio_K(2629746)
-#define atb_YEARS atb_Ratio_K(31556952)
+#define atb_SEC atb_Ratio_(1)
+#define atb_MINUTES atb_Ratio_(60)
+#define atb_HOURS atb_Ratio_(60 * 60)
+#define atb_DAYS atb_Ratio_(60 * 60 * 24)
+#define atb_WEEKS atb_Ratio_(60 * 60 * 24 * 7)
+#define atb_MONTHS atb_Ratio_(2629746)
+#define atb_YEARS atb_Ratio_(31556952)
 
 /* Constructors **************************************************************/
 /**
@@ -42,6 +42,24 @@ static inline struct timespec atb_timespec_Now(clockid_t clk);
  */
 static inline struct timespec atb_timespec_From(intmax_t stamp,
                                                 struct atb_Ratio to_sec);
+
+/**
+ *  \brief Create a timespec given a raw stamp and its ratio to seconds
+ *
+ *  \note Usable as static initializer
+ *  \warning stamp and ratio SHOULDN'T have any side effect
+ *
+ *  \param[in] stamp An integer corresponding to the raw timestamp
+ *  \param[in] to_sec An atb_Ratio to seconds of the given timestamp
+ *
+ *  \return struct timespec A timespec created from the given stamp/ratio
+ */
+#define atb_timespec_FROM(stamp, to_sec)                     \
+  (struct timespec) {                                        \
+    .tv_sec = ((stamp) * (to_sec).num / (to_sec).den),       \
+    .tv_nsec = ((((stamp) * (to_sec).num) % (to_sec).den) *  \
+                ((to_sec).num * atb_NS.den / (to_sec).den)), \
+  }
 
 /* Comparisons *************************************************************/
 /**
