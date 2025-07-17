@@ -25,38 +25,38 @@ TEST(TestAtbTime, Now) {
 
 TEST(TestAtbTime, From) {
   for (auto ratio : {
-           atb_ns(),
-           atb_us(),
-           atb_ms(),
-           atb_sec(),
-           atb_minutes(),
-           atb_hours(),
-           atb_days(),
-           atb_weeks(),
-           atb_months(),
-           atb_years(),
+           atb_NS,
+           atb_US,
+           atb_MS,
+           atb_SEC,
+           atb_MINUTES,
+           atb_HOURS,
+           atb_DAYS,
+           atb_WEEKS,
+           atb_MONTHS,
+           atb_YEARS,
        }) {
     EXPECT_THAT(atb_timespec_From(0, ratio),
                 helper::FieldsMatch(timespec{0, 0}))
         << "ratio = " << ratio;
   }
 
-  EXPECT_THAT(atb_timespec_From(100, atb_ns()),
+  EXPECT_THAT(atb_timespec_From(100, atb_NS),
               helper::FieldsMatch(timespec{0, 100}));
 
-  EXPECT_THAT(atb_timespec_From(100, atb_us()),
+  EXPECT_THAT(atb_timespec_From(100, atb_US),
               helper::FieldsMatch(timespec{0, 100'000}));
 
-  EXPECT_THAT(atb_timespec_From(100, atb_ms()),
+  EXPECT_THAT(atb_timespec_From(100, atb_MS),
               helper::FieldsMatch(timespec{0, 100'000'000}));
 
-  EXPECT_THAT(atb_timespec_From(1000, atb_ms()),
+  EXPECT_THAT(atb_timespec_From(1000, atb_MS),
               helper::FieldsMatch(timespec{1, 0}));
 
-  EXPECT_THAT(atb_timespec_From(1300, atb_ms()),
+  EXPECT_THAT(atb_timespec_From(1300, atb_MS),
               helper::FieldsMatch(timespec{1, 300'000'000}));
 
-  EXPECT_THAT(atb_timespec_From(-10300, atb_ms()),
+  EXPECT_THAT(atb_timespec_From(-10300, atb_MS),
               helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
@@ -71,8 +71,8 @@ TEST(TestAtbTime, Compare) {
            std::array{timespec{3, 2}, timespec{3, 2}},
            std::array{timespec{-3, 2}, timespec{-3, 2}},
            std::array{timespec{-3, -2}, timespec{-3, -2}},
-           std::array{atb_timespec_From(10, atb_sec()),
-                      atb_timespec_From(10000, atb_ms())},
+           std::array{atb_timespec_From(10, atb_SEC),
+                      atb_timespec_From(10000, atb_MS)},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -90,8 +90,8 @@ TEST(TestAtbTime, Compare) {
            std::array{timespec{394, 2}, timespec{2, 4}},
            std::array{timespec{2, 4}, timespec{-10, 23939}},
            std::array{timespec{1, -2}, timespec{-1, -2}},
-           std::array{atb_timespec_From(10, atb_sec()),
-                      atb_timespec_From(10, atb_ms())},
+           std::array{atb_timespec_From(10, atb_SEC),
+                      atb_timespec_From(10, atb_MS)},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -108,8 +108,8 @@ TEST(TestAtbTime, Compare) {
            std::array{timespec{1, 2}, timespec{1, -2}},
            std::array{timespec{1, -4}, timespec{-1, 2}},
            std::array{timespec{-1, 4}, timespec{-20, 40}},
-           std::array{atb_timespec_From(10, atb_sec()),
-                      atb_timespec_From(10, atb_ms())},
+           std::array{atb_timespec_From(10, atb_SEC),
+                      atb_timespec_From(10, atb_MS)},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -132,8 +132,8 @@ TEST(TestAtbTime, Compare) {
            std::array{timespec{1, -2}, timespec{1, 2}},
            std::array{timespec{-1, 2}, timespec{1, -4}},
            std::array{timespec{-20, 40}, timespec{-1, 4}},
-           std::array{atb_timespec_From(10, atb_us()),
-                      atb_timespec_From(10, atb_ms())},
+           std::array{atb_timespec_From(10, atb_US),
+                      atb_timespec_From(10, atb_MS)},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -184,10 +184,10 @@ TEST(TestAtbTime, RetryCall) {
       .RetiresOnSaturation();
 
   EXPECT_FALSE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
-                                  atb_timespec_From(0, atb_us())));
+                                  atb_timespec_From(0, atb_US)));
 
   EXPECT_TRUE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
-                                 atb_timespec_From(0, atb_us())));
+                                 atb_timespec_From(0, atb_US)));
 
   // Test args ptr
   int foo = 2;
@@ -197,10 +197,10 @@ TEST(TestAtbTime, RetryCall) {
       .RetiresOnSaturation();
 
   EXPECT_FALSE(
-      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_us())));
+      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_US)));
 
   EXPECT_TRUE(
-      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_us())));
+      atb_Time_RetryCall({mock_fn, &foo}, 0, atb_timespec_From(0, atb_US)));
 
   // Test delays in between calls
   using clk = std::chrono::high_resolution_clock;
@@ -216,7 +216,7 @@ TEST(TestAtbTime, RetryCall) {
           DoAll(WriteStampInto(std::back_inserter(stamps)), Return(false)))
       .RetiresOnSaturation();
 
-  const auto delay = atb_timespec_From(50, atb_ms());
+  const auto delay = atb_timespec_From(50, atb_MS);
 
   const auto begin = clk::now();
   auto succeed = atb_Time_RetryCall({mock_fn, nullptr}, count, delay);
