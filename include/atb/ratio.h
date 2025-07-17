@@ -82,6 +82,18 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio);
 /* Operations **************************************************************/
 
 /**
+ *  \brief Apply (multiply) the ratio to the given value
+ *
+ *  \param[in] value The value that will be multiply by the ratio
+ *  \param[in] ratio The ratio we wish to apply
+ *
+ *  \warning 'ratio' SHOULDN'T have any side effects
+ *
+ *  \return The result of ((value) * (ratio).num / (ratio).den)
+ */
+#define atb_Ratio_APPLY(ratio, value) (((value) * (ratio).num) / (ratio).den)
+
+/**
  *  \return The ratio correspondint to the inverse
  */
 struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio);

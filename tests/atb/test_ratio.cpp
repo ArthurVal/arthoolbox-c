@@ -9,6 +9,12 @@ TEST(TestAtbRatio, Tof) {
   EXPECT_NEAR((double)0.666'666'666, atb_Ratio_Tof64({2, 3}), 1e-9);
 }
 
+TEST(TestAtbRatio, APPLY) {
+  EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{2, 1}), 10)), 20);
+  EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{1, 2}), 10)), 5);
+  EXPECT_NEAR((atb_Ratio_APPLY((atb_Ratio{1, 10}), 0.5)), 0.05, 1e-9);
+}
+
 TEST(TestAtbRatio, Inv) {
   EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_Inv(atb_Ratio{2, 1}));
   EXPECT_EQ((atb_Ratio{3, 4}), atb_Ratio_Inv(atb_Ratio{4, 3}));
