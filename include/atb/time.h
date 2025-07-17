@@ -44,11 +44,11 @@ extern "C" {
  *
  *  \return struct timespec A timespec created from the given stamp/ratio
  */
-#define atb_timespec_FROM(stamp, to_sec)                     \
-  (struct timespec) {                                        \
-    .tv_sec = ((stamp) * (to_sec).num / (to_sec).den),       \
-    .tv_nsec = ((((stamp) * (to_sec).num) % (to_sec).den) *  \
-                ((to_sec).num * atb_NS.den / (to_sec).den)), \
+#define atb_timespec_FROM(stamp, to_sec)                    \
+  (struct timespec) {                                       \
+    .tv_sec = atb_Ratio_APPLY((to_sec), (stamp)),           \
+    .tv_nsec = ((((stamp) * (to_sec).num) % (to_sec).den) * \
+                atb_Ratio_APPLY((to_sec), atb_NS.den)),     \
   }
 
 /**
