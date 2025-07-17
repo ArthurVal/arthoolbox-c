@@ -31,14 +31,16 @@ extern "C" {
 #define atb_YEARS atb_Ratio_(31556952)
 
 /* Constructors **************************************************************/
+
 /**
  *  \brief Create a timespec given a raw stamp and its ratio to seconds
  *
  *  \note Usable as static initializer
- *  \warning stamp and ratio SHOULDN'T have any side effect
  *
  *  \param[in] stamp An integer corresponding to the raw timestamp
  *  \param[in] to_sec An atb_Ratio to seconds of the given timestamp
+ *
+ *  \warning Arguments SHOULDN'T have any side effect
  *
  *  \return struct timespec A timespec created from the given stamp/ratio
  */
@@ -69,6 +71,7 @@ struct timespec atb_timespec_From(intmax_t stamp, struct atb_Ratio to_sec);
 struct timespec atb_timespec_Now(clockid_t clk);
 
 /* Comparisons *************************************************************/
+
 /**
  *  \brief Enum representing the result of the _Compare function
  */
@@ -92,6 +95,7 @@ bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs);
 bool atb_timespec_Le(struct timespec lhs, struct timespec rhs);
 
 /* Utils functions ***********************************************************/
+
 /**
  *  \brief Argument used to describe the predicate (function ptr + args) from
  *         _RetryCall()
