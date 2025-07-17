@@ -3,26 +3,26 @@
 
 namespace {
 
-TEST(AtbList, Initialize) {
+TEST(TestAtbList, Initialize) {
   atb_List list = atb_List_INITIALIZE(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(AtbList, DeclareHead) {
+TEST(TestAtbList, DeclareHead) {
   atb_List_DECLARE_HEAD(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(AtbList, Init) {
+TEST(TestAtbList, Init) {
   atb_List list;
   atb_List_Init(&list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(AtbList, IsCorrupted) {
+TEST(TestAtbList, IsCorrupted) {
   atb_List list;
 
   atb_List_Init(&list);
@@ -41,7 +41,7 @@ TEST(AtbList, IsCorrupted) {
   EXPECT_TRUE(atb_List_IsCorrupted(&list));
 }
 
-TEST(AtbList, InsertAfter) {
+TEST(TestAtbList, InsertAfter) {
   atb_List first = atb_List_INITIALIZE(first);
 
   atb_List second = atb_List_INITIALIZE(second);
@@ -82,7 +82,7 @@ TEST(AtbList, InsertAfter) {
   EXPECT_EQ(first.prev, &(fourth));
 }
 
-TEST(AtbList, InsertBefore) {
+TEST(TestAtbList, InsertBefore) {
   atb_List first = atb_List_INITIALIZE(first);
 
   atb_List second = atb_List_INITIALIZE(second);
@@ -123,7 +123,7 @@ TEST(AtbList, InsertBefore) {
   EXPECT_EQ(first.prev, &(second));
 }
 
-TEST(AtbList, Pop) {
+TEST(TestAtbList, Pop) {
   atb_List first = atb_List_INITIALIZE(first);
 
   // Poping an empty list does nothing
@@ -158,7 +158,7 @@ struct Toto {
   std::size_t useless_1;
 };
 
-TEST(AtbList, Entry) {
+TEST(TestAtbList, Entry) {
   Toto toto = {
       0,
       atb_List_INITIALIZE(toto.list),
@@ -169,7 +169,7 @@ TEST(AtbList, Entry) {
   EXPECT_EQ(&toto, atb_List_Entry(toto_list, struct Toto, list));
 }
 
-TEST(AtbList, ForEach) {
+TEST(TestAtbList, ForEach) {
   atb_List head = atb_List_INITIALIZE(head);
 
   Toto first{0, atb_List_INITIALIZE(first.list), 0};
@@ -196,7 +196,7 @@ TEST(AtbList, ForEach) {
   }
 }
 
-TEST(AtbList, Size) {
+TEST(TestAtbList, Size) {
   atb_List_DECLARE_HEAD(head);
 
   EXPECT_EQ(atb_List_Size(&head), 0);
