@@ -10,7 +10,15 @@ extern "C" {
 
 #include "atb/ratio.h"
 
+/* Format string helper ****************************************************/
+
+#define atb_timespec_FMT_RAW "{.tv_sec=%li, .tv_nsec=%li}"
+#define atb_timespec_FMT "%li.%.0li seconds"
+
+#define atb_timespec_FMT_VA_ARG(ts) (ts).tv_sec, (ts).tv_nsec
+
 /* Pre-defined time related ratios *******************************************/
+
 #define atb_NS atb_Ratio_NANO
 #define atb_US atb_Ratio_MICRO
 #define atb_MS atb_Ratio_MILLI
