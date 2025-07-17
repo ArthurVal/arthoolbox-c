@@ -58,6 +58,25 @@ TEST(TestAtbTime, From) {
 
   EXPECT_THAT(atb_timespec_From(-10300, atb_MS),
               helper::FieldsMatch(timespec{-10, -300'000'000}));
+
+  // Test _FROM
+  EXPECT_THAT((atb_timespec_FROM(100, atb_NS)),
+              helper::FieldsMatch(timespec{0, 100}));
+
+  EXPECT_THAT((atb_timespec_FROM(100, atb_US)),
+              helper::FieldsMatch(timespec{0, 100'000}));
+
+  EXPECT_THAT((atb_timespec_FROM(100, atb_MS)),
+              helper::FieldsMatch(timespec{0, 100'000'000}));
+
+  EXPECT_THAT((atb_timespec_FROM(1000, atb_MS)),
+              helper::FieldsMatch(timespec{1, 0}));
+
+  EXPECT_THAT((atb_timespec_FROM(1300, atb_MS)),
+              helper::FieldsMatch(timespec{1, 300'000'000}));
+
+  EXPECT_THAT((atb_timespec_FROM(-10300, atb_MS)),
+              helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
 TEST(DeathTestAtbTime, From) {
