@@ -122,7 +122,6 @@ struct atb_Time_RetryPredicate {
  *
  *  \note count will be zeroed when delay is <= 0
  */
-
 bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate, size_t count,
                         struct timespec delay);
 
