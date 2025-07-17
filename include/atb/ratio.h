@@ -18,6 +18,11 @@ struct atb_Ratio {
   atb_Ratio_elem_t den; /*!< The denumerator of the ratio */
 };
 
+/* Format string helper ****************************************************/
+
+#define atb_Ratio_FMT "{.num=%jd, .den=%jd}"
+#define atb_Ratio_FMT_VA_ARG(ratio) (intmax_t)(ratio).num, (intmax_t)(ratio).den
+
 /* Constant ****************************************************************/
 
 /**
@@ -59,10 +64,6 @@ struct atb_Ratio {
 
 /* #define atb_Ratio_PERA atb_Ratio_(1000000000000000) */
 /* #define atb_Ratio_FEMPTO atb_Ratio_1_(1000000000000000) */
-
-/* Format string helper ****************************************************/
-#define atb_Ratio_FMT "{.num=%jd, .den=%jd}"
-#define atb_Ratio_FMT_VA_ARG(ratio) (intmax_t)(ratio).num, (intmax_t)(ratio).den
 
 /* Conversion **************************************************************/
 
