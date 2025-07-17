@@ -183,11 +183,11 @@ TEST(TestAtbTime, RetryCall) {
       .WillOnce(Return(true))
       .RetiresOnSaturation();
 
-  EXPECT_FALSE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
-                                  atb_timespec_From(0, atb_US)));
+  EXPECT_FALSE(
+      atb_Time_RetryCall({mock_fn, nullptr}, 0, atb_timespec_From(0, atb_US)));
 
-  EXPECT_TRUE(atb_Time_RetryCall({mock_fn, nullptr}, 0,
-                                 atb_timespec_From(0, atb_US)));
+  EXPECT_TRUE(
+      atb_Time_RetryCall({mock_fn, nullptr}, 0, atb_timespec_From(0, atb_US)));
 
   // Test args ptr
   int foo = 2;
