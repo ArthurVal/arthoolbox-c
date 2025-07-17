@@ -11,16 +11,16 @@ extern "C" {
 #include "atb/ratio.h"
 
 /* Pre-defined time related ratios *******************************************/
-static inline struct atb_Ratio atb_ns(void);
-static inline struct atb_Ratio atb_us(void);
-static inline struct atb_Ratio atb_ms(void);
-static inline struct atb_Ratio atb_sec(void);
-static inline struct atb_Ratio atb_minutes(void);
-static inline struct atb_Ratio atb_hours(void);
-static inline struct atb_Ratio atb_days(void);
-static inline struct atb_Ratio atb_weeks(void);
-static inline struct atb_Ratio atb_months(void);
-static inline struct atb_Ratio atb_years(void);
+#define atb_NS atb_Ratio_NANO
+#define atb_US atb_Ratio_MICRO
+#define atb_MS atb_Ratio_MILLI
+#define atb_SEC atb_Ratio_1
+#define atb_MINUTES atb_Ratio_K(60)
+#define atb_HOURS atb_Ratio_K(60 * 60)
+#define atb_DAYS atb_Ratio_K(60 * 60 * 24)
+#define atb_WEEKS atb_Ratio_K(60 * 60 * 24 * 7)
+#define atb_MONTHS atb_Ratio_K(2629746)
+#define atb_YEARS atb_Ratio_K(31556952)
 
 /* Constructors **************************************************************/
 /**
@@ -101,53 +101,6 @@ static inline bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
 /***************************************************************************/
 /*                           Inline definitions                            */
 /***************************************************************************/
-
-static inline struct atb_Ratio atb_ns(void) { return atb_nano(); }
-
-static inline struct atb_Ratio atb_us(void) { return atb_micro(); }
-
-static inline struct atb_Ratio atb_ms(void) { return atb_milli(); }
-
-static inline struct atb_Ratio atb_sec(void) { return atb_one(); }
-
-static inline struct atb_Ratio atb_minutes(void) {
-  struct atb_Ratio r = atb_sec();
-  r.num *= 60;
-  return r;
-}
-
-static inline struct atb_Ratio atb_hours(void) {
-  struct atb_Ratio r = atb_minutes();
-  r.num *= 60;
-  return r;
-}
-
-static inline struct atb_Ratio atb_days(void) {
-  struct atb_Ratio r = atb_hours();
-  r.num *= 24;
-  return r;
-}
-
-static inline struct atb_Ratio atb_weeks(void) {
-  struct atb_Ratio r = atb_days();
-  r.num *= 7;
-  return r;
-}
-
-static inline struct atb_Ratio atb_months(void) {
-  struct atb_Ratio r;
-  r.num = 2629746;
-  r.den = 1;
-  return r;
-}
-
-static inline struct atb_Ratio atb_years(void) {
-  struct atb_Ratio r;
-  r.num = 31556952;
-  r.den = 1;
-  return r;
-}
-
 static inline struct timespec atb_timespec_Now(clockid_t clk) {
   struct timespec now;
 
@@ -169,7 +122,7 @@ static inline struct timespec atb_timespec_From(intmax_t stamp,
   out.tv_sec = (stamp / to_sec.den);
   out.tv_nsec = (stamp % to_sec.den);
 
-  to_sec = atb_Ratio_Div(to_sec, atb_ns());
+  to_sec = atb_Ratio_Div(to_sec, atb_NS);
   out.tv_nsec *= to_sec.num;
   out.tv_nsec /= to_sec.den;
 
@@ -236,7 +189,7 @@ static inline bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
   assert(predicate.function != NULL);
 
   /* Any negative timespecs cancel the retries */
-  if (atb_timespec_Le(delay, atb_timespec_From(0, atb_sec()))) {
+  if (atb_timespec_Le(delay, atb_timespec_From(0, atb_SEC))) {
     count = 0;
   }
 
