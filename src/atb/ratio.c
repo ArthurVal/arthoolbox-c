@@ -74,7 +74,7 @@ struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
   return reduced_ratio;
 }
 
-struct atb_Ratio atb_Ratio_FixSign(struct atb_Ratio ratio) {
+static struct atb_Ratio FixSign(struct atb_Ratio ratio) {
   if (ratio.den < 0) {
     ratio.num *= -1;
     ratio.den *= -1;
@@ -85,8 +85,7 @@ struct atb_Ratio atb_Ratio_FixSign(struct atb_Ratio ratio) {
 
 atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
                                            struct atb_Ratio rhs) {
-  const struct atb_Ratio div =
-      atb_Ratio_Div(atb_Ratio_FixSign(lhs), atb_Ratio_FixSign(rhs));
+  const struct atb_Ratio div = atb_Ratio_Div(FixSign(lhs), FixSign(rhs));
 
   if (div.num == div.den) {
     return atb_Ratio_Compare_EQUAL;

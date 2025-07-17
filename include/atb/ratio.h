@@ -124,14 +124,6 @@ struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs);
  */
 struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio);
 
-/**
- *  \brief Normalize the sign of the ratio by moving it from the denominator to
- *         the numerator when relevant
- *
- *  \return A ratio with it's denominator always be POSITIVE
- */
-struct atb_Ratio atb_Ratio_FixSign(struct atb_Ratio ratio);
-
 /* Comparison **************************************************************/
 
 /**

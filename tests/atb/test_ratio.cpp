@@ -76,13 +76,6 @@ TEST(TestAtbRatio, Reduce) {
   EXPECT_EQ((atb_Ratio{4, 0}), atb_Ratio_Reduce(atb_Ratio{4, 0}));
 }
 
-TEST(TestAtbRatio, FixSign) {
-  EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_FixSign({1, 2}));
-  EXPECT_EQ((atb_Ratio{-1, 2}), atb_Ratio_FixSign({1, -2}));
-  EXPECT_EQ((atb_Ratio{-1, 2}), atb_Ratio_FixSign({-1, 2}));
-  EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_FixSign({-1, -2}));
-}
-
 TEST(TestAtbRatio, Comparisons) {
   // TESTS EQ
   for (auto [lhs, rhs] : std::array{
