@@ -7,6 +7,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "atb/export.h"
+
 /// Underlying integer type used within a atb_Ratio
 typedef int32_t atb_Ratio_elem_t;
 
@@ -71,13 +73,13 @@ struct atb_Ratio {
  *  \return The closest floating point value (32 bits) represented by this ratio
  *  \pre ratio.den != 0
  */
-float atb_Ratio_Tof32(struct atb_Ratio ratio);
+ATB_PUBLIC float atb_Ratio_Tof32(struct atb_Ratio ratio);
 
 /**
  *  \return The closest floating point value (64 bits) represented by this ratio
  *  \pre ratio.den != 0
  */
-double atb_Ratio_Tof64(struct atb_Ratio ratio);
+ATB_PUBLIC double atb_Ratio_Tof64(struct atb_Ratio ratio);
 
 /* Operations **************************************************************/
 
@@ -96,33 +98,37 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio);
 /**
  *  \return The ratio correspondint to the inverse
  */
-struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio);
 
 /**
  *  \return The addition of the 2 lhs/rhs ratios
  */
-struct atb_Ratio atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Add(struct atb_Ratio lhs,
+                                          struct atb_Ratio rhs);
 
 /**
  *  \return The substraction of the 2 lhs/rhs ratios
  */
-struct atb_Ratio atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Sub(struct atb_Ratio lhs,
+                                          struct atb_Ratio rhs);
 
 /**
  *  \return The multiplication of the 2 lhs/rhs ratios
  */
-struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs,
+                                          struct atb_Ratio rhs);
 
 /**
  *  \return The division of the 2 lhs/rhs ratios
  */
-struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs,
+                                          struct atb_Ratio rhs);
 
 /**
  *  \return The reduced fraction using Euclid's algorithm to find the GCD
  *  \note When either num or den are equal to 0, return the same ratio
  */
-struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio);
+ATB_PUBLIC struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio);
 
 /* Comparison **************************************************************/
 
@@ -133,20 +139,20 @@ typedef enum {
   atb_Ratio_Compare_LESS,    /*!< LHS is LESS than RHS */
   atb_Ratio_Compare_EQUAL,   /*!< LHS is EQUAL to RHS */
   atb_Ratio_Compare_GREATER, /*!< LHS is GREATER than RHS */
-} atb_Ratio_Compare_Result;
+} ATB_PUBLIC atb_Ratio_Compare_Result;
 
 /**
  *  \brief Compare 2 ratios with each other
  */
-atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
-                                           struct atb_Ratio rhs);
+ATB_PUBLIC atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
+                                                      struct atb_Ratio rhs);
 
-bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs);
-bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs);
-bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs);
-bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs);
-bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs);
-bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs);
+ATB_PUBLIC bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs);
 
 #if defined(__cplusplus)
 } /* extern "C" */
