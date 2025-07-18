@@ -60,8 +60,8 @@ extern "C" {
  *
  *  \return struct timespec A timespec created from the given stamp/ratio
  */
-ATB_PUBLIC struct timespec atb_timespec_From(intmax_t stamp,
-                                             struct atb_Ratio to_sec);
+struct timespec atb_timespec_From(intmax_t stamp,
+                                  struct atb_Ratio to_sec) ATB_PUBLIC;
 
 /**
  *  \return struct timespec of the current time. On failure, returns -1
@@ -70,7 +70,7 @@ ATB_PUBLIC struct timespec atb_timespec_From(intmax_t stamp,
  *  \param[in] clk The clock ID used to get the time, one of : [CLOCK_REALTIME
  *             ,CLOCK_MONOTONIC, CLOCK_PROCESS_CPUTIME_ID, ...] (cf time.h)
  */
-ATB_PUBLIC struct timespec atb_timespec_Now(clockid_t clk);
+struct timespec atb_timespec_Now(clockid_t clk) ATB_PUBLIC;
 
 /* Comparisons *************************************************************/
 
@@ -86,15 +86,15 @@ typedef enum {
 /**
  *  \brief Compare 2 timespecs with each other
  */
-ATB_PUBLIC atb_timespec_Compare_Result
-atb_timespec_Compare(struct timespec lhs, struct timespec rhs);
+atb_timespec_Compare_Result atb_timespec_Compare(
+    struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
 
-ATB_PUBLIC bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs);
-ATB_PUBLIC bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs);
-ATB_PUBLIC bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs);
-ATB_PUBLIC bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs);
-ATB_PUBLIC bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs);
-ATB_PUBLIC bool atb_timespec_Le(struct timespec lhs, struct timespec rhs);
+bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
 
 /* Utils functions ***********************************************************/
 
@@ -124,8 +124,8 @@ struct atb_Time_RetryPredicate {
  *
  *  \note count will be zeroed when delay is <= 0
  */
-ATB_PUBLIC bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate,
-                                   size_t count, struct timespec delay);
+bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate, size_t count,
+                        struct timespec delay) ATB_PUBLIC;
 
 #if defined(__cplusplus)
 } /* extern "C" */
