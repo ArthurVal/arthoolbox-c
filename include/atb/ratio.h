@@ -139,7 +139,7 @@ typedef enum {
   atb_Ratio_Compare_LESS,    /*!< LHS is LESS than RHS */
   atb_Ratio_Compare_EQUAL,   /*!< LHS is EQUAL to RHS */
   atb_Ratio_Compare_GREATER, /*!< LHS is GREATER than RHS */
-} ATB_PUBLIC atb_Ratio_Compare_Result;
+} atb_Ratio_Compare_Result;
 
 /**
  *  \brief Compare 2 ratios with each other
