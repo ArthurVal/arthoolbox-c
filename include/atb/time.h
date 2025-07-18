@@ -14,7 +14,7 @@ extern "C" {
 /* Format string helper ****************************************************/
 
 #define atb_timespec_FMT_RAW "{.tv_sec=%li, .tv_nsec=%li}"
-#define atb_timespec_FMT "%li.%.0li"
+#define atb_timespec_FMT "%li.%.9li"
 
 #define atb_timespec_FMT_VA_ARG(ts) (ts).tv_sec, (ts).tv_nsec
 
