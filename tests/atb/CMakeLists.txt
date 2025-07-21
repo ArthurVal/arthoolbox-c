@@ -1,4 +1,5 @@
 add_executable(${PROJECT_NAME}-test
+    test_macro.cpp
     test_list.cpp
     test_array.cpp
     test_arithmetic.cpp
