@@ -7,5 +7,3 @@
  */
 #define atb_VA_ARGN(...) \
   atb_internal_Macro_ARGN(_, ##__VA_ARGS__, atb_internal_Macro_ARGN_20)
-
-#define atb_
