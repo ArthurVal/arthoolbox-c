@@ -3,10 +3,10 @@
 #include "internal/macro.h"
 
 /**
- *  \return The size of the given __VA_ARGS__ (up to 20 tokens)
+ *  \return The size of the given __VA_ARGS__ (up to 200 tokens)
  */
 #define atb_VA_ARGN(...) \
-  atb_internal_ARGN(_, ##__VA_ARGS__, atb_internal_ARGN_20)
+  atb_internal_ARGN(_, ##__VA_ARGS__, atb_internal_ARGN_200)
 
 /**
  *  \brief Create a token by concatenating the given args AFTER evaluation (up
