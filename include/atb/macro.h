@@ -3,7 +3,7 @@
 #include "internal/macro.h"
 
 /**
- *  \return Get the size of the given __VA_ARGS__ (up to 20 tokens)
+ *  \return The size of the given __VA_ARGS__ (up to 20 tokens)
  */
 #define atb_VA_ARGN(...) \
   atb_internal_ARGN(_, ##__VA_ARGS__, atb_internal_ARGN_20)
