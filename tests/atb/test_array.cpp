@@ -22,12 +22,12 @@ TEST(TestAtbArray, Size) {
 
 TEST(TestAtbArray, IsInRangeOf) {
   int toto[20] = {0};
-  EXPECT_TRUE(atb_Array_IsInRangeOf(toto, 0));
-  EXPECT_TRUE(atb_Array_IsInRangeOf(toto, 5));
-  EXPECT_TRUE(atb_Array_IsInRangeOf(toto, 19));
-  EXPECT_FALSE(atb_Array_IsInRangeOf(toto, 20));
-  EXPECT_FALSE(atb_Array_IsInRangeOf(toto, -1));
-  EXPECT_FALSE(atb_Array_IsInRangeOf(toto, 0xff));
+  EXPECT_FALSE(atb_Array_IsOutOfRange(toto, 0));
+  EXPECT_FALSE(atb_Array_IsOutOfRange(toto, 5));
+  EXPECT_FALSE(atb_Array_IsOutOfRange(toto, 19));
+  EXPECT_TRUE(atb_Array_IsOutOfRange(toto, 20));
+  EXPECT_TRUE(atb_Array_IsOutOfRange(toto, -1));
+  EXPECT_TRUE(atb_Array_IsOutOfRange(toto, 0xff));
 }
 
 TEST(TestAtbArray, ForEach) {

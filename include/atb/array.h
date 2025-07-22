@@ -36,8 +36,8 @@ extern "C" {
 #define atb_Array_Size(array) (sizeof((array)) / sizeof(*(array)))
 
 /**
- *  \return True if idx is in the range of the given static array (i.e. 0 <= idx
- *          < N), false otherwise.
+ *  \return True if idx is out or range of the given static array[N] (i.e. not
+ *  in [0, N)), false otherwise.
  *
  *  \note usefull for assert statements
  *
@@ -48,11 +48,11 @@ extern "C" {
  *    float my_array[20];
  *
  *    puts("- Begin");
- *    printf("idx = -20 -> %d\n", atb_Array_IsInRangeOf(my_array, -20));
- *    printf("idx =   0 -> %d\n", atb_Array_IsInRangeOf(my_array, 0));
- *    printf("idx =  10 -> %d\n", atb_Array_IsInRangeOf(my_array, 10));
- *    printf("idx =  20 -> %d\n", atb_Array_IsInRangeOf(my_array, 20));
- *    printf("idx =  40 -> %d\n", atb_Array_IsInRangeOf(my_array, 40));
+ *    printf("idx = -20 -> %d\n", atb_Array_IsOutOfRange(my_array, -20));
+ *    printf("idx =   0 -> %d\n", atb_Array_IsOutOfRange(my_array, 0));
+ *    printf("idx =  10 -> %d\n", atb_Array_IsOutOfRange(my_array, 10));
+ *    printf("idx =  20 -> %d\n", atb_Array_IsOutOfRange(my_array, 20));
+ *    printf("idx =  40 -> %d\n", atb_Array_IsOutOfRange(my_array, 40));
  *    puts("- End");
  *
  *    return 0;
@@ -61,19 +61,19 @@ extern "C" {
  *
  *  STDOUT Output:
  *  - Begin
- *  idx = -20 -> 0
- *  idx =   0 -> 1
- *  idx =  10 -> 1
- *  idx =  20 -> 0
- *  idx =  40 -> 0
+ *  idx = -20 -> 1
+ *  idx =   0 -> 0
+ *  idx =  10 -> 0
+ *  idx =  20 -> 1
+ *  idx =  40 -> 1
  *  - End
  *
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  *  \param[in] idx Index we wish to check for
  */
-#define atb_Array_IsInRangeOf(array, idx) \
-  ((0 <= (idx)) && ((idx) < atb_Array_Size(array)))
+#define atb_Array_IsOutOfRange(array, idx) \
+  (((idx) < 0) || (atb_Array_Size(array) <= (idx)))
 
 /**
  *  \return The address of the FIRST element of a static array
