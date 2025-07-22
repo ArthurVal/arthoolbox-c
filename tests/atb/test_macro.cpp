@@ -27,5 +27,14 @@ TEST(TestAtbMacro, TKN_CONCAT) {
   EXPECT_EQ(TEST_COUCOU_1, atb_TKN_CONCAT(TEST, _COUCOU, _1));
   EXPECT_EQ(TEST_COUCOU_2, atb_TKN_CONCAT(TEST, _COU, COU_, 2));
   EXPECT_EQ(TEST_COUCOU_2, atb_TKN_CONCAT(T, E, S, T, _, C, O, U, C, OU_2));
+  EXPECT_EQ(TEST_COUCOU_2, atb_TKN_CONCAT(T, E, S, T, _, C, O, U, C, OU_2));
+
+  // Tokens are evaluated
+  EXPECT_EQ(TEST_COUCOU_0, atb_TKN_CONCAT(TEST_COUCOU_, TEST_COUCOU_0));
+}
+
+TEST(TestAtbMacro, TKN_STR) {
+  EXPECT_STREQ("0", atb_TKN_STR(0));
+  EXPECT_STREQ("0", atb_TKN_STR(TEST_COUCOU_0));
 }
 } // namespace

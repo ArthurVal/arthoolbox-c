@@ -36,3 +36,5 @@
   atb_internal_TKN_CONCAT_##N(__VA_ARGS__)
 #define atb_internal_TKN_CONCAT_N(N, ...) \
   atb_internal_TKN_CONCAT_N_IMPL(N, __VA_ARGS__)
+
+#define atb_internal_TKN_STR(a) #a
