@@ -3,7 +3,7 @@ add_executable(${PROJECT_NAME}-test
   test_bits.cpp
   test_list.cpp
   test_array.cpp
-  test_arithmetic.cpp
+  test_ints.cpp
   test_ratio.cpp
   test_time.cpp
   test_str_view.cpp
