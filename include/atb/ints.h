@@ -25,7 +25,6 @@ extern "C" {
 ///  - INT_SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
 ///  - INT_ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
 #define ATB_INTS_X_FOREACH_UNSIGNED(DO)                                        \
-  DO(uintmax_t, MAX, umax)                                                     \
   DO(uint8_t, 8, u8)                                                           \
   DO(uint16_t, 16, u16)                                                        \
   DO(uint32_t, 32, u32)                                                        \
@@ -40,7 +39,6 @@ extern "C" {
 ///  - INT_SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
 ///  - INT_ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
 #define ATB_INTS_X_FOREACH_SIGNED(DO)                                          \
-  DO(intmax_t, MAX, imax)                                                      \
   DO(int8_t, 8, i8)                                                            \
   DO(int16_t, 16, i16)                                                         \
   DO(int32_t, 32, i32)                                                         \

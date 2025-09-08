@@ -1,14 +1,13 @@
-#include "atb/ints.h"
-
-#include "gtest/gtest.h"
-
 #include <limits>
 #include <type_traits>
 
+#include "atb/ints.h"
+#include "gtest/gtest.h"
+
 namespace {
 
-template <class T> struct TestAtbInts : testing::Test {
-
+template <class T>
+struct TestAtbInts : testing::Test {
   static void SetUpTestSuite() {}
   constexpr TestAtbInts() {}
   void SetUp() override {}
@@ -24,13 +23,13 @@ template <class T> struct TestAtbInts : testing::Test {
 };
 
 using AllInts =
-    testing::Types<std::intmax_t, std::int8_t, std::int16_t, std::int32_t,
-                   std::int64_t, std::uintmax_t, std::uint8_t, std::uint16_t,
-                   std::uint32_t, std::uint64_t>;
+    testing::Types<std::int8_t, std::int16_t, std::int32_t, std::int64_t,
+                   std::uint8_t, std::uint16_t, std::uint32_t, std::uint64_t>;
 
 TYPED_TEST_SUITE(TestAtbInts, AllInts);
 
-template <class T> constexpr auto Add_IsOverflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Add_IsOverflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Add_IsOverflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -47,10 +46,6 @@ template <class T> constexpr auto Add_IsOverflowing(T lhs, T rhs) -> bool {
     return atb_Add_IsOverflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Add_IsOverflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Add_IsOverflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Add_IsOverflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -82,7 +77,8 @@ TYPED_TEST(TestAtbInts, Add_IsOverflowing) {
   }
 }
 
-template <class T> constexpr auto Add_IsUnderflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Add_IsUnderflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Add_IsUnderflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -99,10 +95,6 @@ template <class T> constexpr auto Add_IsUnderflowing(T lhs, T rhs) -> bool {
     return atb_Add_IsUnderflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Add_IsUnderflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Add_IsUnderflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Add_IsUnderflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -133,7 +125,8 @@ TYPED_TEST(TestAtbInts, Add_IsUnderflowing) {
   }
 }
 
-template <class T> constexpr auto Sub_IsOverflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Sub_IsOverflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Sub_IsOverflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -150,10 +143,6 @@ template <class T> constexpr auto Sub_IsOverflowing(T lhs, T rhs) -> bool {
     return atb_Sub_IsOverflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Sub_IsOverflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Sub_IsOverflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Sub_IsOverflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -185,7 +174,8 @@ TYPED_TEST(TestAtbInts, Sub_IsOverflowing) {
   }
 }
 
-template <class T> constexpr auto Sub_IsUnderflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Sub_IsUnderflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Sub_IsUnderflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -202,10 +192,6 @@ template <class T> constexpr auto Sub_IsUnderflowing(T lhs, T rhs) -> bool {
     return atb_Sub_IsUnderflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Sub_IsUnderflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Sub_IsUnderflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Sub_IsUnderflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -238,7 +224,8 @@ TYPED_TEST(TestAtbInts, Sub_IsUnderflowing) {
   }
 }
 
-template <class T> constexpr auto Mul_IsOverflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Mul_IsOverflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Mul_IsOverflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -255,10 +242,6 @@ template <class T> constexpr auto Mul_IsOverflowing(T lhs, T rhs) -> bool {
     return atb_Mul_IsOverflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Mul_IsOverflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Mul_IsOverflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Mul_IsOverflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -290,7 +273,8 @@ TYPED_TEST(TestAtbInts, Mul_IsOverflowing) {
   }
 }
 
-template <class T> constexpr auto Mul_IsUnderflowing(T lhs, T rhs) -> bool {
+template <class T>
+constexpr auto Mul_IsUnderflowing(T lhs, T rhs) -> bool {
   if constexpr (std::is_same_v<T, std::int8_t>) {
     return atb_Mul_IsUnderflowing_i8(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::int16_t>) {
@@ -307,10 +291,6 @@ template <class T> constexpr auto Mul_IsUnderflowing(T lhs, T rhs) -> bool {
     return atb_Mul_IsUnderflowing_u32(lhs, rhs);
   } else if constexpr (std::is_same_v<T, std::uint64_t>) {
     return atb_Mul_IsUnderflowing_u64(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::intmax_t>) {
-    return atb_Mul_IsUnderflowing_imax(lhs, rhs);
-  } else if constexpr (std::is_same_v<T, std::uintmax_t>) {
-    return atb_Mul_IsUnderflowing_umax(lhs, rhs);
   } else {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
