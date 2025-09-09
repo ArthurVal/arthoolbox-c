@@ -22,12 +22,12 @@ extern "C" {
 ///
 /// The `DO` parameter is expected to be a macro that will be evaluated with the
 /// following signature:
-/// DO(INT_T, INT_ABBREV, INT_MIN, INT_MAX, INT_SIZE) With:
-///  - INT_T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
-///  - INT_ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
-///  - INT_MIN   : Minimum value accepted by this type
-///  - INT_MAX   : Maximum value accepted by this type
-///  - INT_SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
+/// DO(T, ABBREV, MIN, MAX, SIZE) With:
+///  - T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
+///  - ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
+///  - MIN   : Minimum value accepted by this type
+///  - MAX   : Maximum value accepted by this type
+///  - SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
 #define ATB_INTS_X_FOREACH_UNSIGNED(DO) \
   DO(uint8_t, u8, 0, UINT8_MAX, 8)      \
   DO(uint16_t, u16, 0, UINT16_MAX, 16)  \
@@ -38,12 +38,12 @@ extern "C" {
 ///
 /// The `DO` parameter is expected to be a macro that will be evaluated with the
 /// following signature:
-/// DO(INT_T, INT_ABBREV, INT_MIN, INT_MAX, INT_SIZE) With:
-///  - INT_T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
-///  - INT_ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
-///  - INT_MIN   : Minimum value accepted by this type
-///  - INT_MAX   : Maximum value accepted by this type
-///  - INT_SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
+/// DO(T, ABBREV, MIN, MAX, SIZE) With:
+///  - T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
+///  - ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
+///  - MIN   : Minimum value accepted by this type
+///  - MAX   : Maximum value accepted by this type
+///  - SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
 #define ATB_INTS_X_FOREACH_SIGNED(DO)        \
   DO(int8_t, i8, INT8_MIN, INT8_MAX, 8)      \
   DO(int16_t, i16, INT16_MIN, INT16_MAX, 16) \
@@ -54,12 +54,12 @@ extern "C" {
 ///
 /// The `DO` parameter is expected to be a macro that will be evaluated with the
 /// following signature:
-/// DO(INT_T, INT_ABBREV, INT_MIN, INT_MAX, INT_SIZE) With:
-///  - INT_T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
-///  - INT_ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
-///  - INT_MIN   : Minimum value accepted by this type
-///  - INT_MAX   : Maximum value accepted by this type
-///  - INT_SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
+/// DO(T, ABBREV, MIN, MAX, SIZE) With:
+///  - T     : The underlying type (e.g. `int8_t`, `int32_t`, ...);
+///  - ABBREV: The common abbrev associated (e.g. i8, u16, i32, ...);
+///  - MIN   : Minimum value accepted by this type
+///  - MAX   : Maximum value accepted by this type
+///  - SIZE  : The size (in bits) of the int type (e.g. 8, 16, 32, ...);
 #define ATB_INTS_X_FOREACH(DO) \
   ATB_INTS_X_FOREACH_UNSIGNED(DO) ATB_INTS_X_FOREACH_SIGNED(DO)
 
