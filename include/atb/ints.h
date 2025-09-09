@@ -69,46 +69,46 @@ extern "C" {
 
 /* SIGNED ******************************************************************/
 
-#define _DEFINE_ADD_ISOVERFLOWING_SIGNED(TYPE, NAME, _, MAX, ...)       \
-  static inline bool atb_Add_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs > 0) && (lhs > (MAX - rhs));                            \
+#define _DEFINE_ADD_ISOVERFLOWING_SIGNED(T, NAME, _, MAX, ...)    \
+  static inline bool atb_Add_IsOverflowing_##NAME(T lhs, T rhs) { \
+    return (rhs > 0) && (lhs > (MAX - rhs));                      \
   }
 
-#define _DEFINE_SUB_ISOVERFLOWING_SIGNED(TYPE, NAME, _, MAX, ...)       \
-  static inline bool atb_Sub_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs < 0) && (lhs > (MAX + rhs));                            \
+#define _DEFINE_SUB_ISOVERFLOWING_SIGNED(T, NAME, _, MAX, ...)    \
+  static inline bool atb_Sub_IsOverflowing_##NAME(T lhs, T rhs) { \
+    return (rhs < 0) && (lhs > (MAX + rhs));                      \
   }
 
-#define _DEFINE_MUL_ISOVERFLOWING_SIGNED(TYPE, NAME, _, MAX, ...)       \
-  static inline bool atb_Mul_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    if ((lhs > 0) && (rhs > 0)) {                                       \
-      return lhs > (MAX / rhs);                                         \
-    } else if ((lhs < 0) && (rhs < 0)) {                                \
-      return lhs < (MAX / rhs);                                         \
-    } else {                                                            \
-      return false;                                                     \
-    }                                                                   \
+#define _DEFINE_MUL_ISOVERFLOWING_SIGNED(T, NAME, _, MAX, ...)    \
+  static inline bool atb_Mul_IsOverflowing_##NAME(T lhs, T rhs) { \
+    if ((lhs > 0) && (rhs > 0)) {                                 \
+      return lhs > (MAX / rhs);                                   \
+    } else if ((lhs < 0) && (rhs < 0)) {                          \
+      return lhs < (MAX / rhs);                                   \
+    } else {                                                      \
+      return false;                                               \
+    }                                                             \
   }
 
-#define _DEFINE_ADD_ISUNDERFLOWING_SIGNED(TYPE, NAME, MIN, ...)          \
-  static inline bool atb_Add_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs < 0) && (lhs < (MIN - rhs));                             \
+#define _DEFINE_ADD_ISUNDERFLOWING_SIGNED(T, NAME, MIN, ...)       \
+  static inline bool atb_Add_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    return (rhs < 0) && (lhs < (MIN - rhs));                       \
   }
 
-#define _DEFINE_SUB_ISUNDERFLOWING_SIGNED(TYPE, NAME, MIN, ...)          \
-  static inline bool atb_Sub_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs > 0) && (lhs < (MIN + rhs));                             \
+#define _DEFINE_SUB_ISUNDERFLOWING_SIGNED(T, NAME, MIN, ...)       \
+  static inline bool atb_Sub_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    return (rhs > 0) && (lhs < (MIN + rhs));                       \
   }
 
-#define _DEFINE_MUL_ISUNDERFLOWING_SIGNED(TYPE, NAME, MIN, ...)          \
-  static inline bool atb_Mul_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    if ((lhs > 0) && (rhs < 0)) {                                        \
-      return lhs > (MIN / rhs);                                          \
-    } else if ((lhs < 0) && (rhs > 0)) {                                 \
-      return lhs < (MIN / rhs);                                          \
-    } else {                                                             \
-      return false;                                                      \
-    }                                                                    \
+#define _DEFINE_MUL_ISUNDERFLOWING_SIGNED(T, NAME, MIN, ...)       \
+  static inline bool atb_Mul_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    if ((lhs > 0) && (rhs < 0)) {                                  \
+      return lhs > (MIN / rhs);                                    \
+    } else if ((lhs < 0) && (rhs > 0)) {                           \
+      return lhs < (MIN / rhs);                                    \
+    } else {                                                       \
+      return false;                                                \
+    }                                                              \
   }
 
 #define _DEFINE_ALL_ISXX_SIGNED(...)             \
@@ -131,40 +131,40 @@ ATB_INTS_X_FOREACH_SIGNED(_DEFINE_ALL_ISXX_SIGNED)
 
 /* UNSIGNED ******************************************************************/
 
-#define _DEFINE_ADD_ISOVERFLOWING_UNSIGNED(TYPE, NAME, _, MAX, ...)     \
-  static inline bool atb_Add_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs > 0) && (lhs > (MAX - rhs));                            \
+#define _DEFINE_ADD_ISOVERFLOWING_UNSIGNED(T, NAME, _, MAX, ...)  \
+  static inline bool atb_Add_IsOverflowing_##NAME(T lhs, T rhs) { \
+    return (rhs > 0) && (lhs > (MAX - rhs));                      \
   }
 
-#define _DEFINE_SUB_ISOVERFLOWING_UNSIGNED(TYPE, NAME, ...)             \
-  static inline bool atb_Sub_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    (void)lhs;                                                          \
-    (void)rhs;                                                          \
-    return false;                                                       \
+#define _DEFINE_SUB_ISOVERFLOWING_UNSIGNED(T, NAME, ...)          \
+  static inline bool atb_Sub_IsOverflowing_##NAME(T lhs, T rhs) { \
+    (void)lhs;                                                    \
+    (void)rhs;                                                    \
+    return false;                                                 \
   }
 
-#define _DEFINE_MUL_ISOVERFLOWING_UNSIGNED(TYPE, NAME, _, MAX, ...)     \
-  static inline bool atb_Mul_IsOverflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (rhs != 0) && (lhs > (MAX / rhs));                           \
+#define _DEFINE_MUL_ISOVERFLOWING_UNSIGNED(T, NAME, _, MAX, ...)  \
+  static inline bool atb_Mul_IsOverflowing_##NAME(T lhs, T rhs) { \
+    return (rhs != 0) && (lhs > (MAX / rhs));                     \
   }
 
-#define _DEFINE_ADD_ISUNDERFLOWING_UNSIGNED(TYPE, NAME, ...)             \
-  static inline bool atb_Add_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    (void)lhs;                                                           \
-    (void)rhs;                                                           \
-    return false;                                                        \
+#define _DEFINE_ADD_ISUNDERFLOWING_UNSIGNED(T, NAME, ...)          \
+  static inline bool atb_Add_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    (void)lhs;                                                     \
+    (void)rhs;                                                     \
+    return false;                                                  \
   }
 
-#define _DEFINE_SUB_ISUNDERFLOWING_UNSIGNED(TYPE, NAME, ...)             \
-  static inline bool atb_Sub_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    return (lhs < rhs);                                                  \
+#define _DEFINE_SUB_ISUNDERFLOWING_UNSIGNED(T, NAME, ...)          \
+  static inline bool atb_Sub_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    return (lhs < rhs);                                            \
   }
 
-#define _DEFINE_MUL_ISUNDERFLOWING_UNSIGNED(TYPE, NAME, ...)             \
-  static inline bool atb_Mul_IsUnderflowing_##NAME(TYPE lhs, TYPE rhs) { \
-    (void)lhs;                                                           \
-    (void)rhs;                                                           \
-    return false;                                                        \
+#define _DEFINE_MUL_ISUNDERFLOWING_UNSIGNED(T, NAME, ...)          \
+  static inline bool atb_Mul_IsUnderflowing_##NAME(T lhs, T rhs) { \
+    (void)lhs;                                                     \
+    (void)rhs;                                                     \
+    return false;                                                  \
   }
 
 #define _DEFINE_ALL_ISXX_UNSIGNED(...)             \
@@ -189,46 +189,46 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
 /*                              _Add, _Sub, _Mul                             */
 /*****************************************************************************/
 
-#define _DEFINE_ADD_(TYPE, NAME, ...)                                       \
-  static inline bool atb_Add_##NAME(TYPE lhs, TYPE rhs, TYPE *const dest) { \
-    assert(dest != NULL);                                                   \
-                                                                            \
-    bool success = !(atb_Add_IsOverflowing_##NAME(lhs, rhs) ||              \
-                     atb_Add_IsUnderflowing_##NAME(lhs, rhs));              \
-                                                                            \
-    if (success) {                                                          \
-      *dest = (lhs + rhs);                                                  \
-    }                                                                       \
-                                                                            \
-    return success;                                                         \
+#define _DEFINE_ADD_(T, NAME, ...)                                 \
+  static inline bool atb_Add_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                          \
+                                                                   \
+    bool success = !(atb_Add_IsOverflowing_##NAME(lhs, rhs) ||     \
+                     atb_Add_IsUnderflowing_##NAME(lhs, rhs));     \
+                                                                   \
+    if (success) {                                                 \
+      *dest = (lhs + rhs);                                         \
+    }                                                              \
+                                                                   \
+    return success;                                                \
   }
 
-#define _DEFINE_SUB_(TYPE, NAME, ...)                                       \
-  static inline bool atb_Sub_##NAME(TYPE lhs, TYPE rhs, TYPE *const dest) { \
-    assert(dest != NULL);                                                   \
-                                                                            \
-    bool success = !(atb_Sub_IsOverflowing_##NAME(lhs, rhs) ||              \
-                     atb_Sub_IsUnderflowing_##NAME(lhs, rhs));              \
-                                                                            \
-    if (success) {                                                          \
-      *dest = (lhs - rhs);                                                  \
-    }                                                                       \
-                                                                            \
-    return success;                                                         \
+#define _DEFINE_SUB_(T, NAME, ...)                                 \
+  static inline bool atb_Sub_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                          \
+                                                                   \
+    bool success = !(atb_Sub_IsOverflowing_##NAME(lhs, rhs) ||     \
+                     atb_Sub_IsUnderflowing_##NAME(lhs, rhs));     \
+                                                                   \
+    if (success) {                                                 \
+      *dest = (lhs - rhs);                                         \
+    }                                                              \
+                                                                   \
+    return success;                                                \
   }
 
-#define _DEFINE_MUL_(TYPE, NAME, ...)                                       \
-  static inline bool atb_Mul_##NAME(TYPE lhs, TYPE rhs, TYPE *const dest) { \
-    assert(dest != NULL);                                                   \
-                                                                            \
-    bool success = !(atb_Mul_IsOverflowing_##NAME(lhs, rhs) ||              \
-                     atb_Mul_IsUnderflowing_##NAME(lhs, rhs));              \
-                                                                            \
-    if (success) {                                                          \
-      *dest = (lhs * rhs);                                                  \
-    }                                                                       \
-                                                                            \
-    return success;                                                         \
+#define _DEFINE_MUL_(T, NAME, ...)                                 \
+  static inline bool atb_Mul_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                          \
+                                                                   \
+    bool success = !(atb_Mul_IsOverflowing_##NAME(lhs, rhs) ||     \
+                     atb_Mul_IsUnderflowing_##NAME(lhs, rhs));     \
+                                                                   \
+    if (success) {                                                 \
+      *dest = (lhs * rhs);                                         \
+    }                                                              \
+                                                                   \
+    return success;                                                \
   }
 
 #define _DEFINE_ALL_OPS(...) \
