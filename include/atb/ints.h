@@ -186,22 +186,41 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
 #undef _DEFINE_MUL_ISUNDERFLOWING_UNSIGNED
 
 /*****************************************************************************/
-/*                                 _Policy_t                                 */
-/*****************************************************************************/
-
-#define _DECLARE_ALL_POLICY_TYPE(T, NAME, ...)               \
-  typedef bool (*atb_Add_Policy_##NAME##_t)(T, T, T *const); \
-  typedef bool (*atb_Sub_Policy_##NAME##_t)(T, T, T *const); \
-  typedef bool (*atb_Mul_Policy_##NAME##_t)(T, T, T *const);
-
-ATB_INTS_X_FOREACH(_DECLARE_ALL_POLICY_TYPE)
-
-#undef _DECLARE_ALL_POLICY_TYPE
-
-/*****************************************************************************/
 /*                                  _Unsafe                                  */
 /*****************************************************************************/
-/* TODO */
+
+#define _DEFINE_ADD_UNSAFE(T, NAME, ...)                                  \
+  static inline bool atb_Add_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs + rhs);                                                  \
+    return true;                                                          \
+  }
+
+#define _DEFINE_SUB_UNSAFE(T, NAME, ...)                                  \
+  static inline bool atb_Sub_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs - rhs);                                                  \
+    return true;                                                          \
+  }
+
+#define _DEFINE_MUL_UNSAFE(T, NAME, ...)                                  \
+  static inline bool atb_Mul_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs * rhs);                                                  \
+    return true;                                                          \
+  }
+
+#define _DEFINE_ALL_UNSAFE(...)   \
+  _DEFINE_ADD_UNSAFE(__VA_ARGS__) \
+  _DEFINE_SUB_UNSAFE(__VA_ARGS__) \
+  _DEFINE_MUL_UNSAFE(__VA_ARGS__)
+
+ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
+
+#undef _DEFINE_ALL_UNSAFE
+#undef _DEFINE_MUL_UNSAFE
+#undef _DEFINE_SUB_UNSAFE
+#undef _DEFINE_ADD_UNSAFE
 
 /*****************************************************************************/
 /*                                  _Safely                                  */
@@ -333,6 +352,21 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_SATURATE)
 #undef _DEFINE_MUL_SATURATE
 #undef _DEFINE_SUB_SATURATE
 #undef _DEFINE_ADD_SATURATE
+
+/*****************************************************************************/
+/*                          _Arithmetic_Policy_t                             */
+/*****************************************************************************/
+
+#define _DECLARE_ALL_POLICY_TYPE(T, NAME, ...)  \
+  typedef struct atb_Arithmetic_Policy_##NAME { \
+    bool (*add)(T, T, T *const);                \
+    bool (*sub)(T, T, T *const);                \
+    bool (*mul)(T, T, T *const);                \
+  } atb_Arithmetic_Policy_##NAME##_t;
+
+ATB_INTS_X_FOREACH(_DECLARE_ALL_POLICY_TYPE)
+
+#undef _DECLARE_ALL_POLICY_TYPE
 
 #if defined(__cplusplus)
 } /* extern "C" */
