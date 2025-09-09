@@ -186,62 +186,153 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
 #undef _DEFINE_MUL_ISUNDERFLOWING_UNSIGNED
 
 /*****************************************************************************/
-/*                              _Add, _Sub, _Mul                             */
+/*                                 _Policy_t                                 */
 /*****************************************************************************/
 
-#define _DEFINE_ADD_(T, NAME, ...)                                 \
-  static inline bool atb_Add_##NAME(T lhs, T rhs, T *const dest) { \
-    assert(dest != NULL);                                          \
-                                                                   \
-    bool success = !(atb_Add_IsOverflowing_##NAME(lhs, rhs) ||     \
-                     atb_Add_IsUnderflowing_##NAME(lhs, rhs));     \
-                                                                   \
-    if (success) {                                                 \
-      *dest = (lhs + rhs);                                         \
-    }                                                              \
-                                                                   \
-    return success;                                                \
+#define _DECLARE_ALL_POLICY_TYPE(T, NAME, ...)               \
+  typedef bool (*atb_Add_Policy_##NAME##_t)(T, T, T *const); \
+  typedef bool (*atb_Sub_Policy_##NAME##_t)(T, T, T *const); \
+  typedef bool (*atb_Mul_Policy_##NAME##_t)(T, T, T *const);
+
+ATB_INTS_X_FOREACH(_DECLARE_ALL_POLICY_TYPE)
+
+#undef _DECLARE_ALL_POLICY_TYPE
+
+/*****************************************************************************/
+/*                                  _Unsafe                                  */
+/*****************************************************************************/
+/* TODO */
+
+/*****************************************************************************/
+/*                                  _Safely                                  */
+/*****************************************************************************/
+
+#define _DEFINE_ADD_SAFELY(T, NAME, ...)                                  \
+  static inline bool atb_Add_Safely_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+                                                                          \
+    bool success = !(atb_Add_IsOverflowing_##NAME(lhs, rhs) ||            \
+                     atb_Add_IsUnderflowing_##NAME(lhs, rhs));            \
+                                                                          \
+    if (success) {                                                        \
+      *dest = (lhs + rhs);                                                \
+    }                                                                     \
+                                                                          \
+    return success;                                                       \
   }
 
-#define _DEFINE_SUB_(T, NAME, ...)                                 \
-  static inline bool atb_Sub_##NAME(T lhs, T rhs, T *const dest) { \
-    assert(dest != NULL);                                          \
-                                                                   \
-    bool success = !(atb_Sub_IsOverflowing_##NAME(lhs, rhs) ||     \
-                     atb_Sub_IsUnderflowing_##NAME(lhs, rhs));     \
-                                                                   \
-    if (success) {                                                 \
-      *dest = (lhs - rhs);                                         \
-    }                                                              \
-                                                                   \
-    return success;                                                \
+#define _DEFINE_SUB_SAFELY(T, NAME, ...)                                  \
+  static inline bool atb_Sub_Safely_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+                                                                          \
+    bool success = !(atb_Sub_IsOverflowing_##NAME(lhs, rhs) ||            \
+                     atb_Sub_IsUnderflowing_##NAME(lhs, rhs));            \
+                                                                          \
+    if (success) {                                                        \
+      *dest = (lhs - rhs);                                                \
+    }                                                                     \
+                                                                          \
+    return success;                                                       \
   }
 
-#define _DEFINE_MUL_(T, NAME, ...)                                 \
-  static inline bool atb_Mul_##NAME(T lhs, T rhs, T *const dest) { \
-    assert(dest != NULL);                                          \
-                                                                   \
-    bool success = !(atb_Mul_IsOverflowing_##NAME(lhs, rhs) ||     \
-                     atb_Mul_IsUnderflowing_##NAME(lhs, rhs));     \
-                                                                   \
-    if (success) {                                                 \
-      *dest = (lhs * rhs);                                         \
-    }                                                              \
-                                                                   \
-    return success;                                                \
+#define _DEFINE_MUL_SAFELY(T, NAME, ...)                                  \
+  static inline bool atb_Mul_Safely_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                 \
+                                                                          \
+    bool success = !(atb_Mul_IsOverflowing_##NAME(lhs, rhs) ||            \
+                     atb_Mul_IsUnderflowing_##NAME(lhs, rhs));            \
+                                                                          \
+    if (success) {                                                        \
+      *dest = (lhs * rhs);                                                \
+    }                                                                     \
+                                                                          \
+    return success;                                                       \
   }
 
-#define _DEFINE_ALL_OPS(...) \
-  _DEFINE_ADD_(__VA_ARGS__)  \
-  _DEFINE_SUB_(__VA_ARGS__)  \
-  _DEFINE_MUL_(__VA_ARGS__)
+#define _DEFINE_ALL_SAFELY(...)   \
+  _DEFINE_ADD_SAFELY(__VA_ARGS__) \
+  _DEFINE_SUB_SAFELY(__VA_ARGS__) \
+  _DEFINE_MUL_SAFELY(__VA_ARGS__)
 
-ATB_INTS_X_FOREACH(_DEFINE_ALL_OPS)
+ATB_INTS_X_FOREACH(_DEFINE_ALL_SAFELY)
 
-#undef _DEFINE_ALL_OPS
-#undef _DEFINE_MUL_
-#undef _DEFINE_SUB_
-#undef _DEFINE_ADD_
+#undef _DEFINE_ALL_SAFELY
+#undef _DEFINE_MUL_SAFELY
+#undef _DEFINE_SUB_SAFELY
+#undef _DEFINE_ADD_SAFELY
+
+/*****************************************************************************/
+/*                                 _Saturate                                 */
+/*****************************************************************************/
+
+#define _DEFINE_ADD_SATURATE(T, NAME, MIN, MAX, ...)                        \
+  static inline bool atb_Add_Saturate_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                   \
+                                                                            \
+    bool success = true;                                                    \
+                                                                            \
+    if (atb_Add_IsOverflowing_##NAME(lhs, rhs)) {                           \
+      success = false;                                                      \
+      *dest = MAX;                                                          \
+    } else if (atb_Add_IsUnderflowing_##NAME(lhs, rhs)) {                   \
+      success = false;                                                      \
+      *dest = MIN;                                                          \
+    } else {                                                                \
+      *dest = (lhs + rhs);                                                  \
+    }                                                                       \
+                                                                            \
+    return success;                                                         \
+  }
+
+#define _DEFINE_SUB_SATURATE(T, NAME, MIN, MAX, ...)                        \
+  static inline bool atb_Sub_Saturate_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                   \
+                                                                            \
+    bool success = true;                                                    \
+                                                                            \
+    if (atb_Sub_IsOverflowing_##NAME(lhs, rhs)) {                           \
+      success = false;                                                      \
+      *dest = MAX;                                                          \
+    } else if (atb_Sub_IsUnderflowing_##NAME(lhs, rhs)) {                   \
+      success = false;                                                      \
+      *dest = MIN;                                                          \
+    } else {                                                                \
+      *dest = (lhs - rhs);                                                  \
+    }                                                                       \
+                                                                            \
+    return success;                                                         \
+  }
+
+#define _DEFINE_MUL_SATURATE(T, NAME, MIN, MAX, ...)                        \
+  static inline bool atb_Mul_Saturate_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                   \
+                                                                            \
+    bool success = true;                                                    \
+                                                                            \
+    if (atb_Mul_IsOverflowing_##NAME(lhs, rhs)) {                           \
+      success = false;                                                      \
+      *dest = MAX;                                                          \
+    } else if (atb_Mul_IsUnderflowing_##NAME(lhs, rhs)) {                   \
+      success = false;                                                      \
+      *dest = MIN;                                                          \
+    } else {                                                                \
+      *dest = (lhs * rhs);                                                  \
+    }                                                                       \
+                                                                            \
+    return success;                                                         \
+  }
+
+#define _DEFINE_ALL_SATURATE(...)   \
+  _DEFINE_ADD_SATURATE(__VA_ARGS__) \
+  _DEFINE_SUB_SATURATE(__VA_ARGS__) \
+  _DEFINE_MUL_SATURATE(__VA_ARGS__)
+
+ATB_INTS_X_FOREACH(_DEFINE_ALL_SATURATE)
+
+#undef _DEFINE_ALL_SATURATE
+#undef _DEFINE_MUL_SATURATE
+#undef _DEFINE_SUB_SATURATE
+#undef _DEFINE_ADD_SATURATE
 
 #if defined(__cplusplus)
 } /* extern "C" */

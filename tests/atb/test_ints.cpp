@@ -270,13 +270,13 @@ TYPED_TEST(AtbIntsTest, Mul_IsUnderflowing) {
   }
 }
 
-#define _DEF(TYPE, NAME, ...)              \
-  if constexpr (std::is_same_v<T, TYPE>) { \
-    return atb_Add_##NAME(lhs, rhs, dest); \
+#define _DEF(TYPE, NAME, ...)                     \
+  if constexpr (std::is_same_v<T, TYPE>) {        \
+    return atb_Add_Safely_##NAME(lhs, rhs, dest); \
   } else
 
 template <class T>
-constexpr auto Add(T lhs, T rhs, T *const dest) -> bool {
+constexpr auto Add_Safely(T lhs, T rhs, T *const dest) -> bool {
   ATB_INTS_X_FOREACH(_DEF) {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -285,47 +285,47 @@ constexpr auto Add(T lhs, T rhs, T *const dest) -> bool {
 
 #undef _DEF
 
-TYPED_TEST(AtbIntsTest, Add) {
+TYPED_TEST(AtbIntsTest, Add_Safely) {
   TypeParam res = 0;
-  EXPECT_TRUE(Add<TypeParam>(1, 2, &res));
+  EXPECT_TRUE(Add_Safely<TypeParam>(1, 2, &res));
   EXPECT_EQ(res, 1 + 2);
 
   res = 0;
-  EXPECT_TRUE(Add<TypeParam>(this->Max(), 0, &res));
+  EXPECT_TRUE(Add_Safely<TypeParam>(this->Max(), 0, &res));
   EXPECT_EQ(res, this->Max());
 
   res = 0;
-  EXPECT_TRUE(Add<TypeParam>(this->Min(), 0, &res));
+  EXPECT_TRUE(Add_Safely<TypeParam>(this->Min(), 0, &res));
   EXPECT_EQ(res, this->Min());
 
   // Overflows
   res = 0;
-  EXPECT_FALSE(Add<TypeParam>(this->Max(), 20, &res));
+  EXPECT_FALSE(Add_Safely<TypeParam>(this->Max(), 20, &res));
   EXPECT_EQ(res, 0);
 
   if constexpr (this->IsSigned()) {
     res = 0;
-    EXPECT_TRUE(Add<TypeParam>(this->Max(), -20, &res));
+    EXPECT_TRUE(Add_Safely<TypeParam>(this->Max(), -20, &res));
     EXPECT_EQ(res, this->Max() - 20);
 
     // Underflows
     res = 0;
-    EXPECT_FALSE(Add<TypeParam>(this->Min(), -20, &res));
+    EXPECT_FALSE(Add_Safely<TypeParam>(this->Min(), -20, &res));
     EXPECT_EQ(res, 0);
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Add) {
-  EXPECT_DEBUG_DEATH(Add<TypeParam>(0, 0, nullptr), "dest != NULL");
+TYPED_TEST(AtbIntsDeathTest, Add_Safely) {
+  EXPECT_DEBUG_DEATH(Add_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
-#define _DEF(TYPE, NAME, ...)              \
-  if constexpr (std::is_same_v<T, TYPE>) { \
-    return atb_Sub_##NAME(lhs, rhs, dest); \
+#define _DEF(TYPE, NAME, ...)                     \
+  if constexpr (std::is_same_v<T, TYPE>) {        \
+    return atb_Sub_Safely_##NAME(lhs, rhs, dest); \
   } else
 
 template <class T>
-constexpr auto Sub(T lhs, T rhs, T *const dest) -> bool {
+constexpr auto Sub_Safely(T lhs, T rhs, T *const dest) -> bool {
   ATB_INTS_X_FOREACH(_DEF) {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -334,47 +334,47 @@ constexpr auto Sub(T lhs, T rhs, T *const dest) -> bool {
 
 #undef _DEF
 
-TYPED_TEST(AtbIntsTest, Sub) {
+TYPED_TEST(AtbIntsTest, Sub_Safely) {
   TypeParam res = 0;
-  EXPECT_TRUE(Sub<TypeParam>(3, 2, &res));
+  EXPECT_TRUE(Sub_Safely<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 - 2);
 
   res = 0;
-  EXPECT_TRUE(Sub<TypeParam>(this->Max(), 0, &res));
+  EXPECT_TRUE(Sub_Safely<TypeParam>(this->Max(), 0, &res));
   EXPECT_EQ(res, this->Max());
 
   res = 0;
-  EXPECT_TRUE(Sub<TypeParam>(this->Min(), 0, &res));
+  EXPECT_TRUE(Sub_Safely<TypeParam>(this->Min(), 0, &res));
   EXPECT_EQ(res, this->Min());
 
   // Underflows
   res = 0;
-  EXPECT_FALSE(Sub<TypeParam>(this->Min(), 20, &res));
+  EXPECT_FALSE(Sub_Safely<TypeParam>(this->Min(), 20, &res));
   EXPECT_EQ(res, 0);
 
   if constexpr (this->IsSigned()) {
     res = 0;
-    EXPECT_TRUE(Sub<TypeParam>(this->Min(), -20, &res));
+    EXPECT_TRUE(Sub_Safely<TypeParam>(this->Min(), -20, &res));
     EXPECT_EQ(res, this->Min() + 20);
 
     // Overflows
     res = 0;
-    EXPECT_FALSE(Sub<TypeParam>(this->Max(), -20, &res));
+    EXPECT_FALSE(Sub_Safely<TypeParam>(this->Max(), -20, &res));
     EXPECT_EQ(res, 0);
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Sub) {
-  EXPECT_DEBUG_DEATH(Sub<TypeParam>(0, 0, nullptr), "dest != NULL");
+TYPED_TEST(AtbIntsDeathTest, Sub_Safely) {
+  EXPECT_DEBUG_DEATH(Sub_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
-#define _DEF(TYPE, NAME, ...)              \
-  if constexpr (std::is_same_v<T, TYPE>) { \
-    return atb_Mul_##NAME(lhs, rhs, dest); \
+#define _DEF(TYPE, NAME, ...)                     \
+  if constexpr (std::is_same_v<T, TYPE>) {        \
+    return atb_Mul_Safely_##NAME(lhs, rhs, dest); \
   } else
 
 template <class T>
-constexpr auto Mul(T lhs, T rhs, T *const dest) -> bool {
+constexpr auto Mul_Safely(T lhs, T rhs, T *const dest) -> bool {
   ATB_INTS_X_FOREACH(_DEF) {
     static_assert(sizeof(T) == 0, "No implementation for type T");
     return false;
@@ -383,43 +383,43 @@ constexpr auto Mul(T lhs, T rhs, T *const dest) -> bool {
 
 #undef _DEF
 
-TYPED_TEST(AtbIntsTest, Mul) {
+TYPED_TEST(AtbIntsTest, Mul_Safely) {
   TypeParam res = 0;
-  EXPECT_TRUE(Mul<TypeParam>(3, 2, &res));
+  EXPECT_TRUE(Mul_Safely<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 * 2);
 
   res = 0;
-  EXPECT_TRUE(Mul<TypeParam>(this->Max(), 1, &res));
+  EXPECT_TRUE(Mul_Safely<TypeParam>(this->Max(), 1, &res));
   EXPECT_EQ(res, this->Max());
 
   res = 0;
-  EXPECT_TRUE(Mul<TypeParam>(this->Max(), 0, &res));
+  EXPECT_TRUE(Mul_Safely<TypeParam>(this->Max(), 0, &res));
   EXPECT_EQ(res, 0);
 
   // Overflows
   res = 0;
-  EXPECT_FALSE(Mul<TypeParam>(this->Max(), 2, &res));
+  EXPECT_FALSE(Mul_Safely<TypeParam>(this->Max(), 2, &res));
   EXPECT_EQ(res, 0);
 
   if constexpr (this->IsSigned()) {
     res = 0;
-    EXPECT_TRUE(Mul<TypeParam>(-3, -2, &res));
+    EXPECT_TRUE(Mul_Safely<TypeParam>(-3, -2, &res));
     EXPECT_EQ(res, 6);
 
     // Overflows
     res = 0;
-    EXPECT_FALSE(Mul<TypeParam>(this->Min(), -20, &res));
+    EXPECT_FALSE(Mul_Safely<TypeParam>(this->Min(), -20, &res));
     EXPECT_EQ(res, 0);
 
     // Underflows
     res = 0;
-    EXPECT_FALSE(Mul<TypeParam>(this->Max(), -2, &res));
+    EXPECT_FALSE(Mul_Safely<TypeParam>(this->Max(), -2, &res));
     EXPECT_EQ(res, 0);
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Mul) {
-  EXPECT_DEBUG_DEATH(Mul<TypeParam>(0, 0, nullptr), "dest != NULL");
+TYPED_TEST(AtbIntsDeathTest, Mul_Safely) {
+  EXPECT_DEBUG_DEATH(Mul_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
 } // namespace
