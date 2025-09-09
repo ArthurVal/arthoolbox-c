@@ -32,7 +32,7 @@ using AllInts =
 TYPED_TEST_SUITE(AtbIntsTest, AllInts);
 TYPED_TEST_SUITE(AtbIntsDeathTest, AllInts);
 
-#define _DEF(TYPE, _, NAME)                        \
+#define _DEF(TYPE, NAME, ...)                      \
   if constexpr (std::is_same_v<T, TYPE>) {         \
     return atb_Add_IsOverflowing_##NAME(lhs, rhs); \
   } else
@@ -72,7 +72,7 @@ TYPED_TEST(AtbIntsTest, Add_IsOverflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                         \
+#define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Add_IsUnderflowing_##NAME(lhs, rhs); \
   } else
@@ -111,7 +111,7 @@ TYPED_TEST(AtbIntsTest, Add_IsUnderflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                        \
+#define _DEF(TYPE, NAME, ...)                      \
   if constexpr (std::is_same_v<T, TYPE>) {         \
     return atb_Sub_IsOverflowing_##NAME(lhs, rhs); \
   } else
@@ -151,7 +151,7 @@ TYPED_TEST(AtbIntsTest, Sub_IsOverflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                         \
+#define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Sub_IsUnderflowing_##NAME(lhs, rhs); \
   } else
@@ -192,7 +192,7 @@ TYPED_TEST(AtbIntsTest, Sub_IsUnderflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                        \
+#define _DEF(TYPE, NAME, ...)                      \
   if constexpr (std::is_same_v<T, TYPE>) {         \
     return atb_Mul_IsOverflowing_##NAME(lhs, rhs); \
   } else
@@ -232,7 +232,7 @@ TYPED_TEST(AtbIntsTest, Mul_IsOverflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                         \
+#define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Mul_IsUnderflowing_##NAME(lhs, rhs); \
   } else
@@ -270,7 +270,7 @@ TYPED_TEST(AtbIntsTest, Mul_IsUnderflowing) {
   }
 }
 
-#define _DEF(TYPE, _, NAME)                \
+#define _DEF(TYPE, NAME, ...)              \
   if constexpr (std::is_same_v<T, TYPE>) { \
     return atb_Add_##NAME(lhs, rhs, dest); \
   } else
@@ -319,7 +319,7 @@ TYPED_TEST(AtbIntsDeathTest, Add) {
   EXPECT_DEBUG_DEATH(Add<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
-#define _DEF(TYPE, _, NAME)                \
+#define _DEF(TYPE, NAME, ...)              \
   if constexpr (std::is_same_v<T, TYPE>) { \
     return atb_Sub_##NAME(lhs, rhs, dest); \
   } else
@@ -368,7 +368,7 @@ TYPED_TEST(AtbIntsDeathTest, Sub) {
   EXPECT_DEBUG_DEATH(Sub<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
-#define _DEF(TYPE, _, NAME)                \
+#define _DEF(TYPE, NAME, ...)              \
   if constexpr (std::is_same_v<T, TYPE>) { \
     return atb_Mul_##NAME(lhs, rhs, dest); \
   } else
