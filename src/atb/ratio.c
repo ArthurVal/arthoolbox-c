@@ -1,9 +1,34 @@
 #include "atb/ratio.h"
 
 #include <assert.h>
-#include <stddef.h>
+#include <stdlib.h>
 
 #include "atb/ints.h"
+
+static atb_Ratio_elem_t Ratio_FindGCD(atb_Ratio_elem_t a, atb_Ratio_elem_t b) {
+  atb_Ratio_elem_t tmp = 0;
+
+  /* Euclid 's algorithm to find the GCD between a and b */
+  /* https://en.wikipedia.org/wiki/Euclidean_algorithm */
+
+  /* Here 'a' will be used to holds the value of the computed GCD... */
+  while (b != 0) {
+    tmp = b;
+    b = a % b;
+    a = tmp;
+  }
+
+  return abs(a);
+}
+
+static struct atb_Ratio Ratio_FixSign(struct atb_Ratio ratio) {
+  if (ratio.den < 0) {
+    ratio.num *= -1;
+    ratio.den *= -1;
+  }
+
+  return ratio;
+}
 
 float atb_Ratio_Tof32(struct atb_Ratio ratio) {
   assert(ratio.den != 0);
@@ -20,6 +45,16 @@ struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio) {
   const atb_Ratio_elem_t tmp = ratio.num;
   ratio.num = ratio.den;
   ratio.den = tmp;
+
+  return ratio;
+}
+
+struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
+  if (ratio.num != 0 && ratio.den != 0) {
+    const atb_Ratio_elem_t gcd = Ratio_FindGCD(ratio.num, ratio.den);
+    ratio.num /= gcd;
+    ratio.den /= gcd;
+  }
 
   return ratio;
 }
@@ -98,39 +133,10 @@ struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs) {
   return atb_Ratio_Mul(lhs, atb_Ratio_Inv(rhs));
 }
 
-struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
-  if (ratio.num == 0 || ratio.den == 0) return ratio;
-
-  struct atb_Ratio reduced_ratio = ratio;
-
-  /* Euclid 's algorithm to find the GCD */
-  /* Here 'ratio.num' will be used to holds the value of the computed GCD... */
-  atb_Ratio_elem_t tmp = 0;
-  while (ratio.den != 0) {
-    tmp = ratio.den;
-    ratio.den = ratio.num % ratio.den;
-    ratio.num = tmp;
-  }
-
-  /* ratio.num == GCD */
-  reduced_ratio.num /= ratio.num;
-  reduced_ratio.den /= ratio.num;
-
-  return reduced_ratio;
-}
-
-static struct atb_Ratio FixSign(struct atb_Ratio ratio) {
-  if (ratio.den < 0) {
-    ratio.num *= -1;
-    ratio.den *= -1;
-  }
-
-  return ratio;
-}
-
 atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
                                            struct atb_Ratio rhs) {
-  const struct atb_Ratio div = atb_Ratio_Div(FixSign(lhs), FixSign(rhs));
+  const struct atb_Ratio div =
+      atb_Ratio_Div(Ratio_FixSign(lhs), Ratio_FixSign(rhs));
 
   if (div.num == div.den) {
     return atb_Ratio_Compare_EQUAL;
