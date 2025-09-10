@@ -110,8 +110,8 @@ extern "C" {
 
 #define _DEFINE_MUL_ISUNDERFLOWING_SIGNED(T, NAME, MIN, ...)       \
   static inline bool atb_Mul_IsUnderflowing_##NAME(T lhs, T rhs) { \
-    if ((lhs > 0) && (rhs < 0)) {                                  \
-      return lhs > (MIN / rhs);                                    \
+    if ((lhs > 0) && (rhs < -1)) {                                 \
+      return (lhs > (MIN / rhs));                                  \
     } else if ((lhs < 0) && (rhs > 0)) {                           \
       return lhs < (MIN / rhs);                                    \
     } else {                                                       \

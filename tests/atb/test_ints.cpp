@@ -226,6 +226,7 @@ TYPED_TEST(AtbIntsTest, Mul_IsOverflowing) {
   EXPECT_FALSE(Mul_IsOverflowing<TypeParam>(2, this->Max() / 3));
 
   if constexpr (this->IsSigned()) {
+    EXPECT_TRUE(Mul_IsOverflowing<TypeParam>(this->Min(), -1));
     EXPECT_TRUE(Mul_IsOverflowing<TypeParam>(this->Min(), -2));
     EXPECT_TRUE(Mul_IsOverflowing<TypeParam>(-2, this->Min()));
     EXPECT_FALSE(Mul_IsOverflowing<TypeParam>(this->Min(), 2));
@@ -259,6 +260,12 @@ TYPED_TEST(AtbIntsTest, Mul_IsUnderflowing) {
   EXPECT_FALSE(Mul_IsUnderflowing<TypeParam>(this->Max(), 100));
 
   if constexpr (this->IsSigned()) {
+    EXPECT_FALSE(Mul_IsUnderflowing<TypeParam>(this->Min(), -1));
+    EXPECT_FALSE(Mul_IsUnderflowing<TypeParam>(-1, this->Min()));
+
+    EXPECT_FALSE(Mul_IsUnderflowing<TypeParam>(2, -1));
+    EXPECT_FALSE(Mul_IsUnderflowing<TypeParam>(-1, 2));
+
     EXPECT_TRUE(Mul_IsUnderflowing<TypeParam>(this->Min(), 2));
     EXPECT_TRUE(Mul_IsUnderflowing<TypeParam>(2, this->Min()));
 
@@ -405,6 +412,10 @@ TYPED_TEST(AtbIntsTest, Mul_Safely) {
     res = 0;
     EXPECT_TRUE(Mul_Safely<TypeParam>(-3, -2, &res));
     EXPECT_EQ(res, 6);
+
+    res = 0;
+    EXPECT_TRUE(Mul_Safely<TypeParam>(-1, 1, &res));
+    EXPECT_EQ(res, -1);
 
     // Overflows
     res = 0;
