@@ -1,6 +1,9 @@
 #include "atb/ratio.h"
 
 #include <assert.h>
+#include <stddef.h>
+
+#include "atb/ints.h"
 
 float atb_Ratio_Tof32(struct atb_Ratio ratio) {
   assert(ratio.den != 0);
@@ -21,15 +24,36 @@ struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio) {
   return ratio;
 }
 
-struct atb_Ratio atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs) {
+bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) {
+  /* We use LHS to store the result and then assign to dest if it succeeded */
+  bool success = true;
+
   if (lhs.den != rhs.den) {
-    lhs.num = (lhs.num * rhs.den) + (rhs.num * lhs.den);
-    lhs.den *= rhs.den;
+    /*
+     * lhs.num = (lhs.num * rhs.den) + (rhs.num * lhs.den)
+     * lhs.den = (lhs.den * rhs.den)
+     *
+     * The first computation is divide like this:
+     * lhs.num = (lhs.num * rhs.den)
+     * rhs.num = (rhs.num * lhs.den)
+     * lhs.num = lhs.num + rhs.num
+     */
+    success = atb_Mul_Safely_i32(lhs.num, rhs.den, &(lhs.num)) &&
+              atb_Mul_Safely_i32(rhs.num, lhs.den, &(rhs.num)) &&
+              atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
+              atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
+
+    /* Only assign if it succeeded */
   } else {
-    lhs.num += rhs.num;
+    success = atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num));
   }
 
-  return lhs;
+  if (success && (dest != NULL)) {
+    *dest = lhs;
+  }
+
+  return success;
 }
 
 struct atb_Ratio atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs) {
@@ -106,30 +130,38 @@ bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs) {
 
 bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
   switch (atb_Ratio_Compare(lhs, rhs)) {
-    case atb_Ratio_Compare_GREATER: return true;
-    default: return false;
+    case atb_Ratio_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
   switch (atb_Ratio_Compare(lhs, rhs)) {
-    case atb_Ratio_Compare_LESS: return true;
-    default: return false;
+    case atb_Ratio_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs) {
   switch (atb_Ratio_Compare(lhs, rhs)) {
     case atb_Ratio_Compare_EQUAL:
-    case atb_Ratio_Compare_GREATER: return true;
-    default: return false;
+    case atb_Ratio_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs) {
   switch (atb_Ratio_Compare(lhs, rhs)) {
     case atb_Ratio_Compare_EQUAL:
-    case atb_Ratio_Compare_LESS: return true;
-    default: return false;
+    case atb_Ratio_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }

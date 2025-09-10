@@ -1,3 +1,5 @@
+#include <limits>
+
 #include "atb/ratio.h"
 #include "gtest/gtest.h"
 #include "helper/Ratio.hpp"
@@ -23,13 +25,77 @@ TEST(TestAtbRatio, Inv) {
   EXPECT_EQ((atb_Ratio{0, 1}), atb_Ratio_Inv(atb_Ratio{1, 0}));
 }
 
-TEST(TestAtbRatio, Add) {
-  EXPECT_EQ((atb_Ratio{2, 2}), atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{8, 8}), atb_Ratio_Add(atb_Ratio{2, 4}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{7, 2}), atb_Ratio_Add(atb_Ratio{3, 1}, atb_Ratio{1, 2}));
+TEST(AtbRatioTest, Add) {
+  constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
+  atb_Ratio res;
 
-  EXPECT_EQ((atb_Ratio{0, 2}),
-            atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{-1, 2}));
+  // Nominal tests
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{2, 2}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{2, 4}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{8, 8}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{3, 1}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{7, 2}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 2}));
+
+  // Failure
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{max, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{2, max}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{max, 2}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{2, max}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  // dest = nullptr
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, nullptr));
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{2, max}, atb_Ratio{1, 2}, nullptr));
+
+  // Aliasing
+  res = {0, 1};
+  EXPECT_TRUE(atb_Ratio_Add(res, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 2}));
+
+  res = {10, 5};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{25, 10}));
+
+  res = {10, 5};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{max, 2}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 5}));
+
+  // .den = 0
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{2, 0}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{4, 0}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{2, 5}, atb_Ratio{10, 0}, &res));
+  EXPECT_EQ(res, (atb_Ratio{50, 0}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 1}, atb_Ratio{0, 10}, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 10}));
+
+  res = {1, 1};
+  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{1, max}, atb_Ratio{0, 10}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
 TEST(TestAtbRatio, Sub) {

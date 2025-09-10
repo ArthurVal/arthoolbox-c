@@ -1,13 +1,13 @@
 #pragma once
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "atb/export.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /// Underlying integer type used within a atb_Ratio
 typedef int32_t atb_Ratio_elem_t;
@@ -96,15 +96,45 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
 #define atb_Ratio_APPLY(ratio, value) (((value) * (ratio).num) / (ratio).den)
 
 /**
+ *  \brief Same as _APPLY but divide first, then multiply
+ *
+ *  \param[in] value The value that will be multiply by the ratio
+ *  \param[in] ratio The ratio we wish to apply
+ *
+ *  \warning 'ratio' SHOULDN'T have any side effects
+ *
+ *  \return The result of ((value) / (ratio).den * (ratio).num)
+ */
+#define atb_Ratio_APPLY_R(ratio, value) (((value) / (ratio).den) * (ratio).num)
+
+/**
  *  \return The ratio correspondint to the inverse
  */
 struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio) ATB_PUBLIC;
 
 /**
- *  \return The addition of the 2 lhs/rhs ratios
+ *  \return The reduced fraction using Euclid's algorithm to find the GCD
+ *  \note When either num or den are equal to 0, return the same ratio
  */
-struct atb_Ratio atb_Ratio_Add(struct atb_Ratio lhs,
-                               struct atb_Ratio rhs) ATB_PUBLIC;
+struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) ATB_PUBLIC;
+
+/**
+ *  \brief Add 2 ratios and store the result in dest, if valid
+ *
+ *  \param[in] lhs, rhs Both ratios we wish to add
+ *  \param[out] dest If not null, the result of the computation
+ *
+ *  \note Setting dest to NULL can be used to simply check if an
+ *        overflows/underflows would happen.
+ *
+ *  \warning Having one of the inputs with a `.den = 0` is not checked and
+ *           doesn't trigger any error
+ *
+ *  \returns True when the computation succeed. False when computing this new
+ *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
+ */
+bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
  *  \return The substraction of the 2 lhs/rhs ratios
@@ -123,12 +153,6 @@ struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs,
  */
 struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs,
                                struct atb_Ratio rhs) ATB_PUBLIC;
-
-/**
- *  \return The reduced fraction using Euclid's algorithm to find the GCD
- *  \note When either num or den are equal to 0, return the same ratio
- */
-struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) ATB_PUBLIC;
 
 /* Comparison **************************************************************/
 
