@@ -137,10 +137,22 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
- *  \return The substraction of the 2 lhs/rhs ratios
+ *  \brief Substract 2 ratios and store the result in dest, if valid
+ *
+ *  \param[in] lhs, rhs Both ratios we wish to substract
+ *  \param[out] dest If not null, the result of the computation
+ *
+ *  \note Setting dest to NULL can be used to simply check if an
+ *        overflows/underflows would happen.
+ *
+ *  \warning Having one of the inputs with a `.den = 0` is not checked and
+ *           doesn't trigger any error
+ *
+ *  \returns True when the computation succeed. False when computing this new
+ *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
  */
-struct atb_Ratio atb_Ratio_Sub(struct atb_Ratio lhs,
-                               struct atb_Ratio rhs) ATB_PUBLIC;
+bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
  *  \return The multiplication of the 2 lhs/rhs ratios

@@ -56,15 +56,36 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
   return success;
 }
 
-struct atb_Ratio atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs) {
+bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) {
+  /* We use LHS to store the result and then assign to dest if it succeeded */
+  bool success = true;
+
   if (lhs.den != rhs.den) {
-    lhs.num = (lhs.num * rhs.den) - (rhs.num * lhs.den);
-    lhs.den *= rhs.den;
+    /*
+     * lhs.num = (lhs.num * rhs.den) - (rhs.num * lhs.den)
+     * lhs.den = (lhs.den * rhs.den)
+     *
+     * The first computation is divide like this:
+     * lhs.num = (lhs.num * rhs.den)
+     * rhs.num = (rhs.num * lhs.den)
+     * lhs.num = lhs.num - rhs.num
+     */
+    success = atb_Mul_Safely_i32(lhs.num, rhs.den, &(lhs.num)) &&
+              atb_Mul_Safely_i32(rhs.num, lhs.den, &(rhs.num)) &&
+              atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
+              atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
+
+    /* Only assign if it succeeded */
   } else {
-    lhs.num -= rhs.num;
+    success = atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num));
   }
 
-  return lhs;
+  if (success && (dest != NULL)) {
+    *dest = lhs;
+  }
+
+  return success;
 }
 
 struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs) {
