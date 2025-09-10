@@ -67,6 +67,14 @@ extern "C" {
 /*                        IsOverflowing/Underflowing                       */
 /***************************************************************************/
 
+/// `<OP>_IsOverflowing(lhs, rhs) -> bool` returns TRUE when `lhs <OP> rhs`
+/// (with <OP> being one of +, -, *) overflows the underlying int type range.
+/// FALSE otherwise (operation is safe).
+
+/// `<OP>_IsUnderflowing(lhs, rhs) -> bool` returns TRUE when `lhs <OP> rhs`
+/// (with <OP> being one of +, -, *) underflows the underlying int type range.
+/// FALSE otherwise (operation is safe).
+
 /* SIGNED ******************************************************************/
 
 #define _DEFINE_ADD_ISOVERFLOWING_SIGNED(T, NAME, _, MAX, ...)    \
@@ -189,6 +197,13 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
 /*                                  _Unsafe                                  */
 /*****************************************************************************/
 
+/// `<OP>_Unsafe(lhs, rhs, &dest) -> bool`
+/// Perform `*dest = lhs <OP> rhs` (with <OP> being one of +, -, *) without
+/// checking for overflows/underflows.
+/// Always return TRUE.
+///
+/// \pre dest != NULL
+
 #define _DEFINE_ADD_UNSAFE(T, NAME, ...)                                  \
   static inline bool atb_Add_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
     assert(dest != NULL);                                                 \
@@ -226,6 +241,14 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
 /*                                  _Safely                                  */
 /*****************************************************************************/
 
+/// `<OP>_Safely(lhs, rhs, &dest) -> bool`
+/// Perform `*dest = lhs <OP> rhs` (with <OP> being one of +, -, *) when the
+/// given operation is SAFE (i.e. no overflows nor underflows).
+/// When the operation is performed, returns TRUE.
+/// Otherwise (overflows/underflows), returns FALSE and dest is LEFT UNCHANGED.
+///
+/// \pre dest != NULL
+
 #define _DEFINE_SAFELY(OP, T, NAME, ...)                                     \
   static inline bool atb_##OP##_Safely_##NAME(T lhs, T rhs, T *const dest) { \
     if (atb_##OP##_IsOverflowing_##NAME(lhs, rhs) ||                         \
@@ -249,6 +272,16 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_SAFELY)
 /*****************************************************************************/
 /*                                 _Saturate                                 */
 /*****************************************************************************/
+
+/// `<OP>_Saturate(lhs, rhs, &dest) -> bool`
+/// Perform `*dest = lhs <OP> rhs` (with <OP> being one of +, -, *) when the
+/// given operation is SAFE (i.e. no overflows nor underflows).
+/// When the operation is performed, returns TRUE.
+/// Otherwise (overflows/underflows), returns FALSE and dest is set to either
+/// the MAX/MIN value of the underlying int type, if the operation would have
+/// overflows/underflows respectively.
+///
+/// \pre dest != NULL
 
 #define _DEFINE_SATURATE(OP, T, NAME, MIN, MAX, ...)                           \
   static inline bool atb_##OP##_Saturate_##NAME(T lhs, T rhs, T *const dest) { \
