@@ -422,4 +422,156 @@ TYPED_TEST(AtbIntsDeathTest, Mul_Safely) {
   EXPECT_DEBUG_DEATH(Mul_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
+#define _DEF(TYPE, NAME, ...)                       \
+  if constexpr (std::is_same_v<T, TYPE>) {          \
+    return atb_Add_Saturate_##NAME(lhs, rhs, dest); \
+  } else
+
+template <class T>
+constexpr auto Add_Saturate(T lhs, T rhs, T *const dest) -> bool {
+  ATB_INTS_X_FOREACH(_DEF) {
+    static_assert(sizeof(T) == 0, "No implementation for type T");
+    return false;
+  }
+}
+
+#undef _DEF
+
+TYPED_TEST(AtbIntsTest, Add_Saturate) {
+  TypeParam res = 0;
+  EXPECT_TRUE(Add_Saturate<TypeParam>(1, 2, &res));
+  EXPECT_EQ(res, 1 + 2);
+
+  res = 0;
+  EXPECT_TRUE(Add_Saturate<TypeParam>(this->Max(), 0, &res));
+  EXPECT_EQ(res, this->Max());
+
+  res = 0;
+  EXPECT_TRUE(Add_Saturate<TypeParam>(this->Min(), 0, &res));
+  EXPECT_EQ(res, this->Min());
+
+  // Overflows
+  res = 0;
+  EXPECT_FALSE(Add_Saturate<TypeParam>(this->Max(), 20, &res));
+  EXPECT_EQ(res, this->Max());
+
+  if constexpr (this->IsSigned()) {
+    res = 0;
+    EXPECT_TRUE(Add_Saturate<TypeParam>(this->Max(), -20, &res));
+    EXPECT_EQ(res, this->Max() - 20);
+
+    // Underflows
+    res = 0;
+    EXPECT_FALSE(Add_Saturate<TypeParam>(this->Min(), -20, &res));
+    EXPECT_EQ(res, this->Min());
+  }
+}
+
+TYPED_TEST(AtbIntsDeathTest, Add_Saturate) {
+  EXPECT_DEBUG_DEATH(Add_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+}
+
+#define _DEF(TYPE, NAME, ...)                       \
+  if constexpr (std::is_same_v<T, TYPE>) {          \
+    return atb_Sub_Saturate_##NAME(lhs, rhs, dest); \
+  } else
+
+template <class T>
+constexpr auto Sub_Saturate(T lhs, T rhs, T *const dest) -> bool {
+  ATB_INTS_X_FOREACH(_DEF) {
+    static_assert(sizeof(T) == 0, "No implementation for type T");
+    return false;
+  }
+}
+
+#undef _DEF
+
+TYPED_TEST(AtbIntsTest, Sub_Saturate) {
+  TypeParam res = 0;
+  EXPECT_TRUE(Sub_Saturate<TypeParam>(3, 2, &res));
+  EXPECT_EQ(res, 3 - 2);
+
+  res = 0;
+  EXPECT_TRUE(Sub_Saturate<TypeParam>(this->Max(), 0, &res));
+  EXPECT_EQ(res, this->Max());
+
+  res = 0;
+  EXPECT_TRUE(Sub_Saturate<TypeParam>(this->Min(), 0, &res));
+  EXPECT_EQ(res, this->Min());
+
+  // Underflows
+  res = 42;
+  EXPECT_FALSE(Sub_Saturate<TypeParam>(this->Min(), 20, &res));
+  EXPECT_EQ(res, this->Min());
+
+  if constexpr (this->IsSigned()) {
+    res = 0;
+    EXPECT_TRUE(Sub_Saturate<TypeParam>(this->Min(), -20, &res));
+    EXPECT_EQ(res, this->Min() + 20);
+
+    // Overflows
+    res = 0;
+    EXPECT_FALSE(Sub_Saturate<TypeParam>(this->Max(), -20, &res));
+    EXPECT_EQ(res, this->Max());
+  }
+}
+
+TYPED_TEST(AtbIntsDeathTest, Sub_Saturate) {
+  EXPECT_DEBUG_DEATH(Sub_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+}
+
+#define _DEF(TYPE, NAME, ...)                       \
+  if constexpr (std::is_same_v<T, TYPE>) {          \
+    return atb_Mul_Saturate_##NAME(lhs, rhs, dest); \
+  } else
+
+template <class T>
+constexpr auto Mul_Saturate(T lhs, T rhs, T *const dest) -> bool {
+  ATB_INTS_X_FOREACH(_DEF) {
+    static_assert(sizeof(T) == 0, "No implementation for type T");
+    return false;
+  }
+}
+
+#undef _DEF
+
+TYPED_TEST(AtbIntsTest, Mul_Saturate) {
+  TypeParam res = 0;
+  EXPECT_TRUE(Mul_Saturate<TypeParam>(3, 2, &res));
+  EXPECT_EQ(res, 3 * 2);
+
+  res = 0;
+  EXPECT_TRUE(Mul_Saturate<TypeParam>(this->Max(), 1, &res));
+  EXPECT_EQ(res, this->Max());
+
+  res = 0;
+  EXPECT_TRUE(Mul_Saturate<TypeParam>(this->Max(), 0, &res));
+  EXPECT_EQ(res, 0);
+
+  // Overflows
+  res = 0;
+  EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Max(), 2, &res));
+  EXPECT_EQ(res, this->Max());
+
+  if constexpr (this->IsSigned()) {
+    res = 0;
+    EXPECT_TRUE(Mul_Saturate<TypeParam>(-3, -2, &res));
+    EXPECT_EQ(res, 6);
+
+    // Overflows
+    res = 0;
+    EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Min(), -20, &res));
+    EXPECT_EQ(res, this->Max());
+
+    // Underflows
+    res = 0;
+    EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Max(), -2, &res));
+    EXPECT_EQ(res, this->Min());
+  }
+}
+
+TYPED_TEST(AtbIntsDeathTest, Mul_Saturate) {
+  EXPECT_DEBUG_DEATH(Mul_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+}
+
 } // namespace
