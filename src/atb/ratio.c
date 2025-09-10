@@ -44,11 +44,11 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
               atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
               atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
 
-    /* Only assign if it succeeded */
   } else {
     success = atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num));
   }
 
+  /* Only assign if it succeeded */
   if (success && (dest != NULL)) {
     *dest = lhs;
   }
@@ -76,11 +76,11 @@ bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
               atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
               atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
 
-    /* Only assign if it succeeded */
   } else {
     success = atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num));
   }
 
+  /* Only assign if it succeeded */
   if (success && (dest != NULL)) {
     *dest = lhs;
   }
