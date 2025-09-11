@@ -77,13 +77,13 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) {
   return (double)ratio.num / (double)ratio.den;
 }
 
-struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio) {
-  /* Just swap num and den ... */
-  const atb_Ratio_elem_t tmp = ratio.num;
-  ratio.num = ratio.den;
-  ratio.den = tmp;
+bool atb_Ratio_Inv(struct atb_Ratio ratio, struct atb_Ratio *const dest) {
+  assert(dest != NULL);
 
-  return ratio;
+  dest->num = ratio.den;
+  dest->den = ratio.num;
+
+  return true;
 }
 
 struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
@@ -138,36 +138,65 @@ bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
 
 bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
-  return atb_Ratio_Mul(lhs, atb_Ratio_Inv(rhs), dest);
+  return atb_Ratio_Inv(rhs, &rhs) && atb_Ratio_Mul(lhs, rhs, dest);
 }
 
-atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
-                                           struct atb_Ratio rhs) {
-  if (Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
+bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                       atb_Ratio_Compare_Result *const dest) {
+  bool success =
+      Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
       (atb_Ratio_Div(lhs, rhs, &lhs) ||
-       atb_Ratio_Div(atb_Ratio_Reduce(lhs), atb_Ratio_Reduce(rhs), &lhs))) {
+       atb_Ratio_Div(atb_Ratio_Reduce(lhs), atb_Ratio_Reduce(rhs), &lhs));
+
+  if (success) {
     if (lhs.num == lhs.den) {
-      return atb_Ratio_Compare_EQUAL;
+      *dest = atb_Ratio_Compare_EQUAL;
     } else if (lhs.num > lhs.den) {
-      return atb_Ratio_Compare_GREATER;
+      *dest = atb_Ratio_Compare_GREATER;
     } else {
-      return atb_Ratio_Compare_LESS;
+      *dest = atb_Ratio_Compare_LESS;
     }
-  } else {
-    return atb_Ratio_Compare_UNKNOWN;
   }
+
+  return success;
 }
 
 bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  return atb_Ratio_Compare(lhs, rhs) == atb_Ratio_Compare_EQUAL;
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
+    case atb_Ratio_Compare_EQUAL:
+      return true;
+    default:
+      return false;
+  }
 }
 
 bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  return !atb_Ratio_Eq(lhs, rhs);
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
+    case atb_Ratio_Compare_GREATER:
+    case atb_Ratio_Compare_LESS:
+      return true;
+    default:
+      return false;
+  }
 }
 
 bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  switch (atb_Ratio_Compare(lhs, rhs)) {
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
     case atb_Ratio_Compare_GREATER:
       return true;
     default:
@@ -176,7 +205,12 @@ bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
 }
 
 bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  switch (atb_Ratio_Compare(lhs, rhs)) {
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
     case atb_Ratio_Compare_LESS:
       return true;
     default:
@@ -185,7 +219,12 @@ bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
 }
 
 bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  switch (atb_Ratio_Compare(lhs, rhs)) {
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
     case atb_Ratio_Compare_EQUAL:
     case atb_Ratio_Compare_GREATER:
       return true;
@@ -195,7 +234,12 @@ bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs) {
 }
 
 bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  switch (atb_Ratio_Compare(lhs, rhs)) {
+  atb_Ratio_Compare_Result cmp_res;
+  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
+    return false;
+  }
+
+  switch (cmp_res) {
     case atb_Ratio_Compare_EQUAL:
     case atb_Ratio_Compare_LESS:
       return true;

@@ -108,9 +108,15 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
 #define atb_Ratio_APPLY_R(ratio, value) (((value) / (ratio).den) * (ratio).num)
 
 /**
- *  \return The ratio correspondint to the inverse
+ *  \brief Inverse the ratio
+ *
+ *  \param[in] ratio The ratio we wish to inverse
+ *  \param[out] dest The inverse computed
+ *
+ *  \return Always true.
  */
-struct atb_Ratio atb_Ratio_Inv(struct atb_Ratio ratio) ATB_PUBLIC;
+bool atb_Ratio_Inv(struct atb_Ratio ratio,
+                   struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
  *  \return The reduced fraction using Euclid's algorithm to find the GCD
@@ -199,14 +205,19 @@ typedef enum {
   atb_Ratio_Compare_LESS = -1,   /*!< LHS is LESS than RHS */
   atb_Ratio_Compare_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
   atb_Ratio_Compare_GREATER = 1, /*!< LHS is GREATER than RHS */
-  atb_Ratio_Compare_UNKNOWN      /*!< Comparison failed */
 } atb_Ratio_Compare_Result;
 
 /**
- *  \brief Compare 2 ratios with each other
+ *  \brief Compare 2 ratios with each other and set dest accordingly
+ *
+ *  \param[in] lhs, rhs Both ratios we wish to compare
+ *  \param[out] dest The result of the comparison, if succeeded
+ *
+ *  \return True when the comparison succeeded (no overflows/underflows...).
+ *          False otherwise, and dest is left unchanged.
  */
-atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
-                                           struct atb_Ratio rhs) ATB_PUBLIC;
+bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                       atb_Ratio_Compare_Result *const dest) ATB_PUBLIC;
 
 bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
 bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
