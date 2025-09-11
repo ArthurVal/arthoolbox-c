@@ -7,7 +7,7 @@
 
 namespace {
 
-class TestAtbStrView : public ::testing::Test {
+class AtbStrViewTest : public ::testing::Test {
   struct TestStrView {
     atb_StrView valid;
     atb_StrView corrupted;
@@ -34,7 +34,7 @@ class TestAtbStrView : public ::testing::Test {
 /***************************************************************************/
 /*                                Construct                                */
 /***************************************************************************/
-TEST_F(TestAtbStrView, Init) {
+TEST_F(AtbStrViewTest, Init) {
   auto str = atb_StrView{
       reinterpret_cast<const char *>(0x1234),
       42,
@@ -44,16 +44,16 @@ TEST_F(TestAtbStrView, Init) {
   EXPECT_THAT(str, helper::FieldsMatch({nullptr, 0u}));
 }
 
-TEST_F(TestAtbStrView, MakeEmpty) {
+TEST_F(AtbStrViewTest, MakeEmpty) {
   EXPECT_EQ(atb_StrView_MakeEmpty(), str_example.null);
 }
 
-TEST_F(TestAtbStrView, MakeFromLiteral) {
+TEST_F(AtbStrViewTest, MakeFromLiteral) {
   auto view = atb_StrView_MakeFromLiteral("Foo");
   EXPECT_EQ(view, "Foo");
 }
 
-TEST_F(TestAtbStrView, MakeFromCString) {
+TEST_F(AtbStrViewTest, MakeFromCString) {
   EXPECT_THAT(atb_StrView_MakeFromCString(nullptr, -1),
               helper::FieldsMatch({nullptr, 0u}));
 
@@ -75,14 +75,14 @@ TEST_F(TestAtbStrView, MakeFromCString) {
 /*                                Operations                               */
 /***************************************************************************/
 /* Checks ******************************************************************/
-TEST_F(TestAtbStrView, IsCorrupted) {
+TEST_F(AtbStrViewTest, IsCorrupted) {
   EXPECT_PRED1(atb_StrView_IsCorrupted, str_example.corrupted);
   EXPECT_PRED1(helper::DoNot(atb_StrView_IsCorrupted), str_example.valid);
   EXPECT_PRED1(helper::DoNot(atb_StrView_IsCorrupted), str_example.null);
   EXPECT_PRED1(helper::DoNot(atb_StrView_IsCorrupted), str_example.empty);
 }
 
-TEST_F(TestAtbStrView, IsOverlapping) {
+TEST_F(AtbStrViewTest, IsOverlapping) {
   const auto str = atb_StrView_MakeFromLiteral("ABCDEF");
 
   const auto left = atb_StrView_SliceBack(str, 3);    // ABC
@@ -122,7 +122,7 @@ TEST_F(TestAtbStrView, IsOverlapping) {
 }
 
 /* Slicing *****************************************************************/
-TEST_F(TestAtbStrView, Slicing) {
+TEST_F(AtbStrViewTest, Slicing) {
   EXPECT_EQ(atb_StrView_SliceBack(str_example.empty, 0), "");
   EXPECT_EQ(atb_StrView_SliceBack(str_example.empty, 1), "");
   EXPECT_EQ(atb_StrView_SliceBack(str_example.empty, 50), "");
@@ -169,7 +169,7 @@ TEST_F(TestAtbStrView, Slicing) {
 }
 
 /* Comparison **************************************************************/
-TEST_F(TestAtbStrView, Compare) {
+TEST_F(AtbStrViewTest, Compare) {
   EXPECT_EQ(atb_StrView_Compare(str_example.null, str_example.null),
             atb_StrView_Compare_EQUAL);
 
@@ -228,7 +228,7 @@ TEST_F(TestAtbStrView, Compare) {
       "Assertion");
 }
 
-TEST_F(TestAtbStrView, Eq) {
+TEST_F(AtbStrViewTest, Eq) {
   EXPECT_PRED2(atb_StrView_Eq, str_example.null, str_example.null);
   EXPECT_PRED2(atb_StrView_Eq, str_example.empty, str_example.empty);
 
@@ -261,7 +261,7 @@ TEST_F(TestAtbStrView, Eq) {
       "Assertion");
 }
 
-TEST_F(TestAtbStrView, Ne) {
+TEST_F(AtbStrViewTest, Ne) {
   EXPECT_PRED2(helper::DoNot(atb_StrView_Ne), str_example.null,
                str_example.null);
   EXPECT_PRED2(helper::DoNot(atb_StrView_Ne), str_example.empty,
@@ -296,7 +296,7 @@ TEST_F(TestAtbStrView, Ne) {
       "Assertion");
 }
 
-TEST_F(TestAtbStrView, GtLt) {
+TEST_F(AtbStrViewTest, GtLt) {
   EXPECT_PRED2(helper::DoNot(atb_StrView_Lt), str_example.null,
                str_example.null);
   EXPECT_PRED2(helper::DoNot(atb_StrView_Lt), str_example.empty,
@@ -339,7 +339,7 @@ TEST_F(TestAtbStrView, GtLt) {
       "Assertion");
 }
 
-TEST_F(TestAtbStrView, GeLe) {
+TEST_F(AtbStrViewTest, GeLe) {
   EXPECT_PRED2(atb_StrView_Le, str_example.null, str_example.null);
   EXPECT_PRED2(atb_StrView_Le, str_example.empty, str_example.empty);
 
@@ -390,7 +390,7 @@ TEST_F(TestAtbStrView, GeLe) {
 }
 
 /* Lookup *****************************************************************/
-TEST_F(TestAtbStrView, Find) {
+TEST_F(AtbStrViewTest, Find) {
   constexpr auto main_str = atb_StrView_MakeFromLiteral("This is a phrase");
 
   for (auto [substr, expected_offset] : {
@@ -432,7 +432,7 @@ TEST_F(TestAtbStrView, Find) {
       "Assertion");
 }
 
-TEST_F(TestAtbStrView, FindR) {
+TEST_F(AtbStrViewTest, FindR) {
   constexpr auto main_str = atb_StrView_MakeFromLiteral("This is a phrase");
 
   for (auto [substr, expected_offset] : {

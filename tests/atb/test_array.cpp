@@ -3,7 +3,7 @@
 
 namespace {
 
-TEST(TestAtbArray, Size) {
+TEST(AtbArrayTest, Size) {
   {
     int toto[20] = {};
     EXPECT_EQ(20, atb_Array_Size(toto));
@@ -20,7 +20,7 @@ TEST(TestAtbArray, Size) {
   }
 }
 
-TEST(TestAtbArray, IsInRangeOf) {
+TEST(AtbArrayTest, IsInRangeOf) {
   int toto[20] = {0};
   EXPECT_FALSE(atb_Array_IsOutOfRange(toto, 0));
   EXPECT_FALSE(atb_Array_IsOutOfRange(toto, 5));
@@ -30,7 +30,7 @@ TEST(TestAtbArray, IsInRangeOf) {
   EXPECT_TRUE(atb_Array_IsOutOfRange(toto, 0xff));
 }
 
-TEST(TestAtbArray, ForEach) {
+TEST(AtbArrayTest, ForEach) {
   int toto[] = {0, 1, 2, 3};
 
   int *v = nullptr;

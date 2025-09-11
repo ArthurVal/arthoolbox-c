@@ -13,7 +13,7 @@ constexpr auto ToChronoDuration(timespec ts) {
   return std::chrono::seconds{ts.tv_sec} + std::chrono::nanoseconds{ts.tv_nsec};
 }
 
-TEST(TestAtbTime, Now) {
+TEST(AtbTimeTest, Now) {
   const auto now = atb_timespec_Now(CLOCK_REALTIME);
 
   const std::chrono::nanoseconds expected =
@@ -23,7 +23,7 @@ TEST(TestAtbTime, Now) {
       << SCOPE_LOOP_MSG_2(now, expected);
 }
 
-TEST(TestAtbTime, From) {
+TEST(AtbTimeTest, From) {
   for (auto ratio : {
            atb_NS,
            atb_US,
@@ -79,11 +79,11 @@ TEST(TestAtbTime, From) {
               helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
-TEST(DeathTestAtbTime, From) {
+TEST(AtbTimeDeathTest, From) {
   EXPECT_DEBUG_DEATH({ atb_timespec_From(0, {1, 0}); }, "den != 0");
 }
 
-TEST(TestAtbTime, Compare) {
+TEST(AtbTimeTest, Compare) {
   // TESTS EQ
   for (auto [lhs, rhs] : std::array{
            std::array{timespec{1, 2}, timespec{1, 2}},
@@ -186,7 +186,7 @@ constexpr auto WriteStampInto(InputIt d_first) {
       [d_first]() mutable { *d_first++ = ClockType::now(); });
 }
 
-TEST(TestAtbTime, RetryCall) {
+TEST(AtbTimeTest, RetryCall) {
   using ::testing::_;
   using ::testing::DoAll;
   using ::testing::InvokeWithoutArgs;
@@ -267,7 +267,7 @@ TEST(TestAtbTime, RetryCall) {
   }
 }
 
-TEST(DeathTestAtbTime, RetryCall) {
+TEST(AtbTimeDeathTest, RetryCall) {
   EXPECT_DEBUG_DEATH(atb_Time_RetryCall({nullptr, nullptr}, 0, {});
                      , "function != NULL");
 }

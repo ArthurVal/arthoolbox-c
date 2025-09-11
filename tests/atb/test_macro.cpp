@@ -3,7 +3,7 @@
 
 namespace {
 
-TEST(TestAtbMacro, ARGN) {
+TEST(AtbMacroTest, ARGN) {
   EXPECT_EQ(0, atb_VA_ARGN());
   EXPECT_EQ(1, atb_VA_ARGN(1));
   EXPECT_EQ(2, atb_VA_ARGN(1, 1));
@@ -31,7 +31,7 @@ TEST(TestAtbMacro, ARGN) {
 #define TEST_COUCOU_1 1
 #define TEST_COUCOU_2 2
 
-TEST(TestAtbMacro, TKN_CONCAT) {
+TEST(AtbMacroTest, TKN_CONCAT) {
   EXPECT_EQ(1234, atb_TKN_CONCAT(1234));
   EXPECT_EQ(1234, atb_TKN_CONCAT(123, 4));
   EXPECT_EQ(1234, atb_TKN_CONCAT(12, 34));
@@ -49,7 +49,7 @@ TEST(TestAtbMacro, TKN_CONCAT) {
   EXPECT_EQ(TEST_COUCOU_0, atb_TKN_CONCAT(TEST_COUCOU_, TEST_COUCOU_0));
 }
 
-TEST(TestAtbMacro, TKN_STR) {
+TEST(AtbMacroTest, TKN_STR) {
   EXPECT_STREQ("0", atb_TKN_STR(0));
   EXPECT_STREQ("0", atb_TKN_STR(TEST_COUCOU_0));
 }

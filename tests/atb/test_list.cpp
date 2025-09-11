@@ -3,26 +3,26 @@
 
 namespace {
 
-TEST(TestAtbList, Initialize) {
+TEST(AtbListTest, Initialize) {
   atb_List list = atb_List_INITIALIZE(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(TestAtbList, DeclareHead) {
+TEST(AtbListTest, DeclareHead) {
   atb_List_DECLARE_HEAD(list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(TestAtbList, Init) {
+TEST(AtbListTest, Init) {
   atb_List list;
   atb_List_Init(&list);
   EXPECT_EQ(list.next, &list);
   EXPECT_EQ(list.prev, &list);
 }
 
-TEST(TestAtbList, IsCorrupted) {
+TEST(AtbListTest, IsCorrupted) {
   atb_List list;
 
   atb_List_Init(&list);
@@ -41,7 +41,7 @@ TEST(TestAtbList, IsCorrupted) {
   EXPECT_TRUE(atb_List_IsCorrupted(&list));
 }
 
-TEST(TestAtbList, InsertAfter) {
+TEST(AtbListTest, InsertAfter) {
   atb_List first = atb_List_INITIALIZE(first);
 
   atb_List second = atb_List_INITIALIZE(second);
@@ -82,7 +82,7 @@ TEST(TestAtbList, InsertAfter) {
   EXPECT_EQ(first.prev, &(fourth));
 }
 
-TEST(TestAtbList, InsertBefore) {
+TEST(AtbListTest, InsertBefore) {
   atb_List first = atb_List_INITIALIZE(first);
 
   atb_List second = atb_List_INITIALIZE(second);
@@ -123,7 +123,7 @@ TEST(TestAtbList, InsertBefore) {
   EXPECT_EQ(first.prev, &(second));
 }
 
-TEST(TestAtbList, Pop) {
+TEST(AtbListTest, Pop) {
   atb_List first = atb_List_INITIALIZE(first);
 
   // Poping an empty list does nothing
@@ -158,7 +158,7 @@ struct Toto {
   std::size_t useless_1;
 };
 
-TEST(TestAtbList, Entry) {
+TEST(AtbListTest, Entry) {
   Toto toto = {
       0,
       atb_List_INITIALIZE(toto.list),
@@ -169,7 +169,7 @@ TEST(TestAtbList, Entry) {
   EXPECT_EQ(&toto, atb_List_Entry(toto_list, struct Toto, list));
 }
 
-TEST(TestAtbList, ForEach) {
+TEST(AtbListTest, ForEach) {
   atb_List head = atb_List_INITIALIZE(head);
 
   Toto first{0, atb_List_INITIALIZE(first.list), 0};
@@ -196,7 +196,7 @@ TEST(TestAtbList, ForEach) {
   }
 }
 
-TEST(TestAtbList, Size) {
+TEST(AtbListTest, Size) {
   atb_List_DECLARE_HEAD(head);
 
   EXPECT_EQ(atb_List_Size(&head), 0);

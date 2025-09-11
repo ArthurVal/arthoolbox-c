@@ -8,7 +8,7 @@
 
 namespace {
 
-TEST(TestAtbMemView, Init) {
+TEST(AtbMemViewTest, Init) {
   auto mem = atb_MemView{
       reinterpret_cast<void *>(0x1234),
       42,
@@ -18,7 +18,7 @@ TEST(TestAtbMemView, Init) {
   EXPECT_THAT(mem, helper::FieldsMatch({nullptr, 0u}));
 }
 
-TEST(TestAtbMemView, Fmt) {
+TEST(AtbMemViewTest, Fmt) {
   const auto mem = atb_MemView{
       reinterpret_cast<void *>(0x1234),
       42,
@@ -31,11 +31,11 @@ TEST(TestAtbMemView, Fmt) {
       << (const void *)mem.data << " " << mem.size;
 }
 
-TEST(TestAtbMemView, MakeEmpty) {
+TEST(AtbMemViewTest, MakeEmpty) {
   EXPECT_THAT(atb_MemView_MakeEmpty(), helper::FieldsMatch({nullptr, 0u}));
 }
 
-TEST(TestAtbMemView, MakeFromStaticArray) {
+TEST(AtbMemViewTest, MakeFromStaticArray) {
   int array[] = {1, 2, 3, 4, 5};
   auto mem = atb_MemView_MakeFromStaticArray(array);
   EXPECT_THAT(mem, helper::FieldsMatch({
@@ -44,7 +44,7 @@ TEST(TestAtbMemView, MakeFromStaticArray) {
                    }));
 }
 
-TEST(TestAtbMemView, Iter) {
+TEST(AtbMemViewTest, Iter) {
   std::uint32_t array[] = {0, 1, 2, 3, 4};
 
   auto mem = atb_MemView_MakeFromStaticArray(array);
@@ -90,7 +90,7 @@ TEST(TestAtbMemView, Iter) {
   // }
 }
 
-TEST(TestAtbMemView, IsInvalid) {
+TEST(AtbMemViewTest, IsInvalid) {
 
   EXPECT_PRED1(atb_MemView_IsInvalid, (atb_MemView{nullptr, 42}));
   EXPECT_PRED1(helper::DoNot(atb_MemView_IsInvalid), (atb_MemView{nullptr, 0}));
@@ -105,7 +105,7 @@ TEST(TestAtbMemView, IsInvalid) {
   EXPECT_PRED1(helper::DoNot(atb_MemView_IsInvalid), mem);
 }
 
-TEST(TestAtbMemView, Sort) {
+TEST(AtbMemViewTest, Sort) {
   int array[] = {0, 1, 2, 3};
   auto lowest = atb_MemView{array, 1};
   auto highest = atb_MemView{array + 1, 3};
@@ -153,7 +153,7 @@ TEST(TestAtbMemView, Sort) {
       "Assertion");
 }
 
-TEST(TestAtbMemView, IsOverlapping) {
+TEST(AtbMemViewTest, IsOverlapping) {
   char array[] = {0, 1, 2, 3};
 
   auto array_span = atb_MemView_MakeFromStaticArray(array);
