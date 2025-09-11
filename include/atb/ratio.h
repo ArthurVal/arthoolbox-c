@@ -155,16 +155,40 @@ bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
- *  \return The multiplication of the 2 lhs/rhs ratios
+ *  \brief Multiply 2 ratios and store the result in dest, if valid
+ *
+ *  \param[in] lhs, rhs Both ratios we wish to substract
+ *  \param[out] dest If not null, the result of the computation
+ *
+ *  \note Setting dest to NULL can be used to simply check if an
+ *        overflows/underflows would happen.
+ *
+ *  \warning Having one of the inputs with a `.den = 0` is not checked and
+ *           doesn't trigger any error
+ *
+ *  \returns True when the computation succeed. False when computing this new
+ *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
  */
-struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs,
-                               struct atb_Ratio rhs) ATB_PUBLIC;
+bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
- *  \return The division of the 2 lhs/rhs ratios
+ *  \brief Divide 2 ratios and store the result in dest, if valid
+ *
+ *  \param[in] lhs, rhs Both ratios we wish to substract
+ *  \param[out] dest If not null, the result of the computation
+ *
+ *  \note Setting dest to NULL can be used to simply check if an
+ *        overflows/underflows would happen.
+ *
+ *  \warning Having one of the inputs with a `.den = 0` is not checked and
+ *           doesn't trigger any error
+ *
+ *  \returns True when the computation succeed. False when computing this new
+ *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
  */
-struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs,
-                               struct atb_Ratio rhs) ATB_PUBLIC;
+bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /* Comparison **************************************************************/
 
@@ -172,9 +196,10 @@ struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs,
  *  \brief Enum representing the result of the _Compare function
  */
 typedef enum {
-  atb_Ratio_Compare_LESS,    /*!< LHS is LESS than RHS */
-  atb_Ratio_Compare_EQUAL,   /*!< LHS is EQUAL to RHS */
-  atb_Ratio_Compare_GREATER, /*!< LHS is GREATER than RHS */
+  atb_Ratio_Compare_LESS = -1,   /*!< LHS is LESS than RHS */
+  atb_Ratio_Compare_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
+  atb_Ratio_Compare_GREATER = 1, /*!< LHS is GREATER than RHS */
+  atb_Ratio_Compare_UNKNOWN      /*!< Comparison failed */
 } atb_Ratio_Compare_Result;
 
 /**

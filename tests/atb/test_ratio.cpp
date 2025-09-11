@@ -143,7 +143,7 @@ TEST(AtbRatioTest, Sub) {
   EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, nullptr));
   EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{2, max}, atb_Ratio{1, 2}, nullptr));
 
-  // // Aliasing
+  // Aliasing
   res = {0, 1};
   EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 2}, res, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 2}));
@@ -175,24 +175,153 @@ TEST(AtbRatioTest, Sub) {
 }
 
 TEST(TestAtbRatio, Mul) {
-  EXPECT_EQ((atb_Ratio{1, 4}), atb_Ratio_Mul(atb_Ratio{1, 2}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{2, 8}), atb_Ratio_Mul(atb_Ratio{2, 4}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{3, 2}), atb_Ratio_Mul(atb_Ratio{3, 1}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{5, 8}), atb_Ratio_Mul(atb_Ratio{1, 4}, atb_Ratio{5, 2}));
+  constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
+  constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
 
-  EXPECT_EQ((atb_Ratio{-1, 4}),
-            atb_Ratio_Mul(atb_Ratio{1, 2}, atb_Ratio{-1, 2}));
+  atb_Ratio res;
+
+  // Nominal tests
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Mul({1, 2}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 4}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Mul({2, 4}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{2, 8}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Mul({3, 1}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{3, 2}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Mul({-1, 2}, {1, -2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{-1, -4}));
+
+  // Failure
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{max, 2}, atb_Ratio{max, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{1, 2}, atb_Ratio{2, max}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{0, min}, atb_Ratio{min, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{2, max}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  // dest = nullptr
+  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{-1, 2}, atb_Ratio{1, 2}, nullptr));
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{2, max}, atb_Ratio{1, 2}, nullptr));
+
+  // Aliasing
+  res = {0, 1};
+  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{1, 2}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 2}));
+
+  res = {10, 5};
+  EXPECT_TRUE(atb_Ratio_Mul(res, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 10}));
+
+  res = {10, 5};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{max, max}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 5}));
+
+  // .den = 0
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{2, 0}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{2, 0}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{2, 5}, atb_Ratio{10, 0}, &res));
+  EXPECT_EQ(res, (atb_Ratio{20, 0}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{1, 1}, atb_Ratio{0, 10}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 10}));
+
+  res = {1, 1};
+  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{1, max}, atb_Ratio{0, 10}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
 TEST(TestAtbRatio, Div) {
-  EXPECT_EQ((atb_Ratio{2, 2}), atb_Ratio_Div(atb_Ratio{1, 2}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{4, 4}), atb_Ratio_Div(atb_Ratio{2, 4}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{6, 1}), atb_Ratio_Div(atb_Ratio{3, 1}, atb_Ratio{1, 2}));
-  EXPECT_EQ((atb_Ratio{2, 20}),
-            atb_Ratio_Div(atb_Ratio{1, 4}, atb_Ratio{5, 2}));
+  constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
+  constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
 
-  EXPECT_EQ((atb_Ratio{2, -2}),
-            atb_Ratio_Div(atb_Ratio{1, 2}, atb_Ratio{-1, 2}));
+  atb_Ratio res;
+
+  // Nominal tests
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Div({1, 2}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{2, 2}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Div({2, 4}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{4, 4}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Div({3, 1}, {1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{6, 1}));
+
+  res = {0, 0};
+  EXPECT_TRUE(atb_Ratio_Div({-1, 2}, {1, -2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{2, 2}));
+
+  // Failure
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{max, 2}, atb_Ratio{max, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{300, 2}, atb_Ratio{2, max}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{0, min}, atb_Ratio{min, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  res = {0, 0};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{2, max}, atb_Ratio{40, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 0}));
+
+  // dest = nullptr
+  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{-1, 2}, atb_Ratio{1, 2}, nullptr));
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{2, max}, atb_Ratio{2, 4}, nullptr));
+
+  // Aliasing
+  res = {0, 1};
+  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{1, 2}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 0}));
+
+  res = {10, 5};
+  EXPECT_TRUE(atb_Ratio_Div(res, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{20, 5}));
+
+  res = {10, 5};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{max, max}, res, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 5}));
+
+  // .den = 0
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{2, 0}, atb_Ratio{1, 2}, &res));
+  EXPECT_EQ(res, (atb_Ratio{4, 0}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{2, 5}, atb_Ratio{10, 0}, &res));
+  EXPECT_EQ(res, (atb_Ratio{0, 50}));
+
+  res = {1, 1};
+  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{1, 1}, atb_Ratio{0, 10}, &res));
+  EXPECT_EQ(res, (atb_Ratio{10, 0}));
+
+  res = {1, 1};
+  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{1, max}, atb_Ratio{10, 0}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
 TEST(TestAtbRatio, Reduce) {
@@ -208,6 +337,9 @@ TEST(TestAtbRatio, Reduce) {
 }
 
 TEST(TestAtbRatio, Comparisons) {
+  constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
+  constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
+
   // TESTS EQ
   for (auto [lhs, rhs] : std::array{
            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 2}},
@@ -235,6 +367,8 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{394, 2}, atb_Ratio{2, 4}},
            std::array{atb_Ratio{2, 4}, atb_Ratio{-10, 23939}},
            std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
+           std::array{atb_Ratio{max, 2}, atb_Ratio{1, 1}},
+           std::array{atb_Ratio{max, 2}, atb_Ratio{1, min}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -252,6 +386,7 @@ TEST(TestAtbRatio, Comparisons) {
            std::array{atb_Ratio{-1, -2}, atb_Ratio{1, -2}},
            std::array{atb_Ratio{1, -4}, atb_Ratio{-1, 2}},
            std::array{atb_Ratio{-1, 4}, atb_Ratio{1, -2}},
+           std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
            std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));

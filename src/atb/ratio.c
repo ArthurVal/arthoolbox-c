@@ -21,13 +21,50 @@ static atb_Ratio_elem_t Ratio_FindGCD(atb_Ratio_elem_t a, atb_Ratio_elem_t b) {
   return abs(a);
 }
 
-static struct atb_Ratio Ratio_FixSign(struct atb_Ratio ratio) {
-  if (ratio.den < 0) {
-    ratio.num *= -1;
-    ratio.den *= -1;
+static bool Ratio_FixSign(struct atb_Ratio *const ratio) {
+  assert(ratio != NULL);
+
+  struct atb_Ratio tmp;
+  bool success = true;
+
+  if (ratio->den < 0) {
+    success = atb_Mul_Safely_i32(ratio->num, -1, &(tmp.num)) &&
+              atb_Mul_Safely_i32(ratio->den, -1, &(tmp.den));
+
+    if (success) {
+      *ratio = tmp;
+    }
   }
 
-  return ratio;
+  return success;
+}
+
+static bool Ratio_SameDenominator(struct atb_Ratio *const lhs,
+                                  struct atb_Ratio *const rhs) {
+  assert(lhs != NULL);
+  assert(rhs != NULL);
+
+  bool success = true;
+
+  if (lhs->den != rhs->den) {
+    atb_Ratio_elem_t lhs_num;
+    atb_Ratio_elem_t rhs_num;
+    atb_Ratio_elem_t den;
+
+    success = atb_Mul_Safely_i32(lhs->den, rhs->den, &(den)) &&
+              atb_Mul_Safely_i32(lhs->num, rhs->den, &(lhs_num)) &&
+              atb_Mul_Safely_i32(rhs->num, lhs->den, &(rhs_num));
+
+    if (success) {
+      lhs->num = lhs_num;
+      lhs->den = den;
+
+      rhs->num = rhs_num;
+      rhs->den = den;
+    }
+  }
+
+  return success;
 }
 
 float atb_Ratio_Tof32(struct atb_Ratio ratio) {
@@ -62,26 +99,8 @@ struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
 bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
   /* We use LHS to store the result and then assign to dest if it succeeded */
-  bool success = true;
-
-  if (lhs.den != rhs.den) {
-    /*
-     * lhs.num = (lhs.num * rhs.den) + (rhs.num * lhs.den)
-     * lhs.den = (lhs.den * rhs.den)
-     *
-     * The first computation is divide like this:
-     * lhs.num = (lhs.num * rhs.den)
-     * rhs.num = (rhs.num * lhs.den)
-     * lhs.num = lhs.num + rhs.num
-     */
-    success = atb_Mul_Safely_i32(lhs.num, rhs.den, &(lhs.num)) &&
-              atb_Mul_Safely_i32(rhs.num, lhs.den, &(rhs.num)) &&
-              atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
-              atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
-
-  } else {
-    success = atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num));
-  }
+  bool success = Ratio_SameDenominator(&lhs, &rhs) &&
+                 atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num));
 
   /* Only assign if it succeeded */
   if (success && (dest != NULL)) {
@@ -94,26 +113,8 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
 bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
   /* We use LHS to store the result and then assign to dest if it succeeded */
-  bool success = true;
-
-  if (lhs.den != rhs.den) {
-    /*
-     * lhs.num = (lhs.num * rhs.den) - (rhs.num * lhs.den)
-     * lhs.den = (lhs.den * rhs.den)
-     *
-     * The first computation is divide like this:
-     * lhs.num = (lhs.num * rhs.den)
-     * rhs.num = (rhs.num * lhs.den)
-     * lhs.num = lhs.num - rhs.num
-     */
-    success = atb_Mul_Safely_i32(lhs.num, rhs.den, &(lhs.num)) &&
-              atb_Mul_Safely_i32(rhs.num, lhs.den, &(rhs.num)) &&
-              atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
-              atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
-
-  } else {
-    success = atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num));
-  }
+  bool success = Ratio_SameDenominator(&lhs, &rhs) &&
+                 atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num));
 
   /* Only assign if it succeeded */
   if (success && (dest != NULL)) {
@@ -123,27 +124,37 @@ bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
   return success;
 }
 
-struct atb_Ratio atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  lhs.num *= rhs.num;
-  lhs.den *= rhs.den;
-  return lhs;
+bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) {
+  bool success = atb_Mul_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
+                 atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
+
+  if (success && (dest != NULL)) {
+    *dest = lhs;
+  }
+
+  return success;
 }
 
-struct atb_Ratio atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  return atb_Ratio_Mul(lhs, atb_Ratio_Inv(rhs));
+bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
+                   struct atb_Ratio *const dest) {
+  return atb_Ratio_Mul(lhs, atb_Ratio_Inv(rhs), dest);
 }
 
 atb_Ratio_Compare_Result atb_Ratio_Compare(struct atb_Ratio lhs,
                                            struct atb_Ratio rhs) {
-  const struct atb_Ratio div =
-      atb_Ratio_Div(Ratio_FixSign(lhs), Ratio_FixSign(rhs));
-
-  if (div.num == div.den) {
-    return atb_Ratio_Compare_EQUAL;
-  } else if (div.num > div.den) {
-    return atb_Ratio_Compare_GREATER;
+  if (Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
+      (atb_Ratio_Div(lhs, rhs, &lhs) ||
+       atb_Ratio_Div(atb_Ratio_Reduce(lhs), atb_Ratio_Reduce(rhs), &lhs))) {
+    if (lhs.num == lhs.den) {
+      return atb_Ratio_Compare_EQUAL;
+    } else if (lhs.num > lhs.den) {
+      return atb_Ratio_Compare_GREATER;
+    } else {
+      return atb_Ratio_Compare_LESS;
+    }
   } else {
-    return atb_Ratio_Compare_LESS;
+    return atb_Ratio_Compare_UNKNOWN;
   }
 }
 

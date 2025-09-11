@@ -22,7 +22,7 @@ struct timespec atb_timespec_From(intmax_t stamp, struct atb_Ratio to_sec) {
   out.tv_sec = (stamp / to_sec.den);
   out.tv_nsec = (stamp % to_sec.den);
 
-  to_sec = atb_Ratio_Div(to_sec, atb_NS);
+  atb_Ratio_Div(to_sec, atb_NS, &to_sec);
   out.tv_nsec *= to_sec.num;
   out.tv_nsec /= to_sec.den;
 
@@ -56,31 +56,39 @@ bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) {
 
 bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs) {
   switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_GREATER: return true;
-    default: return false;
+    case atb_timespec_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs) {
   switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_LESS: return true;
-    default: return false;
+    case atb_timespec_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs) {
   switch (atb_timespec_Compare(lhs, rhs)) {
     case atb_timespec_Compare_EQUAL:
-    case atb_timespec_Compare_GREATER: return true;
-    default: return false;
+    case atb_timespec_Compare_GREATER:
+      return true;
+    default:
+      return false;
   }
 }
 
 bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) {
   switch (atb_timespec_Compare(lhs, rhs)) {
     case atb_timespec_Compare_EQUAL:
-    case atb_timespec_Compare_LESS: return true;
-    default: return false;
+    case atb_timespec_Compare_LESS:
+      return true;
+    default:
+      return false;
   }
 }
 
