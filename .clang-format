@@ -4,7 +4,7 @@ BasedOnStyle:  Google
 IndentPPDirectives: AfterHash
 DerivePointerAlignment: false
 PointerAlignment: Right
-AllowShortCaseLabelsOnASingleLine: true
+# AllowShortCaseLabelsOnASingleLine: true
 SpacesBeforeTrailingComments: 1
 
 # AccessModifierOffset: -1
