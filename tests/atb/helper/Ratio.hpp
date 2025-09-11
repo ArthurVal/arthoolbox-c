@@ -25,8 +25,6 @@ constexpr auto ToString(atb_Ratio_Compare_Result cmp_res) -> std::string_view {
       return "LESS";
     case atb_Ratio_Compare_GREATER:
       return "GREATER";
-    case atb_Ratio_Compare_UNKNOWN:
-      return "UNKNOWN";
   }
   return "";
 }
