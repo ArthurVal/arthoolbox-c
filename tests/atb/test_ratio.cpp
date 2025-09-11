@@ -6,18 +6,18 @@
 
 namespace {
 
-TEST(TestAtbRatio, Tof) {
+TEST(AtbRatioTest, Tof) {
   EXPECT_NEAR((float)0.333'333, atb_Ratio_Tof32({1, 3}), 1e-6);
   EXPECT_NEAR((double)0.666'666'666, atb_Ratio_Tof64({2, 3}), 1e-9);
 }
 
-TEST(TestAtbRatio, APPLY) {
+TEST(AtbRatioTest, APPLY) {
   EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{2, 1}), 10)), 20);
   EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{1, 2}), 10)), 5);
   EXPECT_NEAR((atb_Ratio_APPLY((atb_Ratio{1, 10}), 0.5)), 0.05, 1e-9);
 }
 
-TEST(TestAtbRatio, Inv) {
+TEST(AtbRatioTest, Inv) {
   EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_Inv(atb_Ratio{2, 1}));
   EXPECT_EQ((atb_Ratio{3, 4}), atb_Ratio_Inv(atb_Ratio{4, 3}));
 
@@ -174,7 +174,7 @@ TEST(AtbRatioTest, Sub) {
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
-TEST(TestAtbRatio, Mul) {
+TEST(AtbRatioTest, Mul) {
   constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
   constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
 
@@ -249,7 +249,7 @@ TEST(TestAtbRatio, Mul) {
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
-TEST(TestAtbRatio, Div) {
+TEST(AtbRatioTest, Div) {
   constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
   constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
 
@@ -324,7 +324,7 @@ TEST(TestAtbRatio, Div) {
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
 }
 
-TEST(TestAtbRatio, Reduce) {
+TEST(AtbRatioTest, Reduce) {
   EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_Reduce(atb_Ratio{1, 2}));
   EXPECT_EQ((atb_Ratio{3, 4}), atb_Ratio_Reduce(atb_Ratio{9, 12}));
   EXPECT_EQ((atb_Ratio{1, 2}), atb_Ratio_Reduce(atb_Ratio{2, 4}));
@@ -336,7 +336,7 @@ TEST(TestAtbRatio, Reduce) {
   EXPECT_EQ((atb_Ratio{4, 0}), atb_Ratio_Reduce(atb_Ratio{4, 0}));
 }
 
-TEST(TestAtbRatio, Comparisons) {
+TEST(AtbRatioTest, Comparisons) {
   constexpr auto max = std::numeric_limits<atb_Ratio_elem_t>::max();
   constexpr auto min = std::numeric_limits<atb_Ratio_elem_t>::min();
 
