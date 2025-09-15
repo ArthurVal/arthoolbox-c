@@ -1,14 +1,14 @@
 #pragma once
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h> /* NULL */
 
 #include "atb/export.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /**
  *  \brief Represents a memory block view (constant data)

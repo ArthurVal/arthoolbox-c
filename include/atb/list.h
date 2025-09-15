@@ -1,12 +1,12 @@
 #pragma once
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h> /* NULL */
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /**
  *  \brief Double linked list pointing towards next/prev elements
@@ -283,7 +283,6 @@ static inline void atb_List_Pop(struct atb_List *const node);
        (&(entry_it)->member) != (list_head);                               \
        (entry_it) =                                                        \
            atb_List_Entry((list_head)->next, typeof(*(entry_it)), member))
-
 
 /**
  *  \brief Backward iterate (using ->prev) over the double linked list

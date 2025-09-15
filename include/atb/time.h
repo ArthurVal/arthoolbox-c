@@ -1,15 +1,15 @@
 #pragma once
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 #include <stdbool.h> /* bool */
 #include <stdint.h>  /* intmax_t */
 #include <time.h>    /* timespec */
 
 #include "atb/export.h"
 #include "atb/ratio.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /* Format string helper ****************************************************/
 
