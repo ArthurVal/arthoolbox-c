@@ -27,17 +27,47 @@ struct atb_Ratio {
 
 /* Constant ****************************************************************/
 
-/**
- * \return A ratio corresponding to n:1
- */
-#define atb_Ratio_(n) \
-  (struct atb_Ratio) { .num = (n), .den = 1, }
+/// Initialize an atb_Ratio as n:1 (static initializer)
+#define atb_Ratio_INIT_(n) \
+  { .num = (n), .den = 1, }
 
-/**
- * \return A ratio corresponding to 1:n
- */
-#define atb_Ratio_1_(n) \
-  (struct atb_Ratio) { .num = 1, .den = (n), }
+/// Initialize an atb_Ratio as 1:n (static initializer)
+#define atb_Ratio_INIT_1_(n) \
+  { .num = 1, .den = (n), }
+
+/* Requires 'atb_Ratio_elem_t' to be at least 8 bits */
+#define atb_Ratio_INIT_0 atb_Ratio_INIT_(0)
+#define atb_Ratio_INIT_1 atb_Ratio_INIT_(1)
+
+#define atb_Ratio_INIT_DECA atb_Ratio_INIT_(10)
+#define atb_Ratio_INIT_DECI atb_Ratio_INIT_1_(10)
+
+#define atb_Ratio_INIT_HECTO atb_Ratio_INIT_(100)
+#define atb_Ratio_INIT_CENTI atb_Ratio_INIT_1_(100)
+
+/* Requires 'atb_Ratio_elem_t' to be at least 16 bits */
+#define atb_Ratio_INIT_KILO atb_Ratio_INIT_(1000)
+#define atb_Ratio_INIT_MILLI atb_Ratio_INIT_1_(1000)
+
+/* Requires 'atb_Ratio_elem_t' to be at least 32 bits */
+#define atb_Ratio_INIT_MEGA atb_Ratio_INIT_(1000000)
+#define atb_Ratio_INIT_MICRO atb_Ratio_INIT_1_(1000000)
+
+#define atb_Ratio_INIT_GIGA atb_Ratio_INIT_(1000000000)
+#define atb_Ratio_INIT_NANO atb_Ratio_INIT_1_(1000000000)
+
+/* Requires 'atb_Ratio_elem_t' to be at least 64 bits */
+/* #define atb_Ratio_INIT_TERA atb_Ratio_INIT_(1000000000000) */
+/* #define atb_Ratio_INIT_PICO atb_Ratio_INIT_1_(1000000000000) */
+
+/* #define atb_Ratio_INIT_PERA atb_Ratio_INIT_(1000000000000000) */
+/* #define atb_Ratio_INIT_FEMPTO atb_Ratio_INIT_1_(1000000000000000) */
+
+/// Compound literal of a ratio corresponding to n:1
+#define atb_Ratio_(n) (struct atb_Ratio) atb_Ratio_INIT_(n)
+
+/// Compound literal of a ratio corresponding to 1:n
+#define atb_Ratio_1_(n) (struct atb_Ratio) atb_Ratio_INIT_1_(n)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 8 bits */
 #define atb_Ratio_0 atb_Ratio_(0)
