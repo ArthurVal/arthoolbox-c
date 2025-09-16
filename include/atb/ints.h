@@ -202,23 +202,26 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
 /// checking for overflows/underflows.
 /// Always return TRUE.
 ///
-/// When dest is NULL, does nothing.
+/// \pre dest != NULL
 
 #define _DEFINE_ADD_UNSAFE(T, NAME, ...)                                  \
   static inline bool atb_Add_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
-    if (dest != NULL) *dest = (lhs + rhs);                                \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs + rhs);                                                  \
     return true;                                                          \
   }
 
 #define _DEFINE_SUB_UNSAFE(T, NAME, ...)                                  \
   static inline bool atb_Sub_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
-    if (dest != NULL) *dest = (lhs - rhs);                                \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs - rhs);                                                  \
     return true;                                                          \
   }
 
 #define _DEFINE_MUL_UNSAFE(T, NAME, ...)                                  \
   static inline bool atb_Mul_Unsafe_##NAME(T lhs, T rhs, T *const dest) { \
-    if (dest != NULL) *dest = (lhs * rhs);                                \
+    assert(dest != NULL);                                                 \
+    *dest = (lhs * rhs);                                                  \
     return true;                                                          \
   }
 
@@ -244,14 +247,16 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
 /// When the operation is performed, returns TRUE.
 /// Otherwise (overflows/underflows), returns FALSE and dest is LEFT UNCHANGED.
 ///
-/// When dest is NULL, still return true/false whenever the operation would have
-/// been successfull or not
+/// \pre dest != NULL
 
 #define _DEFINE_SAFELY(OP, T, NAME, ...)                                     \
   static inline bool atb_##OP##_Safely_##NAME(T lhs, T rhs, T *const dest) { \
-    return !(atb_##OP##_IsOverflowing_##NAME(lhs, rhs) ||                    \
-             atb_##OP##_IsUnderflowing_##NAME(lhs, rhs)) &&                  \
-           atb_##OP##_Unsafe_##NAME(lhs, rhs, dest);                         \
+    if (atb_##OP##_IsOverflowing_##NAME(lhs, rhs) ||                         \
+        atb_##OP##_IsUnderflowing_##NAME(lhs, rhs)) {                        \
+      return false;                                                          \
+    } else {                                                                 \
+      return atb_##OP##_Unsafe_##NAME(lhs, rhs, dest);                       \
+    }                                                                        \
   }
 
 #define _DEFINE_ALL_SAFELY(...)    \
@@ -276,16 +281,17 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_SAFELY)
 /// the MAX/MIN value of the underlying int type, if the operation would have
 /// overflows/underflows respectively.
 ///
-/// When dest is NULL, still return true/false whenever the operation would have
-/// been successfull or not
+/// \pre dest != NULL
 
 #define _DEFINE_SATURATE(OP, T, NAME, MIN, MAX, ...)                           \
   static inline bool atb_##OP##_Saturate_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                      \
+                                                                               \
     if (atb_##OP##_IsOverflowing_##NAME(lhs, rhs)) {                           \
-      if (dest != NULL) *dest = MAX;                                           \
+      *dest = MAX;                                                             \
       return false;                                                            \
     } else if (atb_##OP##_IsUnderflowing_##NAME(lhs, rhs)) {                   \
-      if (dest != NULL) *dest = MIN;                                           \
+      *dest = MIN;                                                             \
       return false;                                                            \
     } else {                                                                   \
       return atb_##OP##_Unsafe_##NAME(lhs, rhs, dest);                         \
