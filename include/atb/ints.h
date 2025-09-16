@@ -251,6 +251,8 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
 
 #define _DEFINE_SAFELY(OP, T, NAME, ...)                                     \
   static inline bool atb_##OP##_Safely_##NAME(T lhs, T rhs, T *const dest) { \
+    assert(dest != NULL);                                                    \
+                                                                             \
     if (atb_##OP##_IsOverflowing_##NAME(lhs, rhs) ||                         \
         atb_##OP##_IsUnderflowing_##NAME(lhs, rhs)) {                        \
       return false;                                                          \

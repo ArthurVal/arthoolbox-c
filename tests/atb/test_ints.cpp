@@ -343,6 +343,8 @@ TYPED_TEST(AtbIntsTest, Add_Safely) {
 
 TYPED_TEST(AtbIntsDeathTest, Add_Safely) {
   EXPECT_DEBUG_DEATH(Add_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Add_Safely<TypeParam>(this->Max(), 1, nullptr),
+                     "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                     \
@@ -392,6 +394,8 @@ TYPED_TEST(AtbIntsTest, Sub_Safely) {
 
 TYPED_TEST(AtbIntsDeathTest, Sub_Safely) {
   EXPECT_DEBUG_DEATH(Sub_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Sub_Safely<TypeParam>(this->Min(), 1, nullptr),
+                     "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                     \
@@ -450,6 +454,8 @@ TYPED_TEST(AtbIntsTest, Mul_Safely) {
 
 TYPED_TEST(AtbIntsDeathTest, Mul_Safely) {
   EXPECT_DEBUG_DEATH(Mul_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Mul_Safely<TypeParam>(this->Max(), 2, nullptr),
+                     "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                       \
@@ -499,6 +505,8 @@ TYPED_TEST(AtbIntsTest, Add_Saturate) {
 
 TYPED_TEST(AtbIntsDeathTest, Add_Saturate) {
   EXPECT_DEBUG_DEATH(Add_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Add_Saturate<TypeParam>(this->Max(), 1, nullptr),
+                     "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                       \
@@ -548,6 +556,8 @@ TYPED_TEST(AtbIntsTest, Sub_Saturate) {
 
 TYPED_TEST(AtbIntsDeathTest, Sub_Saturate) {
   EXPECT_DEBUG_DEATH(Sub_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Sub_Saturate<TypeParam>(this->Min(), 1, nullptr),
+                     "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                       \
@@ -602,6 +612,8 @@ TYPED_TEST(AtbIntsTest, Mul_Saturate) {
 
 TYPED_TEST(AtbIntsDeathTest, Mul_Saturate) {
   EXPECT_DEBUG_DEATH(Mul_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
+  EXPECT_DEBUG_DEATH(Mul_Saturate<TypeParam>(this->Max(), 2, nullptr),
+                     "dest != NULL");
 }
 
 } // namespace
