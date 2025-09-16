@@ -12,22 +12,6 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_PREFIX)
 string(REPLACE "-" "_" PROJECT_PREFIX ${PROJECT_PREFIX})
 
 ###############################################################################
-#                         Disable IN-SOURCE build dir                         #
-###############################################################################
-get_filename_component(SRC_DIR "${CMAKE_SOURCE_DIR}" REALPATH)
-get_filename_component(BIN_DIR "${CMAKE_BINARY_DIR}" REALPATH)
-if("${SRC_DIR}" STREQUAL "${BIN_DIR}")
-  message(FATAL_ERROR
-    " In-source build is not allowed.\n"
-    " Please make an independant build directory using:\n"
-    " cmake -S <SOURCE_DIR> -B <BUILD_DIR>\n"
-    " \n"
-    " Feel free to:\n"
-    " rm -rf ${SRC_DIR}/CMakeFiles ${SRC_DIR}/CMakeCache.txt\n"
-  )
-endif()
-
-###############################################################################
 #                               GLOBAL includes                               #
 ###############################################################################
 # We use install paths CMAKE_INSTALL_* from standard GNU install dirs See:
@@ -99,7 +83,33 @@ cmake_print_variables(BUILD_SHARED_LIBS)
 ###############################################################################
 #                           PROJET SPECIFIC OPTIONS                           #
 ###############################################################################
-# n/a
+# ENABLE_IN_SRC_BUILDS ########################################################
+# By default, In-source builds are disabled in order to not add compilation
+# artifacts into the source directory which is tracked by git...
+#
+# In case it is impossible to do anything else other than in-src builds (for a
+# distro, docker, ... ? IDK ...), set this variable to ON in order to bypass the
+# in-src build check
+option(${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS
+  "Enable In-source builds"
+  OFF
+)
+cmake_print_variables(${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS)
+
+if(NOT ${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS)
+  get_filename_component(SRC_DIR "${CMAKE_SOURCE_DIR}" REALPATH)
+  get_filename_component(BIN_DIR "${CMAKE_BINARY_DIR}" REALPATH)
+  if("${SRC_DIR}" STREQUAL "${BIN_DIR}")
+    message(FATAL_ERROR
+      " In-source build is not allowed.\n"
+      " Please make an independant build directory using:\n"
+      " cmake -S <SOURCE_DIR> -B <BUILD_DIR>\n"
+      " \n"
+      " Feel free to:\n"
+      " rm -rf ${SRC_DIR}/CMakeFiles ${SRC_DIR}/CMakeCache.txt\n"
+    )
+  endif()
+endif()
 
 ###############################################################################
 #                                    BUILD                                    #
