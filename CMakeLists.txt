@@ -110,34 +110,6 @@ cmake_print_variables(BUILD_SHARED_LIBS)
 ###############################################################################
 add_subdirectory(src)
 
-
-# ENABLE_TESTING ##############################################################
-# We create a single value independent of BUILD_TESTING in case we want to
-# enable the unit tests only for this package. BUILD_TESTING enables unit tests
-# globally.
-option(${PROJECT_PREFIX}_ENABLE_TESTING
-  "Enable unittests for project \"${PROJECT_PREFIX}\""
-  OFF
-)
-
-if(BUILD_TESTING)
-  set(${PROJECT_PREFIX}_ENABLE_TESTING ON)
-endif()
-
-cmake_print_variables(${PROJECT_PREFIX}_ENABLE_TESTING)
-
-if(${PROJECT_PREFIX}_ENABLE_TESTING)
-  message(STATUS "${PROJECT_PREFIX} Unit testing: ENABLED")
-  if(CMAKE_CROSSCOMPILING)
-    message(WARNING " SKIPPING Unit testing since we are cross compiling...")
-  else()
-    enable_testing()
-    add_subdirectory(tests)
-  endif()
-else()
-  message(STATUS "${PROJECT_PREFIX} Unit testing: DISABLED")
-endif()
-
 ###############################################################################
 #                                 CONFIG FILES                                #
 ###############################################################################
@@ -154,6 +126,36 @@ configure_file(
   include/${PROJECT_NAME}/export.h
   @ONLY
 )
+
+###############################################################################
+#                                  UNIT TESTS                                 #
+###############################################################################
+# ENABLE_TESTING ##############################################################
+# We create a single value independent of BUILD_TESTING in case we want to
+# enable the unit tests only for this package. BUILD_TESTING enables unit tests
+# globally.
+option(${PROJECT_PREFIX}_ENABLE_TESTING
+  "Enable unittests for project \"${PROJECT_PREFIX}\""
+  OFF
+)
+
+if(BUILD_TESTING)
+  set(${PROJECT_PREFIX}_ENABLE_TESTING ON)
+endif()
+cmake_print_variables(${PROJECT_PREFIX}_ENABLE_TESTING)
+
+if(${PROJECT_PREFIX}_ENABLE_TESTING)
+  message(STATUS "${PROJECT_PREFIX} Unit testing: ENABLED")
+  if(CMAKE_CROSSCOMPILING)
+    message(WARNING " SKIPPING Unit testing since we are cross compiling...")
+  else()
+    enable_testing()
+    add_subdirectory(tests)
+  endif()
+else()
+  message(STATUS "${PROJECT_PREFIX} Unit testing: DISABLED")
+endif()
+
 
 ###############################################################################
 #                                   INSTALL                                   #
