@@ -142,7 +142,9 @@ bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
 }
 
 bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
-                       atb_Ratio_Compare_Result *const dest) {
+                       int *const dest) {
+  assert(dest != NULL);
+
   bool success =
       Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
       (atb_Ratio_Div(lhs, rhs, &lhs) ||
@@ -159,91 +161,4 @@ bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
   }
 
   return success;
-}
-
-bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_EQUAL:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_GREATER:
-    case atb_Ratio_Compare_LESS:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_GREATER:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_LESS:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_EQUAL:
-    case atb_Ratio_Compare_GREATER:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs) {
-  atb_Ratio_Compare_Result cmp_res;
-  if (!atb_Ratio_Compare(lhs, rhs, &cmp_res)) {
-    return false;
-  }
-
-  switch (cmp_res) {
-    case atb_Ratio_Compare_EQUAL:
-    case atb_Ratio_Compare_LESS:
-      return true;
-    default:
-      return false;
-  }
 }

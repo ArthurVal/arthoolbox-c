@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "atb/compare.h"
 #include "atb/export.h"
 
 #if defined(__cplusplus)
@@ -247,16 +248,18 @@ typedef enum {
  *
  *  \return True when the comparison succeeded (no overflows/underflows...).
  *          False otherwise, and dest is left unchanged.
+ *
+ *  \pre dest != NULL
  */
 bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
-                       atb_Ratio_Compare_Result *const dest) ATB_PUBLIC;
+                       int *const dest) ATB_PUBLIC;
 
-bool atb_Ratio_Eq(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
-bool atb_Ratio_Ne(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
-bool atb_Ratio_Gt(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
-bool atb_Ratio_Lt(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
-bool atb_Ratio_Ge(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
-bool atb_Ratio_Le(struct atb_Ratio lhs, struct atb_Ratio rhs) ATB_PUBLIC;
+/// Declare `atb_Ratio_[Eq, Ne, Lt, Gt, Le, Ge](lhs, rhs) -> bool`
+/// functions using atb_Ratio_Compare()
+///
+/// \warning Those functions always return FALSE when the comparison failed
+ATB_CMP_DEFINE_ALL_FROM_SAFE_COMPARE(static inline, atb_Ratio_,
+                                     struct atb_Ratio);
 
 #if defined(__cplusplus)
 } /* extern "C" */

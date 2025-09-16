@@ -350,7 +350,7 @@ TEST(AtbRatioTest, Reduce) {
 }
 
 TEST(AtbRatioTest, Comparisons) {
-  atb_Ratio_Compare_Result cmp;
+  int cmp;
 
   // TESTS EQ
   for (auto [lhs, rhs] : std::array{
@@ -458,9 +458,9 @@ TEST(AtbRatioTest, Comparisons) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    cmp = static_cast<atb_Ratio_Compare_Result>(20);
+    cmp = 20;
     EXPECT_FALSE(atb_Ratio_Compare(lhs, rhs, &cmp));
-    EXPECT_EQ(static_cast<atb_Ratio_Compare_Result>(20), cmp);
+    EXPECT_EQ(20, cmp);
 
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_FALSE(atb_Ratio_Ne(lhs, rhs));
