@@ -20,16 +20,31 @@ extern "C" {
 
 /* Pre-defined time related ratios *******************************************/
 
-#define atb_NS atb_Ratio_NANO
-#define atb_US atb_Ratio_MICRO
-#define atb_MS atb_Ratio_MILLI
-#define atb_SEC atb_Ratio_(1)
-#define atb_MINUTES atb_Ratio_(60)
-#define atb_HOURS atb_Ratio_(60 * 60)
-#define atb_DAYS atb_Ratio_(60 * 60 * 24)
-#define atb_WEEKS atb_Ratio_(60 * 60 * 24 * 7)
-#define atb_MONTHS atb_Ratio_(2629746)
-#define atb_YEARS atb_Ratio_(31556952)
+/// Static initializer
+
+#define atb_INIT_NS atb_Ratio_INIT_NANO
+#define atb_INIT_US atb_Ratio_INIT_MICRO
+#define atb_INIT_MS atb_Ratio_INIT_MILLI
+#define atb_INIT_SEC atb_Ratio_INIT_1
+#define atb_INIT_MINUTES atb_Ratio_INIT_(60)
+#define atb_INIT_HOURS atb_Ratio_INIT_(60 * 60)
+#define atb_INIT_DAYS atb_Ratio_INIT_(60 * 60 * 24)
+#define atb_INIT_WEEKS atb_Ratio_INIT_(60 * 60 * 24 * 7)
+#define atb_INIT_MONTHS atb_Ratio_INIT_(2629746)
+#define atb_INIT_YEARS atb_Ratio_INIT_(31556952)
+
+/// Compound literals
+
+#define atb_NS (struct atb_Ratio) atb_INIT_NS
+#define atb_US (struct atb_Ratio) atb_INIT_US
+#define atb_MS (struct atb_Ratio) atb_INIT_MS
+#define atb_SEC (struct atb_Ratio) atb_INIT_SEC
+#define atb_MINUTES (struct atb_Ratio) atb_INIT_MINUTES
+#define atb_HOURS (struct atb_Ratio) atb_INIT_HOURS
+#define atb_DAYS (struct atb_Ratio) atb_INIT_DAYS
+#define atb_WEEKS (struct atb_Ratio) atb_INIT_WEEKS
+#define atb_MONTHS (struct atb_Ratio) atb_INIT_MONTHS
+#define atb_YEARS (struct atb_Ratio) atb_INIT_YEARS
 
 /* Constructors **************************************************************/
 
@@ -45,8 +60,8 @@ extern "C" {
  *
  *  \return struct timespec A timespec created from the given stamp/ratio
  */
-#define atb_timespec_FROM(stamp, to_sec)                    \
-  (struct timespec) {                                       \
+#define atb_timespec_INIT_FROM(stamp, to_sec)               \
+  {                                                         \
     .tv_sec = atb_Ratio_APPLY((to_sec), (stamp)),           \
     .tv_nsec = ((((stamp) * (to_sec).num) % (to_sec).den) * \
                 atb_Ratio_APPLY((to_sec), atb_NS.den)),     \
