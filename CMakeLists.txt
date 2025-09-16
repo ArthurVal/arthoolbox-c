@@ -6,7 +6,7 @@ project(atb
   LANGUAGES C
 )
 
-# PROJET_PREFIX ###############################################################
+# PROJECT_PREFIX ##############################################################
 # Uppercase prefix used by all CMake options / definitions / ... of this project
 string(TOUPPER ${PROJECT_NAME} PROJECT_PREFIX)
 string(REPLACE "-" "_" PROJECT_PREFIX ${PROJECT_PREFIX})
