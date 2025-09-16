@@ -6,8 +6,10 @@ project(atb
   LANGUAGES C
 )
 
-string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
-string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPERCASE)
+# PROJET_PREFIX ###############################################################
+# Uppercase prefix used by all CMake options / definitions / ... of this project
+string(TOUPPER ${PROJECT_NAME} PROJECT_PREFIX)
+string(REPLACE "-" "_" PROJECT_PREFIX ${PROJECT_PREFIX})
 
 ###############################################################################
 #                         Disable IN-SOURCE build dir                         #
@@ -39,10 +41,15 @@ include(CMakePrintHelpers)
 # configure_package_config_file() and write_basic_package_version_file()
 include(CMakePackageConfigHelpers)
 
-message(STATUS "========== Options ==========")
 ###############################################################################
 #                            GLOBAL USEFULL OPTIONS                           #
 ###############################################################################
+# Dump PROJECT related infos
+cmake_print_variables(PROJECT_NAME)
+cmake_print_variables(PROJECT_PREFIX)
+cmake_print_variables(PROJECT_DESCRIPTION)
+cmake_print_variables(PROJECT_VERSION)
+
 # C STANDARD ################################################################
 set(CMAKE_C_STANDARD 11)
 cmake_print_variables(CMAKE_C_STANDARD)
@@ -96,16 +103,16 @@ cmake_print_variables(BUILD_SHARED_LIBS)
 # We create a single value independent of BUILD_TESTING in case we want to
 # enable the unit tests only for this package. BUILD_TESTING enables unit tests
 # globally.
-option(${PROJECT_NAME_UPPERCASE}_ENABLE_TESTING
-  "Enable unittests for project \"${PROJECT_NAME_UPPERCASE}\""
+option(${PROJECT_PREFIX}_ENABLE_TESTING
+  "Enable unittests for project \"${PROJECT_PREFIX}\""
   OFF
 )
 
 if(BUILD_TESTING)
-  set(${PROJECT_NAME_UPPERCASE}_ENABLE_TESTING ON)
+  set(${PROJECT_PREFIX}_ENABLE_TESTING ON)
 endif()
 
-cmake_print_variables(${PROJECT_NAME_UPPERCASE}_ENABLE_TESTING)
+cmake_print_variables(${PROJECT_PREFIX}_ENABLE_TESTING)
 
 ###############################################################################
 #                               CODE GENERATION                               #
@@ -117,7 +124,7 @@ cmake_print_variables(${PROJECT_NAME_UPPERCASE}_ENABLE_TESTING)
 ###############################################################################
 add_subdirectory(src)
 
-if(${PROJECT_NAME_UPPERCASE}_ENABLE_TESTING)
+if(${PROJECT_PREFIX}_ENABLE_TESTING)
   if(CMAKE_CROSSCOMPILING)
     message(WARNING
       " Unit testing is automatically disabled when cross compiling"
