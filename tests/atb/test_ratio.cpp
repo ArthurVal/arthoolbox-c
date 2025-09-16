@@ -363,6 +363,8 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{-3, 2}, atb_Ratio{3, -2}},
            std::array{atb_Ratio{-3, -2}, atb_Ratio{-3, -2}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_max}},
+           std::array{atb_Ratio{k_max, k_max}, atb_Ratio{1, 1}},
+           std::array{atb_Ratio{k_max, k_max}, atb_Ratio{4, 4}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
