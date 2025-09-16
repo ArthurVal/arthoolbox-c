@@ -114,6 +114,8 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
  *  \param[out] dest The inverse computed
  *
  *  \return Always true.
+ *
+ *  \pre dest != NULL
  */
 bool atb_Ratio_Inv(struct atb_Ratio ratio,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
