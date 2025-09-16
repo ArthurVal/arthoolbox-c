@@ -13,10 +13,9 @@ cmake_print_variables(CMAKE_CXX_STANDARD_REQUIRED)
 
 # ${PROJECT_PREFIX}_TESTING_GTEST_URL ###############################
 # Only when not using find_package...
-set(${PROJECT_PREFIX}_TESTING_GTEST_URL
-  "https://github.com/google/googletest/archive/v1.14.0.zip"
+set(${PROJECT_PREFIX}_TESTING_GTEST_URL ""
   CACHE STRING
-  "GTest archive location that will be fetched (if empty, use find_package() instead)"
+  "GTest location that may be fetched (e.g. https://github.com/google/googletest/archive/v1.17.0.zip). By default or when empty, use `find_package(GTest REQUIRED)`."
 )
 cmake_print_variables(${PROJECT_PREFIX}_TESTING_GTEST_URL)
 
@@ -33,7 +32,7 @@ else()
   include(FetchContent)
   FetchContent_Declare(googletest
     URL "${${PROJECT_PREFIX}_TESTING_GTEST_URL}"
-    DOWNLOAD_EXTRACT_TIMESTAMP
+    DOWNLOAD_EXTRACT_TIMESTAMP ON
   )
 
   # GTest customizations ######################################################

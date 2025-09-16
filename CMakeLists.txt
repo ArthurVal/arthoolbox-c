@@ -99,6 +99,18 @@ cmake_print_variables(BUILD_SHARED_LIBS)
 ###############################################################################
 #                           PROJET SPECIFIC OPTIONS                           #
 ###############################################################################
+
+###############################################################################
+#                               CODE GENERATION                               #
+###############################################################################
+# n/a
+
+###############################################################################
+#                                    BUILD                                    #
+###############################################################################
+add_subdirectory(src)
+
+
 # ENABLE_TESTING ##############################################################
 # We create a single value independent of BUILD_TESTING in case we want to
 # enable the unit tests only for this package. BUILD_TESTING enables unit tests
@@ -114,26 +126,16 @@ endif()
 
 cmake_print_variables(${PROJECT_PREFIX}_ENABLE_TESTING)
 
-###############################################################################
-#                               CODE GENERATION                               #
-###############################################################################
-# n/a
-
-###############################################################################
-#                                    BUILD                                    #
-###############################################################################
-add_subdirectory(src)
-
 if(${PROJECT_PREFIX}_ENABLE_TESTING)
+  message(STATUS "${PROJECT_PREFIX} Unit testing: ENABLED")
   if(CMAKE_CROSSCOMPILING)
-    message(WARNING
-      " Unit testing is automatically disabled when cross compiling"
-    )
+    message(WARNING " SKIPPING Unit testing since we are cross compiling...")
   else()
-    message(STATUS "Unittests ENABLED")
     enable_testing()
     add_subdirectory(tests)
   endif()
+else()
+  message(STATUS "${PROJECT_PREFIX} Unit testing: DISABLED")
 endif()
 
 ###############################################################################
