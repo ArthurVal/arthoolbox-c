@@ -312,6 +312,18 @@ constexpr auto Add_Safely(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Add_Safely) {
+  // Null dest
+  EXPECT_TRUE(Add_Safely<TypeParam>(1, 2, nullptr));
+
+  // -> Overflows
+  EXPECT_FALSE(Add_Safely<TypeParam>(1, this->Max(), nullptr));
+
+  // -> Underflows
+  if constexpr (this->IsSigned()) {
+    EXPECT_FALSE(Add_Safely<TypeParam>(this->Min(), -20, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Add_Safely<TypeParam>(1, 2, &res));
   EXPECT_EQ(res, 1 + 2);
@@ -335,14 +347,11 @@ TYPED_TEST(AtbIntsTest, Add_Safely) {
     EXPECT_EQ(res, this->Max() - 20);
 
     // Underflows
+
     res = 0;
     EXPECT_FALSE(Add_Safely<TypeParam>(this->Min(), -20, &res));
     EXPECT_EQ(res, 0);
   }
-}
-
-TYPED_TEST(AtbIntsDeathTest, Add_Safely) {
-  EXPECT_DEBUG_DEATH(Add_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
 #define _DEF(TYPE, NAME, ...)                     \
@@ -361,6 +370,18 @@ constexpr auto Sub_Safely(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Sub_Safely) {
+  // Null dest
+  EXPECT_TRUE(Sub_Safely<TypeParam>(2, 1, nullptr));
+
+  // -> Underflows
+  EXPECT_FALSE(Sub_Safely<TypeParam>(this->Min(), 20, nullptr));
+
+  if constexpr (this->IsSigned()) {
+    // -> Overflows
+    EXPECT_FALSE(Sub_Safely<TypeParam>(this->Max(), -20, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Sub_Safely<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 - 2);
@@ -390,10 +411,6 @@ TYPED_TEST(AtbIntsTest, Sub_Safely) {
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Sub_Safely) {
-  EXPECT_DEBUG_DEATH(Sub_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
-}
-
 #define _DEF(TYPE, NAME, ...)                     \
   if constexpr (std::is_same_v<T, TYPE>) {        \
     return atb_Mul_Safely_##NAME(lhs, rhs, dest); \
@@ -410,6 +427,21 @@ constexpr auto Mul_Safely(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Mul_Safely) {
+  // Null dest
+  EXPECT_TRUE(Mul_Safely<TypeParam>(1, 2, nullptr));
+
+  // -> Overflows
+  EXPECT_FALSE(Mul_Safely<TypeParam>(2, this->Max(), nullptr));
+
+  if constexpr (this->IsSigned()) {
+    // -> Overflows
+    EXPECT_FALSE(Mul_Safely<TypeParam>(this->Min(), -2, nullptr));
+
+    // -> Underflows
+    EXPECT_FALSE(Mul_Safely<TypeParam>(this->Max(), -2, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Mul_Safely<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 * 2);
@@ -448,10 +480,6 @@ TYPED_TEST(AtbIntsTest, Mul_Safely) {
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Mul_Safely) {
-  EXPECT_DEBUG_DEATH(Mul_Safely<TypeParam>(0, 0, nullptr), "dest != NULL");
-}
-
 #define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Add_Saturate_##NAME(lhs, rhs, dest); \
@@ -468,6 +496,18 @@ constexpr auto Add_Saturate(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Add_Saturate) {
+  // Null dest
+  EXPECT_TRUE(Add_Saturate<TypeParam>(1, 2, nullptr));
+
+  // -> Overflows
+  EXPECT_FALSE(Add_Saturate<TypeParam>(1, this->Max(), nullptr));
+
+  // -> Underflows
+  if constexpr (this->IsSigned()) {
+    EXPECT_FALSE(Add_Saturate<TypeParam>(this->Min(), -20, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Add_Saturate<TypeParam>(1, 2, &res));
   EXPECT_EQ(res, 1 + 2);
@@ -497,10 +537,6 @@ TYPED_TEST(AtbIntsTest, Add_Saturate) {
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Add_Saturate) {
-  EXPECT_DEBUG_DEATH(Add_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
-}
-
 #define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Sub_Saturate_##NAME(lhs, rhs, dest); \
@@ -517,6 +553,18 @@ constexpr auto Sub_Saturate(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Sub_Saturate) {
+  // Null dest
+  EXPECT_TRUE(Sub_Saturate<TypeParam>(2, 1, nullptr));
+
+  // -> Underflows
+  EXPECT_FALSE(Sub_Saturate<TypeParam>(this->Min(), 20, nullptr));
+
+  if constexpr (this->IsSigned()) {
+    // -> Overflows
+    EXPECT_FALSE(Sub_Saturate<TypeParam>(this->Max(), -20, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Sub_Saturate<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 - 2);
@@ -546,10 +594,6 @@ TYPED_TEST(AtbIntsTest, Sub_Saturate) {
   }
 }
 
-TYPED_TEST(AtbIntsDeathTest, Sub_Saturate) {
-  EXPECT_DEBUG_DEATH(Sub_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
-}
-
 #define _DEF(TYPE, NAME, ...)                       \
   if constexpr (std::is_same_v<T, TYPE>) {          \
     return atb_Mul_Saturate_##NAME(lhs, rhs, dest); \
@@ -566,6 +610,21 @@ constexpr auto Mul_Saturate(T lhs, T rhs, T *const dest) -> bool {
 #undef _DEF
 
 TYPED_TEST(AtbIntsTest, Mul_Saturate) {
+  // Null dest
+  EXPECT_TRUE(Mul_Saturate<TypeParam>(1, 2, nullptr));
+
+  // -> Overflows
+  EXPECT_FALSE(Mul_Saturate<TypeParam>(2, this->Max(), nullptr));
+
+  if constexpr (this->IsSigned()) {
+    // -> Overflows
+    EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Min(), -2, nullptr));
+
+    // -> Underflows
+    EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Max(), -2, nullptr));
+  }
+
+  // Valid dest
   TypeParam res = 0;
   EXPECT_TRUE(Mul_Saturate<TypeParam>(3, 2, &res));
   EXPECT_EQ(res, 3 * 2);
@@ -598,10 +657,6 @@ TYPED_TEST(AtbIntsTest, Mul_Saturate) {
     EXPECT_FALSE(Mul_Saturate<TypeParam>(this->Max(), -2, &res));
     EXPECT_EQ(res, this->Min());
   }
-}
-
-TYPED_TEST(AtbIntsDeathTest, Mul_Saturate) {
-  EXPECT_DEBUG_DEATH(Mul_Saturate<TypeParam>(0, 0, nullptr), "dest != NULL");
 }
 
 } // namespace
