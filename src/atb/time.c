@@ -46,52 +46,6 @@ atb_timespec_Compare_Result atb_timespec_Compare(struct timespec lhs,
   }
 }
 
-bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs) {
-  return atb_timespec_Compare(lhs, rhs) == atb_timespec_Compare_EQUAL;
-}
-
-bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) {
-  return !atb_timespec_Eq(lhs, rhs);
-}
-
-bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs) {
-  switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_GREATER:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs) {
-  switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_LESS:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs) {
-  switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_EQUAL:
-    case atb_timespec_Compare_GREATER:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) {
-  switch (atb_timespec_Compare(lhs, rhs)) {
-    case atb_timespec_Compare_EQUAL:
-    case atb_timespec_Compare_LESS:
-      return true;
-    default:
-      return false;
-  }
-}
-
 bool atb_Time_RetryCall(struct atb_Time_RetryPredicate predicate, size_t count,
                         struct timespec delay) {
   assert(predicate.function != NULL);

@@ -4,6 +4,7 @@
 #include <stdint.h>  /* intmax_t */
 #include <time.h>    /* timespec */
 
+#include "atb/compare.h"
 #include "atb/export.h"
 #include "atb/ratio.h"
 
@@ -93,9 +94,9 @@ struct timespec atb_timespec_Now(clockid_t clk) ATB_PUBLIC;
  *  \brief Enum representing the result of the _Compare function
  */
 typedef enum {
-  atb_timespec_Compare_LESS,    /*!< LHS is LESS than RHS */
-  atb_timespec_Compare_EQUAL,   /*!< LHS is EQUAL to RHS */
-  atb_timespec_Compare_GREATER, /*!< LHS is GREATER than RHS */
+  atb_timespec_Compare_LESS = -1,   /*!< LHS is LESS than RHS */
+  atb_timespec_Compare_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
+  atb_timespec_Compare_GREATER = 1, /*!< LHS is GREATER than RHS */
 } atb_timespec_Compare_Result;
 
 /**
@@ -104,12 +105,12 @@ typedef enum {
 atb_timespec_Compare_Result atb_timespec_Compare(
     struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
 
-bool atb_timespec_Eq(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
-bool atb_timespec_Ne(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
-bool atb_timespec_Gt(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
-bool atb_timespec_Lt(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
-bool atb_timespec_Ge(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
-bool atb_timespec_Le(struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+/// Declare `atb_Ratio_[Eq, Ne, Lt, Gt, Le, Ge](lhs, rhs) -> bool`
+/// functions using atb_Ratio_Compare()
+///
+/// \warning Those functions always return FALSE when the comparison failed
+ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_timespec_,
+                                       struct timespec);
 
 /* Utils functions ***********************************************************/
 
