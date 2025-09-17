@@ -101,12 +101,14 @@ bool atb_Ratio_Reduce(struct atb_Ratio ratio, struct atb_Ratio *const dest) {
 
 bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
+  assert(dest != NULL);
+
   /* We use LHS to store the result and then assign to dest if it succeeded */
   bool success = Ratio_SameDenominator(&lhs, &rhs) &&
                  atb_Add_Safely_i32(lhs.num, rhs.num, &(lhs.num));
 
   /* Only assign if it succeeded */
-  if (success && (dest != NULL)) {
+  if (success) {
     *dest = lhs;
   }
 
@@ -115,12 +117,14 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
 
 bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
+  assert(dest != NULL);
+
   /* We use LHS to store the result and then assign to dest if it succeeded */
   bool success = Ratio_SameDenominator(&lhs, &rhs) &&
                  atb_Sub_Safely_i32(lhs.num, rhs.num, &(lhs.num));
 
   /* Only assign if it succeeded */
-  if (success && (dest != NULL)) {
+  if (success) {
     *dest = lhs;
   }
 
@@ -129,10 +133,12 @@ bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
 
 bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) {
+  assert(dest != NULL);
+
   bool success = atb_Mul_Safely_i32(lhs.num, rhs.num, &(lhs.num)) &&
                  atb_Mul_Safely_i32(lhs.den, rhs.den, &(lhs.den));
 
-  if (success && (dest != NULL)) {
+  if (success) {
     *dest = lhs;
   }
 

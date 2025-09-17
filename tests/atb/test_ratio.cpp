@@ -128,10 +128,6 @@ TEST(AtbRatioTest, Add) {
   EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
-  // dest = nullptr
-  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, nullptr));
-  EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, nullptr));
-
   // Aliasing
   res = {0, 1};
   EXPECT_TRUE(atb_Ratio_Add(res, atb_Ratio{1, 2}, &res));
@@ -161,6 +157,15 @@ TEST(AtbRatioTest, Add) {
   res = {1, 1};
   EXPECT_FALSE(atb_Ratio_Add(atb_Ratio{1, k_max}, atb_Ratio{0, 10}, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
+}
+
+TEST(AtbRatioDeathTest, Add) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Add(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
+                     "dest != NULL");
+
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Add(atb_Ratio{k_max, 1}, atb_Ratio{1, 1}, nullptr),
+      "dest != NULL");
 }
 
 TEST(AtbRatioTest, Sub) {
@@ -200,10 +205,6 @@ TEST(AtbRatioTest, Sub) {
   EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
-  // dest = nullptr
-  EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, nullptr));
-  EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, nullptr));
-
   // Aliasing
   res = {0, 1};
   EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 2}, res, &res));
@@ -233,6 +234,15 @@ TEST(AtbRatioTest, Sub) {
   res = {1, 1};
   EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{1, k_max}, atb_Ratio{0, 10}, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
+}
+
+TEST(AtbRatioDeathTest, Sub) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Sub(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
+                     "dest != NULL");
+
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Sub(atb_Ratio{k_min, 1}, atb_Ratio{k_max, 1}, nullptr),
+      "dest != NULL");
 }
 
 TEST(AtbRatioTest, Mul) {
@@ -272,10 +282,6 @@ TEST(AtbRatioTest, Mul) {
   EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
-  // dest = nullptr
-  EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{-1, 2}, atb_Ratio{1, 2}, nullptr));
-  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{2, k_max}, atb_Ratio{1, 2}, nullptr));
-
   // Aliasing
   res = {0, 1};
   EXPECT_TRUE(atb_Ratio_Mul(atb_Ratio{1, 2}, res, &res));
@@ -305,6 +311,15 @@ TEST(AtbRatioTest, Mul) {
   res = {1, 1};
   EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{1, k_max}, atb_Ratio{0, 10}, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
+}
+
+TEST(AtbRatioDeathTest, Mul) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Mul(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
+                     "dest != NULL");
+
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Mul(atb_Ratio{k_max, 1}, atb_Ratio{2, 1}, nullptr),
+      "dest != NULL");
 }
 
 TEST(AtbRatioTest, Div) {
@@ -344,10 +359,6 @@ TEST(AtbRatioTest, Div) {
   EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{2, k_max}, atb_Ratio{40, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
-  // dest = nullptr
-  EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{-1, 2}, atb_Ratio{1, 2}, nullptr));
-  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{2, k_max}, atb_Ratio{2, 4}, nullptr));
-
   // Aliasing
   res = {0, 1};
   EXPECT_TRUE(atb_Ratio_Div(atb_Ratio{1, 2}, res, &res));
@@ -377,6 +388,15 @@ TEST(AtbRatioTest, Div) {
   res = {1, 1};
   EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{1, k_max}, atb_Ratio{10, 0}, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
+}
+
+TEST(AtbRatioDeathTest, Div) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Div(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
+                     "dest != NULL");
+
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Div(atb_Ratio{2, 1}, atb_Ratio{2, k_max}, nullptr),
+      "dest != NULL");
 }
 
 TEST(AtbRatioTest, Comparisons) {
@@ -499,6 +519,16 @@ TEST(AtbRatioTest, Comparisons) {
     EXPECT_FALSE(atb_Ratio_Ge(lhs, rhs));
     EXPECT_FALSE(atb_Ratio_Gt(lhs, rhs));
   }
+}
+
+TEST(AtbRatioDeathTest, Comparisons) {
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Compare(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
+      "dest != NULL");
+
+  EXPECT_DEBUG_DEATH(
+      atb_Ratio_Div(atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_min}, nullptr),
+      "dest != NULL");
 }
 
 } // namespace

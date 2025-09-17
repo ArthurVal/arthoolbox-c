@@ -144,9 +144,9 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
  *  \param[in] ratio The ratio we wish to inverse
  *  \param[out] dest The inverse computed
  *
- *  \return Always true.
- *
  *  \pre dest != NULL
+ *
+ *  \return Always true.
  */
 bool atb_Ratio_Inv(struct atb_Ratio ratio,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
@@ -156,6 +156,8 @@ bool atb_Ratio_Inv(struct atb_Ratio ratio,
  *
  *  \param[in] ratio The ratio we wish to reduce
  *  \param[out] dest The result of the reduction
+ *
+ *  \pre dest != NULL
  *
  *  \return Always true
  *
@@ -170,8 +172,7 @@ bool atb_Ratio_Reduce(struct atb_Ratio ratio,
  *  \param[in] lhs, rhs Both ratios we wish to add
  *  \param[out] dest If not null, the result of the computation
  *
- *  \note Setting dest to NULL can be used to simply check if an
- *        overflows/underflows would happen.
+ *  \pre dest != NULL
  *
  *  \warning Having one of the inputs with a `.den = 0` is not checked and
  *           doesn't trigger any error
@@ -188,8 +189,7 @@ bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
  *  \param[in] lhs, rhs Both ratios we wish to substract
  *  \param[out] dest If not null, the result of the computation
  *
- *  \note Setting dest to NULL can be used to simply check if an
- *        overflows/underflows would happen.
+ *  \pre dest != NULL
  *
  *  \warning Having one of the inputs with a `.den = 0` is not checked and
  *           doesn't trigger any error
@@ -206,8 +206,7 @@ bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
  *  \param[in] lhs, rhs Both ratios we wish to substract
  *  \param[out] dest If not null, the result of the computation
  *
- *  \note Setting dest to NULL can be used to simply check if an
- *        overflows/underflows would happen.
+ *  \pre dest != NULL
  *
  *  \warning Having one of the inputs with a `.den = 0` is not checked and
  *           doesn't trigger any error
@@ -224,8 +223,7 @@ bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
  *  \param[in] lhs, rhs Both ratios we wish to substract
  *  \param[out] dest If not null, the result of the computation
  *
- *  \note Setting dest to NULL can be used to simply check if an
- *        overflows/underflows would happen.
+ *  \pre dest != NULL
  *
  *  \warning Having one of the inputs with a `.den = 0` is not checked and
  *           doesn't trigger any error
