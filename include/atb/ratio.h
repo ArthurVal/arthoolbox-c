@@ -152,10 +152,17 @@ bool atb_Ratio_Inv(struct atb_Ratio ratio,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
- *  \return The reduced fraction using Euclid's algorithm to find the GCD
- *  \note When either num or den are equal to 0, return the same ratio
+ *  \brief Reduce a ratio (e.g. 2/4 becomes 1/2, ...)
+ *
+ *  \param[in] ratio The ratio we wish to reduce
+ *  \param[out] dest The result of the reduction
+ *
+ *  \return Always true
+ *
+ *  \note When either num or den are equal to 0, dest is set to ratio
  */
-struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) ATB_PUBLIC;
+bool atb_Ratio_Reduce(struct atb_Ratio ratio,
+                      struct atb_Ratio *const dest) ATB_PUBLIC;
 
 /**
  *  \brief Add 2 ratios and store the result in dest, if valid

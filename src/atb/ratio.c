@@ -86,14 +86,17 @@ bool atb_Ratio_Inv(struct atb_Ratio ratio, struct atb_Ratio *const dest) {
   return true;
 }
 
-struct atb_Ratio atb_Ratio_Reduce(struct atb_Ratio ratio) {
+bool atb_Ratio_Reduce(struct atb_Ratio ratio, struct atb_Ratio *const dest) {
+  assert(dest != NULL);
+
   if (ratio.num != 0 && ratio.den != 0) {
     const atb_Ratio_elem_t gcd = Ratio_FindGCD(ratio.num, ratio.den);
     ratio.num /= gcd;
     ratio.den /= gcd;
   }
 
-  return ratio;
+  *dest = ratio;
+  return true;
 }
 
 bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
@@ -145,10 +148,10 @@ bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
                        int *const dest) {
   assert(dest != NULL);
 
-  bool success =
-      Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
-      (atb_Ratio_Div(lhs, rhs, &lhs) ||
-       atb_Ratio_Div(atb_Ratio_Reduce(lhs), atb_Ratio_Reduce(rhs), &lhs));
+  bool success = Ratio_FixSign(&lhs) && Ratio_FixSign(&rhs) &&
+                 (atb_Ratio_Div(lhs, rhs, &lhs) ||
+                  (atb_Ratio_Reduce(lhs, &lhs) && atb_Ratio_Reduce(rhs, &rhs) &&
+                   atb_Ratio_Div(lhs, rhs, &lhs)));
 
   if (success) {
     if (lhs.num == lhs.den) {
