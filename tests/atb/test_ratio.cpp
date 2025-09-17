@@ -526,9 +526,9 @@ TEST(AtbRatioDeathTest, Comparisons) {
       atb_Ratio_Compare(atb_Ratio{1, 1}, atb_Ratio{1, 1}, nullptr),
       "dest != NULL");
 
-  EXPECT_DEBUG_DEATH(
-      atb_Ratio_Div(atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_min}, nullptr),
-      "dest != NULL");
+  EXPECT_DEBUG_DEATH(atb_Ratio_Compare(atb_Ratio{k_max, k_max},
+                                       atb_Ratio{k_max, k_min}, nullptr),
+                     "dest != NULL");
 }
 
 } // namespace
