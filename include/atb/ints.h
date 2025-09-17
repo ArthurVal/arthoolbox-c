@@ -67,14 +67,6 @@ extern "C" {
 /*                        IsOverflowing/Underflowing                       */
 /***************************************************************************/
 
-/// `<OP>_IsOverflowing(lhs, rhs) -> bool` returns TRUE when `lhs <OP> rhs`
-/// (with <OP> being one of +, -, *) overflows the underlying int type range.
-/// FALSE otherwise (operation is safe).
-
-/// `<OP>_IsUnderflowing(lhs, rhs) -> bool` returns TRUE when `lhs <OP> rhs`
-/// (with <OP> being one of +, -, *) underflows the underlying int type range.
-/// FALSE otherwise (operation is safe).
-
 /* SIGNED ******************************************************************/
 
 #define _DEFINE_ADD_ISOVERFLOWING_SIGNED(T, NAME, _, MAX, ...)    \
@@ -127,7 +119,17 @@ extern "C" {
   _DEFINE_SUB_ISUNDERFLOWING_SIGNED(__VA_ARGS__) \
   _DEFINE_MUL_ISUNDERFLOWING_SIGNED(__VA_ARGS__)
 
+/**@{*/
+/**
+ * \brief Check if the operation (+, -, *) will overflows/underflows.
+ *
+ * \param[in] lhs, rhs Operands of the underlying operation
+ *
+ * \returns bool True if the operation would failed (i.e. overflows or
+ *               underflows). False otherwise.
+ */
 ATB_INTS_X_FOREACH_SIGNED(_DEFINE_ALL_ISXX_SIGNED)
+/**@}*/
 
 #undef _DEFINE_ALL_ISXX_SIGNED
 #undef _DEFINE_ADD_ISOVERFLOWING_SIGNED
@@ -183,7 +185,17 @@ ATB_INTS_X_FOREACH_SIGNED(_DEFINE_ALL_ISXX_SIGNED)
   _DEFINE_SUB_ISUNDERFLOWING_UNSIGNED(__VA_ARGS__) \
   _DEFINE_MUL_ISUNDERFLOWING_UNSIGNED(__VA_ARGS__)
 
+/**@{*/
+/**
+ * \brief Check if the operation (+, -, *) will overflows/underflows.
+ *
+ * \param[in] lhs, rhs Operands of the underlying operation
+ *
+ * \returns bool True if the operation would failed (i.e. overflows or
+ *               underflows). False otherwise.
+ */
 ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
+/**@}*/
 
 #undef _DEFINE_ALL_ISXX_UNSIGNED
 #undef _DEFINE_ADD_ISOVERFLOWING_UNSIGNED
@@ -230,7 +242,21 @@ ATB_INTS_X_FOREACH_UNSIGNED(_DEFINE_ALL_ISXX_UNSIGNED)
   _DEFINE_SUB_UNSAFE(__VA_ARGS__) \
   _DEFINE_MUL_UNSAFE(__VA_ARGS__)
 
+/**@{*/
+/**
+ * \brief Perform the operation (+, -, *) without care for underflows/overflows
+ *
+ * \warning Any underflow/overflow is UB.
+ *
+ * \param[in] lhs, rhs Operands of the underlying operation
+ * \param[out] dest Result of the operation
+ *
+ * \returns bool Always true.
+ *
+ * \pre dest != NULL
+ */
 ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
+/**@}*/
 
 #undef _DEFINE_ALL_UNSAFE
 #undef _DEFINE_MUL_UNSAFE
@@ -266,7 +292,20 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_UNSAFE)
   _DEFINE_SAFELY(Sub, __VA_ARGS__) \
   _DEFINE_SAFELY(Mul, __VA_ARGS__)
 
+/**@{*/
+/**
+ * \brief Perform the operation (+, -, *) when it doesn't underflows/overflows
+ *
+ * \param[in] lhs, rhs Operands of the underlying operation
+ * \param[out] dest Result of the operation
+ *
+ * \returns bool True whenever the operation succeed. False otherwise, with dest
+ *               left unchanged.
+ *
+ * \pre dest != NULL
+ */
 ATB_INTS_X_FOREACH(_DEFINE_ALL_SAFELY)
+/**@}*/
 
 #undef _DEFINE_ALL_SAFELY
 #undef _DEFINE_SAFELY
@@ -305,7 +344,21 @@ ATB_INTS_X_FOREACH(_DEFINE_ALL_SAFELY)
   _DEFINE_SATURATE(Sub, __VA_ARGS__) \
   _DEFINE_SATURATE(Mul, __VA_ARGS__)
 
+/**@{*/
+/**
+ * \brief Perform the operation (+, -, *) but saturate when it
+ *        underflows/overflows
+ *
+ * \param[in] lhs, rhs Operands of the underlying operation
+ * \param[out] dest Result of the operation
+ *
+ * \returns bool True whenever the operation succeed. False otherwise, with dest
+ *               set to the MAX/MIN int value whenever it overflows/underflows.
+ *
+ * \pre dest != NULL
+ */
 ATB_INTS_X_FOREACH(_DEFINE_ALL_SATURATE)
+/**@}*/
 
 #undef _DEFINE_ALL_SATURATE
 #undef _DEFINE_SATURATE
