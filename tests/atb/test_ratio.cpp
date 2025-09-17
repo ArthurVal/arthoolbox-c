@@ -14,6 +14,11 @@ TEST(AtbRatioTest, Tof) {
   EXPECT_NEAR((double)0.666'666'666, atb_Ratio_Tof64({2, 3}), 1e-9);
 }
 
+TEST(AtbRatioDeathTest, Tof) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Tof32(atb_Ratio{1, 0}), "ratio.den != 0");
+  EXPECT_DEBUG_DEATH(atb_Ratio_Tof64(atb_Ratio{1, 0}), "ratio.den != 0");
+}
+
 TEST(AtbRatioTest, APPLY) {
   EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{2, 1}), 10)), 20);
   EXPECT_EQ((atb_Ratio_APPLY((atb_Ratio{1, 2}), 10)), 5);
@@ -47,6 +52,43 @@ TEST(AtbRatioTest, Inv) {
 
   EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{-12, k_min}, &inv));
   EXPECT_EQ(inv, (atb_Ratio{k_min, -12}));
+}
+
+TEST(AtbRatioDeathTest, Inv) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Inv(atb_Ratio{1, 1}, nullptr), "dest != NULL");
+}
+
+TEST(AtbRatioTest, Reduce) {
+  atb_Ratio res;
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{1, 2}, &res));
+  EXPECT_EQ((atb_Ratio{1, 2}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{9, 12}, &res));
+  EXPECT_EQ((atb_Ratio{3, 4}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{2, 4}, &res));
+  EXPECT_EQ((atb_Ratio{1, 2}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{3000, 6000}, &res));
+  EXPECT_EQ((atb_Ratio{1, 2}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{4, 4}, &res));
+  EXPECT_NE((atb_Ratio{1, 2}), res);
+
+  // Test with 0
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{0, 4}, &res));
+  EXPECT_EQ((atb_Ratio{0, 4}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{4, 0}, &res));
+  EXPECT_EQ((atb_Ratio{4, 0}), res);
+
+  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{0, 0}, &res));
+  EXPECT_EQ((atb_Ratio{0, 0}), res);
+}
+
+TEST(AtbRatioDeathTest, Reduce) {
+  EXPECT_DEBUG_DEATH(atb_Ratio_Reduce(atb_Ratio{1, 1}, nullptr),
+                     "dest != NULL");
 }
 
 TEST(AtbRatioTest, Add) {
@@ -335,39 +377,6 @@ TEST(AtbRatioTest, Div) {
   res = {1, 1};
   EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{1, k_max}, atb_Ratio{10, 0}, &res));
   EXPECT_EQ(res, (atb_Ratio{1, 1}));
-}
-
-TEST(AtbRatioTest, Reduce) {
-  atb_Ratio res;
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{1, 2}, &res));
-  EXPECT_EQ((atb_Ratio{1, 2}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{9, 12}, &res));
-  EXPECT_EQ((atb_Ratio{3, 4}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{2, 4}, &res));
-  EXPECT_EQ((atb_Ratio{1, 2}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{3000, 6000}, &res));
-  EXPECT_EQ((atb_Ratio{1, 2}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{4, 4}, &res));
-  EXPECT_NE((atb_Ratio{1, 2}), res);
-
-  // Test with 0
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{0, 4}, &res));
-  EXPECT_EQ((atb_Ratio{0, 4}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{4, 0}, &res));
-  EXPECT_EQ((atb_Ratio{4, 0}), res);
-
-  EXPECT_TRUE(atb_Ratio_Reduce(atb_Ratio{0, 0}, &res));
-  EXPECT_EQ((atb_Ratio{0, 0}), res);
-}
-
-TEST(AtbRatioDeathTest, Reduce) {
-  EXPECT_DEBUG_DEATH(atb_Ratio_Reduce(atb_Ratio{1, 1}, nullptr),
-                     "dest != NULL");
 }
 
 TEST(AtbRatioTest, Comparisons) {
