@@ -71,32 +71,32 @@ struct atb_Ratio {
 #define atb_Ratio_1_(n) (struct atb_Ratio) atb_Ratio_INIT_1_(n)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 8 bits */
-#define atb_Ratio_0 atb_Ratio_(0)
-#define atb_Ratio_1 atb_Ratio_(1)
+#define atb_Ratio_0 (struct atb_Ratio) atb_Ratio_INIT_0
+#define atb_Ratio_1 (struct atb_Ratio) atb_Ratio_INIT_1
 
-#define atb_Ratio_DECA atb_Ratio_(10)
-#define atb_Ratio_DECI atb_Ratio_1_(10)
+#define atb_Ratio_DECA (struct atb_Ratio) atb_Ratio_INIT_DECA
+#define atb_Ratio_DECI (struct atb_Ratio) atb_Ratio_INIT_DECI
 
-#define atb_Ratio_HECTO atb_Ratio_(100)
-#define atb_Ratio_CENTI atb_Ratio_1_(100)
+#define atb_Ratio_HECTO (struct atb_Ratio) atb_Ratio_INIT_HECTO
+#define atb_Ratio_CENTI (struct atb_Ratio) atb_Ratio_INIT_CENTI
 
 /* Requires 'atb_Ratio_elem_t' to be at least 16 bits */
-#define atb_Ratio_KILO atb_Ratio_(1000)
-#define atb_Ratio_MILLI atb_Ratio_1_(1000)
+#define atb_Ratio_KILO (struct atb_Ratio) atb_Ratio_INIT_KILO
+#define atb_Ratio_MILLI (struct atb_Ratio) atb_Ratio_INIT_MILLI
 
 /* Requires 'atb_Ratio_elem_t' to be at least 32 bits */
-#define atb_Ratio_MEGA atb_Ratio_(1000000)
-#define atb_Ratio_MICRO atb_Ratio_1_(1000000)
+#define atb_Ratio_MEGA (struct atb_Ratio) atb_Ratio_INIT_MEGA
+#define atb_Ratio_MICRO (struct atb_Ratio) atb_Ratio_INIT_MICRO
 
-#define atb_Ratio_GIGA atb_Ratio_(1000000000)
-#define atb_Ratio_NANO atb_Ratio_1_(1000000000)
+#define atb_Ratio_GIGA (struct atb_Ratio) atb_Ratio_INIT_GIGA
+#define atb_Ratio_NANO (struct atb_Ratio) atb_Ratio_INIT_NANO
 
 /* Requires 'atb_Ratio_elem_t' to be at least 64 bits */
-/* #define atb_Ratio_TERA atb_Ratio_(1000000000000) */
-/* #define atb_Ratio_PICO atb_Ratio_1_(1000000000000) */
+/* #define atb_Ratio_TERA (struct atb_Ratio)atb_Ratio_INIT_TERA */
+/* #define atb_Ratio_PICO (struct atb_Ratio)atb_Ratio_INIT_PICO */
 
-/* #define atb_Ratio_PERA atb_Ratio_(1000000000000000) */
-/* #define atb_Ratio_FEMPTO atb_Ratio_1_(1000000000000000) */
+/* #define atb_Ratio_PERA (struct atb_Ratio)atb_Ratio_INIT_PERA */
+/* #define atb_Ratio_FEMPTO (struct atb_Ratio)atb_Ratio_INIT_FEMPTO */
 
 /* Conversion **************************************************************/
 
