@@ -138,6 +138,32 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
  */
 #define atb_Ratio_APPLY_R(ratio, value) (((value) / (ratio).den) * (ratio).num)
 
+/**@{*/
+/**
+ *  \brief Safely apply the given \a ratio to \a value
+ *
+ *  \note Prevent overflows/underflows
+ *
+ *  \param[in] ratio Ratio we wish to aplly
+ *  \param[in] value Value we wish to transform using ratio
+ *  \param[out] dest Ptr to the value where the result is stored
+ *
+ *  \pre ratio.den != 0
+ *  \pre dest != NULL
+ *
+ *  \return bool True applying the ratio succeed. False when an
+ *          overflows/underflows occured, with dest left unchanged.
+ */
+bool atb_Ratio_Apply_i64(struct atb_Ratio ratio, int64_t value,
+                         int64_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_i32(struct atb_Ratio ratio, int32_t value,
+                         int32_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_i16(struct atb_Ratio ratio, int16_t value,
+                         int16_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_i8(struct atb_Ratio ratio, int8_t value,
+                        int8_t *const dest) ATB_PUBLIC;
+/**@}*/
+
 /**
  *  \brief Inverse the ratio
  *

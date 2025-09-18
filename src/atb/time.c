@@ -2,23 +2,6 @@
 
 #include <assert.h>
 
-#include "atb/ints.h"
-
-static bool Ratio_Apply_Safely_i64(struct atb_Ratio ratio, int64_t value,
-                                   int64_t *const dest) {
-  assert(ratio.den != 0);
-  assert(dest != NULL);
-
-  if (atb_Mul_Safely_i64(value, ratio.num, &(value))) {
-    value /= ratio.den;
-  } else if (!atb_Mul_Safely_i64(value / ratio.den, ratio.num, &(value))) {
-    return false;
-  }
-
-  *dest = value;
-  return true;
-}
-
 static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
                        int64_t *const dest) {
   assert(to_sec.den != 0);
@@ -34,7 +17,7 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
     }
 
     /* -> Convert the stamp using the ratio */
-    if (!Ratio_Apply_Safely_i64(to_sec, stamp, &(stamp))) {
+    if (!atb_Ratio_Apply_i64(to_sec, stamp, &(stamp))) {
       return false;
     }
   }
@@ -49,7 +32,7 @@ bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
   assert(dest != NULL);
 
   if (atb_Ratio_Ge(to_sec, atb_Ratio_1)) {
-    if (!Ratio_Apply_Safely_i64(to_sec, stamp, &(dest->tv_sec))) {
+    if (!atb_Ratio_Apply_i64(to_sec, stamp, &(dest->tv_sec))) {
       return false;
     }
     dest->tv_nsec = 0;

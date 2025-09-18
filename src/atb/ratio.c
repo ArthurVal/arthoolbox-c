@@ -77,6 +77,70 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) {
   return (double)ratio.num / (double)ratio.den;
 }
 
+bool atb_Ratio_Apply_i64(struct atb_Ratio ratio, int64_t value,
+                         int64_t *const dest) {
+  assert(ratio.den != 0);
+  assert(dest != NULL);
+
+  bool success = true;
+
+  if (atb_Mul_Safely_i64(value, ratio.num, &(value))) {
+    value /= ratio.den;
+  } else {
+    success = atb_Mul_Safely_i64(value / ratio.den, ratio.num, &(value));
+  }
+
+  if (success) {
+    *dest = value;
+  }
+
+  return success;
+}
+
+bool atb_Ratio_Apply_i32(struct atb_Ratio ratio, int32_t value,
+                         int32_t *const dest) {
+  assert(ratio.den != 0);
+  assert(dest != NULL);
+
+  bool success = true;
+
+  if (atb_Mul_Safely_i32(value, ratio.num, &(value))) {
+    value /= ratio.den;
+  } else {
+    success = atb_Mul_Safely_i32(value / ratio.den, ratio.num, &(value));
+  }
+
+  if (success) {
+    *dest = value;
+  }
+
+  return success;
+}
+
+bool atb_Ratio_Apply_i16(struct atb_Ratio ratio, int16_t value,
+                         int16_t *const dest) {
+  bool success = atb_Ratio_Apply_i32(ratio, value, &(ratio.num)) &&
+                 ((INT16_MIN <= ratio.num) && (ratio.num <= INT16_MAX));
+
+  if (success) {
+    *dest = (int16_t)ratio.num;
+  }
+
+  return success;
+}
+
+bool atb_Ratio_Apply_i8(struct atb_Ratio ratio, int8_t value,
+                        int8_t *const dest) {
+  bool success = atb_Ratio_Apply_i32(ratio, value, &(ratio.num)) &&
+                 ((INT8_MIN <= ratio.num) && (ratio.num <= INT8_MAX));
+
+  if (success) {
+    *dest = (int8_t)ratio.num;
+  }
+
+  return success;
+}
+
 bool atb_Ratio_Inv(struct atb_Ratio ratio, struct atb_Ratio *const dest) {
   assert(dest != NULL);
 
