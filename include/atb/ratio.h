@@ -100,17 +100,14 @@ struct atb_Ratio {
 
 /* Conversion **************************************************************/
 
+/**@{*/
 /**
- *  \return The closest floating point value (32 bits) represented by this ratio
+ *  \return The floating point value (32/64 bits) represented by this ratio
  *  \pre ratio.den != 0
  */
 float atb_Ratio_Tof32(struct atb_Ratio ratio) ATB_PUBLIC;
-
-/**
- *  \return The closest floating point value (64 bits) represented by this ratio
- *  \pre ratio.den != 0
- */
 double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
+/**@}*/
 
 /* Operations **************************************************************/
 
@@ -191,9 +188,9 @@ bool atb_Ratio_Inv(struct atb_Ratio ratio,
  */
 bool atb_Ratio_Reduce(struct atb_Ratio ratio,
                       struct atb_Ratio *const dest) ATB_PUBLIC;
-
+/**@{*/
 /**
- *  \brief Add 2 ratios and store the result in dest, if valid
+ *  \brief Add/Sub/Mul/Div 2 ratios and store the result in dest, if valid
  *
  *  \param[in] lhs, rhs Both ratios we wish to add
  *  \param[out] dest If not null, the result of the computation
@@ -208,57 +205,13 @@ bool atb_Ratio_Reduce(struct atb_Ratio ratio,
  */
 bool atb_Ratio_Add(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
-
-/**
- *  \brief Substract 2 ratios and store the result in dest, if valid
- *
- *  \param[in] lhs, rhs Both ratios we wish to substract
- *  \param[out] dest If not null, the result of the computation
- *
- *  \pre dest != NULL
- *
- *  \warning Having one of the inputs with a `.den = 0` is not checked and
- *           doesn't trigger any error
- *
- *  \returns True when the computation succeed. False when computing this new
- *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
- */
 bool atb_Ratio_Sub(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
-
-/**
- *  \brief Multiply 2 ratios and store the result in dest, if valid
- *
- *  \param[in] lhs, rhs Both ratios we wish to substract
- *  \param[out] dest If not null, the result of the computation
- *
- *  \pre dest != NULL
- *
- *  \warning Having one of the inputs with a `.den = 0` is not checked and
- *           doesn't trigger any error
- *
- *  \returns True when the computation succeed. False when computing this new
- *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
- */
 bool atb_Ratio_Mul(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
-
-/**
- *  \brief Divide 2 ratios and store the result in dest, if valid
- *
- *  \param[in] lhs, rhs Both ratios we wish to substract
- *  \param[out] dest If not null, the result of the computation
- *
- *  \pre dest != NULL
- *
- *  \warning Having one of the inputs with a `.den = 0` is not checked and
- *           doesn't trigger any error
- *
- *  \returns True when the computation succeed. False when computing this new
- *           ratio would OVERFLOWS/UNDERFLOWS the underlying integer type.
- */
 bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
                    struct atb_Ratio *const dest) ATB_PUBLIC;
+/**@}*/
 
 /* Comparison **************************************************************/
 
