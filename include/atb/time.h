@@ -91,15 +91,6 @@ extern "C" {
 bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
                        struct timespec *const dest) ATB_PUBLIC;
 
-/**
- *  \return struct timespec of the current time. On failure, returns -1
- *          timespec, with errno set according to clock_gettime() function.
- *
- *  \param[in] clk The clock ID used to get the time, one of : [CLOCK_REALTIME
- *             ,CLOCK_MONOTONIC, CLOCK_PROCESS_CPUTIME_ID, ...] (cf time.h)
- */
-struct timespec atb_timespec_Now(clockid_t clk) ATB_PUBLIC;
-
 /* Comparisons *************************************************************/
 
 /**

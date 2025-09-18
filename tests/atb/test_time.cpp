@@ -20,16 +20,6 @@ constexpr auto ToTimespec(std::chrono::nanoseconds d) -> timespec {
   };
 }
 
-TEST(AtbTimeTest, Now) {
-  const auto now = atb_timespec_Now(CLOCK_REALTIME);
-
-  const std::chrono::nanoseconds expected =
-      std::chrono::system_clock::now().time_since_epoch();
-
-  EXPECT_LE(abs(ToChronoDuration(now) - expected), 5us)
-      << SCOPE_LOOP_MSG_2(now, expected);
-}
-
 TEST(AtbTimeTest, From) {
   timespec ts;
 

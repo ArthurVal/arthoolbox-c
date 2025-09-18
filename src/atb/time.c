@@ -43,17 +43,6 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
   return true;
 }
 
-struct timespec atb_timespec_Now(clockid_t clk) {
-  struct timespec now;
-
-  if (clock_gettime(clk, &now)) {
-    now.tv_sec = -1;
-    now.tv_nsec = -1;
-  }
-
-  return now;
-}
-
 bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
                        struct timespec *const dest) {
   assert(to_sec.den != 0);
