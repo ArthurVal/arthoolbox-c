@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h> /* bool */
-#include <stdint.h>  /* intmax_t */
+#include <stdint.h>  /* int64_t */
 #include <time.h>    /* timespec */
 
 #include "atb/compare.h"
@@ -70,15 +70,26 @@ extern "C" {
   }
 
 /**
- *  \brief Create a timespec given a raw stamp and its ratio to seconds
+ *  \brief Same as atb_timespec_INIT_FROM but as a compound literal
+ */
+#define atb_timespec_FROM(stamp, to_sec) \
+  (struct timespec) atb_timespec_INIT_FROM((stamp), (to_sec))
+
+/**
+ *  \brief Set a timespec given a raw stamp and its ratio to seconds
  *
  *  \param[in] stamp Raw timestamps
  *  \param[in] to_sec Ratio to seconds of the given raw timestamp
+ *  \param[out] dest Ptr to the timespec we wish to update
  *
- *  \return struct timespec A timespec created from the given stamp/ratio
+ *  \pre to_sec.den != 0
+ *  \pre dest != NULL
+ *
+ *  \return bool True when the operation succeed. False when the operation
+ *               induce an overflows/underflows.
  */
-struct timespec atb_timespec_From(intmax_t stamp,
-                                  struct atb_Ratio to_sec) ATB_PUBLIC;
+bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
+                       struct timespec *const dest) ATB_PUBLIC;
 
 /**
  *  \return struct timespec of the current time. On failure, returns -1
