@@ -192,7 +192,7 @@ bool atb_Ratio_Reduce(struct atb_Ratio ratio,
 /**
  *  \brief Add/Sub/Mul/Div 2 ratios and store the result in dest, if valid
  *
- *  \param[in] lhs, rhs Both ratios we wish to add
+ *  \param[in] lhs, rhs Both ratio operands
  *  \param[out] dest If not null, the result of the computation
  *
  *  \pre dest != NULL
