@@ -58,6 +58,7 @@ extern "C" {
  *  \param[in] to_sec An atb_Ratio to seconds of the given timestamp
  *
  *  \warning Arguments SHOULDN'T have any side effect
+ *  \warning This is UNSAFE, i.e. no overflows/underflows checks are performed
  *
  *  \return struct timespec A timespec created from the given stamp/ratio
  */
@@ -100,17 +101,37 @@ typedef enum {
 } atb_timespec_Compare_Result;
 
 /**
- *  \brief Compare 2 timespecs with each other
+ * \brief Compare 2 timespecs with each other, following the 'three-way
+ *        comparison' paradigm
+ *
+ * \param[in] lhs, rhs timespec we wish to compare
+ *
+ * \returns atb_timespec_Compare_Result And int value that follows the
+ *          'three-way comparison' paradigm, i.e.:
+ * \li res < 0 : lhs < rhs
+ * \li res == 0: lhs == rhs
+ * \li res > 0 : lhs > rhs
  */
 atb_timespec_Compare_Result atb_timespec_Compare(
     struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
 
-/// Declare `atb_Ratio_[Eq, Ne, Lt, Gt, Le, Ge](lhs, rhs) -> bool`
-/// functions using atb_Ratio_Compare()
-///
-/// \warning Those functions always return FALSE when the comparison failed
+/**@{*/
+/**
+ * \returns bool True when \a lhs is [Eq, Ne, Lt, Gt, Le, Ge] than \a rhs.
+ *
+ * \param[in] lhs, rhs timespec we wish to compare
+ *
+ * \note
+ * \li Eq = Equals
+ * \li Ne = Not Equals
+ * \li Lt = Less than
+ * \li Gt = Greater than
+ * \li Le = Less or equals
+ * \li Ge = Greater or equals
+ */
 ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_timespec_,
                                        struct timespec);
+/**@}*/
 
 /* Utils functions ***********************************************************/
 
