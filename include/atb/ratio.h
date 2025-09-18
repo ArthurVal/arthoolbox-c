@@ -285,12 +285,26 @@ typedef enum {
 bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
                        int *const dest) ATB_PUBLIC;
 
-/// Declare `atb_Ratio_[Eq, Ne, Lt, Gt, Le, Ge](lhs, rhs) -> bool`
-/// functions using atb_Ratio_Compare()
-///
-/// \warning Those functions always return FALSE when the comparison failed
+/**@{*/
+/**
+ * \returns bool True when \a lhs is [Eq, Ne, Lt, Gt, Le, Ge] than \a rhs.
+ *
+ * \param[in] lhs, rhs timespec we wish to compare
+ *
+ * \warning Also returns FALSE when the comparison canno't be performed due to
+ *          overflows/undeflows
+ *
+ * \note
+ * \li Eq = Equals (lhs == rhs)
+ * \li Ne = Not Equals (lhs != rhs)
+ * \li Lt = Less than (lhs < rhs)
+ * \li Gt = Greater than (lhs > rhs)
+ * \li Le = Less or equals (lhs <= rhs)
+ * \li Ge = Greater or equals (lhs >= rhs)
+ */
 ATB_CMP_DEFINE_ALL_FROM_SAFE_COMPARE(static inline, atb_Ratio_,
                                      struct atb_Ratio);
+/**@}*/
 
 #if defined(__cplusplus)
 } /* extern "C" */
