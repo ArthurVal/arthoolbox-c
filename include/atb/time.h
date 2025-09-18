@@ -108,7 +108,7 @@ typedef enum {
  *
  * \param[in] lhs, rhs timespec we wish to compare
  *
- * \returns atb_timespec_Compare_Result And int value that follows the
+ * \returns atb_timespec_Compare_Result An int value that follows the
  *          'three-way comparison' paradigm, i.e.:
  * \li res < 0 : lhs < rhs
  * \li res == 0: lhs == rhs
@@ -124,12 +124,12 @@ atb_timespec_Compare_Result atb_timespec_Compare(
  * \param[in] lhs, rhs timespec we wish to compare
  *
  * \note
- * \li Eq = Equals
- * \li Ne = Not Equals
- * \li Lt = Less than
- * \li Gt = Greater than
- * \li Le = Less or equals
- * \li Ge = Greater or equals
+ * \li Eq = Equals (lhs == rhs)
+ * \li Ne = Not Equals (lhs != rhs)
+ * \li Lt = Less than (lhs < rhs)
+ * \li Gt = Greater than (lhs > rhs)
+ * \li Le = Less or equals (lhs <= rhs)
+ * \li Ge = Greater or equals (lhs >= rhs)
  */
 ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_timespec_,
                                        struct timespec);
