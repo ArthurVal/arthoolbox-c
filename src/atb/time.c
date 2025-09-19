@@ -8,22 +8,21 @@ static bool stamp_ToNs(uint64_t stamp, struct atb_Ratio to_sec,
   assert(to_sec.den != 0);
   assert(dest != NULL);
 
-  if (atb_Ratio_Ne(to_sec, K_ATB_NS)) {
-    /* Convert stamp to NS */
+  bool success = true;
+  int cmp;
 
-    /* -> Find the ratio to transform stamp into NS */
-    if (!(atb_Ratio_Div(to_sec, K_ATB_NS, &(to_sec)) &&
-          atb_Ratio_Reduce(to_sec, &(to_sec)))) {
-      return false;
-    }
-
-    /* -> Convert the stamp using the ratio */
-    if (!atb_Ratio_Apply_u64(to_sec, stamp, &(stamp))) {
-      return false;
-    }
+  if (!atb_Ratio_Compare(to_sec, K_ATB_NS, &cmp)) {
+    success = false;
+  } else if (cmp != K_ATB_RATIO_CMP_EQUAL) {
+    success = atb_Ratio_Div(to_sec, K_ATB_NS, &(to_sec)) &&
+              atb_Ratio_Reduce(to_sec, &(to_sec)) &&
+              atb_Ratio_Apply_u64(to_sec, stamp, &(stamp));
   }
 
-  *dest = stamp;
+  if (success) {
+    *dest = stamp;
+  }
+
   return true;
 }
 
