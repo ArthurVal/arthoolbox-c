@@ -14,7 +14,8 @@ extern "C" {
 typedef uint32_t atb_Ratio_elem_t;
 
 /**
- *  \brief Contains a ratio reprensted by 2 integers
+ *  \brief Contains a ratio reprensted by 2 UNSIGNED integers
+ *  \note Ratio's can't be NEGATIVE
  */
 struct atb_Ratio {
   atb_Ratio_elem_t num; /*!< The numerator of the ratio */
@@ -24,7 +25,8 @@ struct atb_Ratio {
 /* Format string helper ****************************************************/
 
 #define K_ATB_RATIO_FMT "{.num=%ju, .den=%ju}"
-#define atb_Ratio_FMT_VA_ARG(ratio) (intmax_t)(ratio).num, (intmax_t)(ratio).den
+#define atb_Ratio_FMT_VA_ARG(ratio) \
+  (uintmax_t)(ratio).num, (uintmax_t)(ratio).den
 
 /* Constant ****************************************************************/
 
