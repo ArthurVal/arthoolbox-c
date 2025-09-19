@@ -1,9 +1,10 @@
 #include "atb/time.h"
 
 #include <assert.h>
+#include <stdlib.h> /* labs */
 
-static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
-                       int64_t *const dest) {
+static bool stamp_ToNs(uint64_t stamp, struct atb_Ratio to_sec,
+                       uint64_t *const dest) {
   assert(to_sec.den != 0);
   assert(dest != NULL);
 
@@ -17,7 +18,7 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
     }
 
     /* -> Convert the stamp using the ratio */
-    if (!atb_Ratio_Apply_i64(to_sec, stamp, &(stamp))) {
+    if (!atb_Ratio_Apply_u64(to_sec, stamp, &(stamp))) {
       return false;
     }
   }
@@ -26,7 +27,7 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
   return true;
 }
 
-bool atb_timespec_Set(struct timespec *const self, int64_t stamp,
+bool atb_timespec_Set(struct timespec *const self, uint64_t stamp,
                       struct atb_Ratio to_sec) {
   assert(self != NULL);
   assert(to_sec.den != 0);
@@ -34,14 +35,16 @@ bool atb_timespec_Set(struct timespec *const self, int64_t stamp,
   bool success = true;
 
   if (atb_Ratio_Ge(to_sec, K_ATB_RATIO_1)) {
-    if (atb_Ratio_Apply_i64(to_sec, stamp, &(self->tv_sec))) {
+    if (atb_Ratio_Apply_u64(to_sec, stamp, &(stamp)) && (stamp <= INT64_MAX)) {
+      self->tv_sec = (int64_t)stamp;
       self->tv_nsec = 0;
     } else {
       success = false;
     }
-  } else if (stamp_ToNs(stamp, to_sec, &(stamp))) {
-    self->tv_sec = stamp / K_ATB_NS.den;
-    self->tv_nsec = stamp % K_ATB_NS.den;
+  } else if (stamp_ToNs(stamp, to_sec, &(stamp)) &&
+             ((stamp / K_ATB_NS.den) <= INT64_MAX)) {
+    self->tv_sec = (__typeof__(self->tv_sec))(stamp / K_ATB_NS.den);
+    self->tv_nsec = (__typeof__(self->tv_nsec))(stamp % K_ATB_NS.den);
   } else {
     success = false;
   }

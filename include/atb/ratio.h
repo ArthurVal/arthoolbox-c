@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 /// Underlying integer type used within a atb_Ratio
-typedef int32_t atb_Ratio_elem_t;
+typedef uint32_t atb_Ratio_elem_t;
 
 /**
  *  \brief Contains a ratio reprensted by 2 integers
@@ -23,7 +23,7 @@ struct atb_Ratio {
 
 /* Format string helper ****************************************************/
 
-#define K_ATB_RATIO_FMT "{.num=%jd, .den=%jd}"
+#define K_ATB_RATIO_FMT "{.num=%ju, .den=%ju}"
 #define atb_Ratio_FMT_VA_ARG(ratio) (intmax_t)(ratio).num, (intmax_t)(ratio).den
 
 /* Constant ****************************************************************/
@@ -58,11 +58,11 @@ struct atb_Ratio {
 #define K_ATB_RATIO_INIT_NANO K_ATB_RATIO_INIT_1_(1000000000)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 64 bits */
-/* #define K_ATB_RATIO_INIT_TERA K_ATB_RATIO_INIT_(1000000000000) */
-/* #define K_ATB_RATIO_INIT_PICO K_ATB_RATIO_INIT_1_(1000000000000) */
+#define K_ATB_RATIO_INIT_TERA K_ATB_RATIO_INIT_(1000000000000)
+#define K_ATB_RATIO_INIT_PICO K_ATB_RATIO_INIT_1_(1000000000000)
 
-/* #define K_ATB_RATIO_INIT_PERA K_ATB_RATIO_INIT_(1000000000000000) */
-/* #define K_ATB_RATIO_INIT_FEMPTO K_ATB_RATIO_INIT_1_(1000000000000000) */
+#define K_ATB_RATIO_INIT_PERA K_ATB_RATIO_INIT_(1000000000000000)
+#define K_ATB_RATIO_INIT_FEMPTO K_ATB_RATIO_INIT_1_(1000000000000000)
 
 /// Compound literal of a ratio corresponding to n:1
 #define K_ATB_RATIO_(n) (struct atb_Ratio) K_ATB_RATIO_INIT_(n)
@@ -151,14 +151,14 @@ double atb_Ratio_Tof64(struct atb_Ratio ratio) ATB_PUBLIC;
  *  \return bool True applying the ratio succeed. False when an
  *          overflows/underflows occured, with dest left unchanged.
  */
-bool atb_Ratio_Apply_i64(struct atb_Ratio ratio, int64_t value,
-                         int64_t *const dest) ATB_PUBLIC;
-bool atb_Ratio_Apply_i32(struct atb_Ratio ratio, int32_t value,
-                         int32_t *const dest) ATB_PUBLIC;
-bool atb_Ratio_Apply_i16(struct atb_Ratio ratio, int16_t value,
-                         int16_t *const dest) ATB_PUBLIC;
-bool atb_Ratio_Apply_i8(struct atb_Ratio ratio, int8_t value,
-                        int8_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_u64(struct atb_Ratio ratio, uint64_t value,
+                         uint64_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_u32(struct atb_Ratio ratio, uint32_t value,
+                         uint32_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_u16(struct atb_Ratio ratio, uint16_t value,
+                         uint16_t *const dest) ATB_PUBLIC;
+bool atb_Ratio_Apply_u8(struct atb_Ratio ratio, uint8_t value,
+                        uint8_t *const dest) ATB_PUBLIC;
 /**@}*/
 
 /**

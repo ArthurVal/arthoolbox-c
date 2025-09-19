@@ -87,7 +87,7 @@ extern "C" {
  *  \return bool True when the operation succeed. False when the operation
  *               induce an overflows/underflows.
  */
-bool atb_timespec_Set(struct timespec *const self, int64_t stamp,
+bool atb_timespec_Set(struct timespec *const self, uint64_t stamp,
                       struct atb_Ratio to_sec) ATB_PUBLIC;
 
 /* Comparisons *************************************************************/

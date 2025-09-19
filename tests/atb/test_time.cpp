@@ -9,10 +9,6 @@ using namespace std::chrono_literals;
 
 namespace {
 
-constexpr auto ToChronoDuration(timespec ts) {
-  return std::chrono::seconds{ts.tv_sec} + std::chrono::nanoseconds{ts.tv_nsec};
-}
-
 constexpr auto ToTimespec(std::chrono::nanoseconds d) -> timespec {
   return {
       .tv_sec = d.count() / 1'000'000'000,
@@ -21,6 +17,24 @@ constexpr auto ToTimespec(std::chrono::nanoseconds d) -> timespec {
 }
 
 TEST(AtbTimeTest, From) {
+  // Test _FROM
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_NS)),
+              helper::FieldsMatch(timespec{0, 100}));
+
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_US)),
+              helper::FieldsMatch(timespec{0, 100'000}));
+
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_MS)),
+              helper::FieldsMatch(timespec{0, 100'000'000}));
+
+  EXPECT_THAT((atb_timespec_FROM(1000, K_ATB_MS)),
+              helper::FieldsMatch(timespec{1, 0}));
+
+  EXPECT_THAT((atb_timespec_FROM(1300, K_ATB_MS)),
+              helper::FieldsMatch(timespec{1, 300'000'000}));
+}
+
+TEST(AtbTimeTest, Set) {
   timespec ts;
 
   for (auto ratio : {
@@ -62,36 +76,21 @@ TEST(AtbTimeTest, From) {
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 300'000'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_Set(&ts, -10300, K_ATB_MS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{-10, -300'000'000}));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 3, {1, 3}));
+  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 0}));
+
+  ts = {-1, -1};
+  EXPECT_TRUE(atb_timespec_Set(&ts, 4, {1, 3}));
+  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 333'333'333}));
 
   // Failure
   ts = {-1, -1};
   EXPECT_FALSE(
-      atb_timespec_Set(&ts, std::numeric_limits<int64_t>::max(), K_ATB_YEARS));
+      atb_timespec_Set(&ts, std::numeric_limits<uint64_t>::max(), K_ATB_YEARS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{-1, -1}));
-
-  // Test _FROM
-  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_NS)),
-              helper::FieldsMatch(timespec{0, 100}));
-
-  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_US)),
-              helper::FieldsMatch(timespec{0, 100'000}));
-
-  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_MS)),
-              helper::FieldsMatch(timespec{0, 100'000'000}));
-
-  EXPECT_THAT((atb_timespec_FROM(1000, K_ATB_MS)),
-              helper::FieldsMatch(timespec{1, 0}));
-
-  EXPECT_THAT((atb_timespec_FROM(1300, K_ATB_MS)),
-              helper::FieldsMatch(timespec{1, 300'000'000}));
-
-  EXPECT_THAT((atb_timespec_FROM(-10300, K_ATB_MS)),
-              helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
-TEST(AtbTimeDeathTest, From) {
+TEST(AtbTimeDeathTest, Set) {
   timespec ts;
   EXPECT_DEBUG_DEATH({ atb_timespec_Set(nullptr, 0, {1, 1}); }, "self != NULL");
   EXPECT_DEBUG_DEATH({ atb_timespec_Set(&ts, 0, {1, 0}); }, "den != 0");

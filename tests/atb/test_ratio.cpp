@@ -41,267 +41,183 @@ TEST(AtbRatioTest, APPLY) {
   EXPECT_NEAR((atb_Ratio_APPLY((atb_Ratio{1, 10}), 0.5)), 0.05, 1e-9);
 
   {
-    int64_t v;
+    uint64_t v;
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({0, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64({0, 1}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({1, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64({1, 1}, 10, &(v)));
     EXPECT_EQ(v, 10);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({-1, 1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({1, -1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({10, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64({10, 1}, 10, &(v)));
     EXPECT_EQ(v, 100);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({10, 1}, -10, &(v)));
-    EXPECT_EQ(v, -100);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({1, 10}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64({1, 10}, 10, &(v)));
     EXPECT_EQ(v, 1);
 
-    v = -2;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({1, 10}, -10, &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64({1, 20}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64({1, 20}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64(
         {1, 2}, std::numeric_limits<decltype(v)>::max(), &(v)));
     EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max() / 2);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i64(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u64(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max), &(v)));
     EXPECT_EQ(v, (std::numeric_limits<decltype(v)>::max() / k_max) * k_max);
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i64(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u64(
         {2, 1}, std::numeric_limits<decltype(v)>::max(), &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i64(
-        {-1, 1}, std::numeric_limits<decltype(v)>::min(), &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i64(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u64(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max) + 1,
         &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
   }
 
   {
-    int32_t v;
+    uint32_t v;
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({0, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32({0, 1}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({1, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32({1, 1}, 10, &(v)));
     EXPECT_EQ(v, 10);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({-1, 1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({1, -1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({10, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32({10, 1}, 10, &(v)));
     EXPECT_EQ(v, 100);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({10, 1}, -10, &(v)));
-    EXPECT_EQ(v, -100);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({1, 10}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32({1, 10}, 10, &(v)));
     EXPECT_EQ(v, 1);
 
-    v = -2;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({1, 10}, -10, &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32({1, 20}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32({1, 20}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32(
         {1, 2}, std::numeric_limits<decltype(v)>::max(), &(v)));
     EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max() / 2);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i32(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u32(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max), &(v)));
     EXPECT_EQ(v, (std::numeric_limits<decltype(v)>::max() / k_max) * k_max);
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i32(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u32(
         {2, 1}, std::numeric_limits<decltype(v)>::max(), &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i32(
-        {-1, 1}, std::numeric_limits<decltype(v)>::min(), &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i32(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u32(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max) + 1,
         &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
   }
 
   {
-    int16_t v;
+    uint16_t v;
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({0, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16({0, 1}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({1, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16({1, 1}, 10, &(v)));
     EXPECT_EQ(v, 10);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({-1, 1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({1, -1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({10, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16({10, 1}, 10, &(v)));
     EXPECT_EQ(v, 100);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({10, 1}, -10, &(v)));
-    EXPECT_EQ(v, -100);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({1, 10}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16({1, 10}, 10, &(v)));
     EXPECT_EQ(v, 1);
 
-    v = -2;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({1, 10}, -10, &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16({1, 20}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16({1, 20}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16(
         {1, 2}, std::numeric_limits<decltype(v)>::max(), &(v)));
     EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max() / 2);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i16(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u16(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max), &(v)));
     EXPECT_EQ(v, (std::numeric_limits<decltype(v)>::max() / k_max) * k_max);
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i16(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u16(
         {2, 1}, std::numeric_limits<decltype(v)>::max(), &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i16(
-        {-1, 1}, std::numeric_limits<decltype(v)>::min(), &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i16(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u16(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max) + 1,
         &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
   }
 
   {
-    int8_t v;
+    uint8_t v;
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({0, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8({0, 1}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({1, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8({1, 1}, 10, &(v)));
     EXPECT_EQ(v, 10);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({-1, 1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({1, -1}, 10, &(v)));
-    EXPECT_EQ(v, -10);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({10, 1}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8({10, 1}, 10, &(v)));
     EXPECT_EQ(v, 100);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({10, 1}, -10, &(v)));
-    EXPECT_EQ(v, -100);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({1, 10}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8({1, 10}, 10, &(v)));
     EXPECT_EQ(v, 1);
 
-    v = -2;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({1, 10}, -10, &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8({1, 20}, 10, &(v)));
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8({1, 20}, 10, &(v)));
     EXPECT_EQ(v, 0);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8(
         {1, 2}, std::numeric_limits<decltype(v)>::max(), &(v)));
     EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max() / 2);
 
-    v = -1;
-    EXPECT_TRUE(atb_Ratio_Apply_i8(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_TRUE(atb_Ratio_Apply_u8(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max), &(v)));
     EXPECT_EQ(v, (std::numeric_limits<decltype(v)>::max() / k_max) * k_max);
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i8(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u8(
         {2, 1}, std::numeric_limits<decltype(v)>::max(), &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
 
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i8(
-        {-1, 1}, std::numeric_limits<decltype(v)>::min(), &(v)));
-    EXPECT_EQ(v, -1);
-
-    v = -1;
-    EXPECT_FALSE(atb_Ratio_Apply_i8(
+    v = std::numeric_limits<decltype(v)>::max();
+    EXPECT_FALSE(atb_Ratio_Apply_u8(
         {k_max, 1}, (std::numeric_limits<decltype(v)>::max() / k_max) + 1,
         &(v)));
-    EXPECT_EQ(v, -1);
+    EXPECT_EQ(v, std::numeric_limits<decltype(v)>::max());
   }
 }
 
@@ -319,19 +235,16 @@ TEST(AtbRatioTest, Inv) {
   EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{3, 0}, &inv));
   EXPECT_EQ(inv, (atb_Ratio{0, 3}));
 
-  EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{14, -12}, &inv));
-  EXPECT_EQ(inv, (atb_Ratio{-12, 14}));
-
   // Aliasing is OK
   EXPECT_TRUE(atb_Ratio_Inv(inv, &inv));
-  EXPECT_EQ(inv, (atb_Ratio{14, -12}));
+  EXPECT_EQ(inv, (atb_Ratio{3, 0}));
 
   // Min/Max have no effects
-  EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{k_max, -12}, &inv));
-  EXPECT_EQ(inv, (atb_Ratio{-12, k_max}));
+  EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{k_max, 12}, &inv));
+  EXPECT_EQ(inv, (atb_Ratio{12, k_max}));
 
-  EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{-12, k_min}, &inv));
-  EXPECT_EQ(inv, (atb_Ratio{k_min, -12}));
+  EXPECT_TRUE(atb_Ratio_Inv(atb_Ratio{12, k_min}, &inv));
+  EXPECT_EQ(inv, (atb_Ratio{k_min, 12}));
 }
 
 TEST(AtbRatioDeathTest, Inv) {
@@ -386,10 +299,6 @@ TEST(AtbRatioTest, Add) {
   res = {0, 0};
   EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{3, 1}, atb_Ratio{1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{7, 2}));
-
-  res = {0, 0};
-  EXPECT_TRUE(atb_Ratio_Add(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, &res));
-  EXPECT_EQ(res, (atb_Ratio{0, 2}));
 
   // Failure
   res = {0, 0};
@@ -464,10 +373,6 @@ TEST(AtbRatioTest, Sub) {
   EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{3, 1}, atb_Ratio{1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{5, 2}));
 
-  res = {0, 0};
-  EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 2}, atb_Ratio{-1, 2}, &res));
-  EXPECT_EQ(res, (atb_Ratio{2, 2}));
-
   // // Failure
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{k_min, 2}, atb_Ratio{k_max, 2}, &res));
@@ -475,10 +380,6 @@ TEST(AtbRatioTest, Sub) {
 
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{1, 2}, atb_Ratio{2, k_max}, &res));
-  EXPECT_EQ(res, (atb_Ratio{0, 0}));
-
-  res = {0, 0};
-  EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{k_max, 2}, atb_Ratio{k_min, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
   res = {0, 0};
@@ -504,8 +405,8 @@ TEST(AtbRatioTest, Sub) {
   EXPECT_EQ(res, (atb_Ratio{4, 0}));
 
   res = {1, 1};
-  EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{2, 5}, atb_Ratio{10, 0}, &res));
-  EXPECT_EQ(res, (atb_Ratio{-50, 0}));
+  EXPECT_FALSE(atb_Ratio_Sub(atb_Ratio{2, 5}, atb_Ratio{10, 0}, &res));
+  EXPECT_EQ(res, (atb_Ratio{1, 1}));
 
   res = {1, 1};
   EXPECT_TRUE(atb_Ratio_Sub(atb_Ratio{1, 1}, atb_Ratio{0, 10}, &res));
@@ -541,10 +442,6 @@ TEST(AtbRatioTest, Mul) {
   EXPECT_TRUE(atb_Ratio_Mul({3, 1}, {1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{3, 2}));
 
-  res = {0, 0};
-  EXPECT_TRUE(atb_Ratio_Mul({-1, 2}, {1, -2}, &res));
-  EXPECT_EQ(res, (atb_Ratio{-1, -4}));
-
   // Failure
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{k_max, 2}, atb_Ratio{k_max, 2}, &res));
@@ -552,10 +449,6 @@ TEST(AtbRatioTest, Mul) {
 
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{1, 2}, atb_Ratio{2, k_max}, &res));
-  EXPECT_EQ(res, (atb_Ratio{0, 0}));
-
-  res = {0, 0};
-  EXPECT_FALSE(atb_Ratio_Mul(atb_Ratio{0, k_min}, atb_Ratio{k_min, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
   res = {0, 0};
@@ -618,10 +511,6 @@ TEST(AtbRatioTest, Div) {
   EXPECT_TRUE(atb_Ratio_Div({3, 1}, {1, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{6, 1}));
 
-  res = {0, 0};
-  EXPECT_TRUE(atb_Ratio_Div({-1, 2}, {1, -2}, &res));
-  EXPECT_EQ(res, (atb_Ratio{2, 2}));
-
   // Failure
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{k_max, 2}, atb_Ratio{k_max, 2}, &res));
@@ -629,10 +518,6 @@ TEST(AtbRatioTest, Div) {
 
   res = {0, 0};
   EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{300, 2}, atb_Ratio{2, k_max}, &res));
-  EXPECT_EQ(res, (atb_Ratio{0, 0}));
-
-  res = {0, 0};
-  EXPECT_FALSE(atb_Ratio_Div(atb_Ratio{0, k_min}, atb_Ratio{k_min, 2}, &res));
   EXPECT_EQ(res, (atb_Ratio{0, 0}));
 
   res = {0, 0};
@@ -687,11 +572,6 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 2}},
            std::array{atb_Ratio{1, 2}, atb_Ratio{2, 4}},
            std::array{atb_Ratio{2, 4}, atb_Ratio{10, 20}},
-           std::array{atb_Ratio{1, 2}, atb_Ratio{-1, -2}},
-           std::array{atb_Ratio{3, 2}, atb_Ratio{3, 2}},
-           std::array{atb_Ratio{-3, 2}, atb_Ratio{-3, 2}},
-           std::array{atb_Ratio{-3, 2}, atb_Ratio{3, -2}},
-           std::array{atb_Ratio{-3, -2}, atb_Ratio{-3, -2}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_max}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{1, 1}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{4, 4}},
@@ -712,8 +592,6 @@ TEST(AtbRatioTest, Comparisons) {
   for (auto [lhs, rhs] : std::array{
            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 3}},
            std::array{atb_Ratio{394, 2}, atb_Ratio{2, 4}},
-           std::array{atb_Ratio{2, 4}, atb_Ratio{-10, 23939}},
-           std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -729,13 +607,7 @@ TEST(AtbRatioTest, Comparisons) {
   for (auto [lhs, rhs] : std::array{
            std::array{atb_Ratio{3, 2}, atb_Ratio{1, 2}},
            std::array{atb_Ratio{3, 4}, atb_Ratio{1, 2}},
-           std::array{atb_Ratio{1, 2}, atb_Ratio{-1, 2}},
-           std::array{atb_Ratio{1, 2}, atb_Ratio{1, -2}},
-           std::array{atb_Ratio{-1, -2}, atb_Ratio{1, -2}},
-           std::array{atb_Ratio{1, -4}, atb_Ratio{-1, 2}},
-           std::array{atb_Ratio{-1, 4}, atb_Ratio{1, -2}},
-           std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
-           std::array{atb_Ratio{-1, 4}, atb_Ratio{-20, 40}},
+           std::array{atb_Ratio{3, 2}, atb_Ratio{k_max, k_max}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -756,12 +628,7 @@ TEST(AtbRatioTest, Comparisons) {
   for (auto [lhs, rhs] : std::array{
            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 2}},
            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 4}},
-           std::array{atb_Ratio{-1, 2}, atb_Ratio{1, 2}},
-           std::array{atb_Ratio{1, -2}, atb_Ratio{1, 2}},
-           std::array{atb_Ratio{1, -2}, atb_Ratio{-1, -2}},
-           std::array{atb_Ratio{-1, 2}, atb_Ratio{1, -4}},
-           std::array{atb_Ratio{1, -2}, atb_Ratio{-1, 4}},
-           std::array{atb_Ratio{-20, 40}, atb_Ratio{-1, 4}},
+           std::array{atb_Ratio{1, 2}, atb_Ratio{k_max, k_max}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -780,11 +647,9 @@ TEST(AtbRatioTest, Comparisons) {
 
   // TESTS FAILURE
   for (auto [lhs, rhs] : std::array{
-           std::array{atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_min}},
-           std::array{atb_Ratio{k_max, k_min}, atb_Ratio{k_max, k_min}},
-           std::array{atb_Ratio{k_min, 40}, atb_Ratio{-1, k_max}},
-           std::array{atb_Ratio{k_min, k_min}, atb_Ratio{k_min, k_min}},
-           std::array{atb_Ratio{k_min, k_max}, atb_Ratio{k_min, k_max}},
+           std::array{atb_Ratio{k_max, 2}, atb_Ratio{2, k_max}},
+           std::array{atb_Ratio{k_max, 2}, atb_Ratio{k_min, k_max}},
+           std::array{atb_Ratio{k_min, k_max}, atb_Ratio{k_max, 2}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
