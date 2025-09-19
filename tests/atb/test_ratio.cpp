@@ -698,9 +698,9 @@ TEST(AtbRatioTest, Comparisons) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    cmp = atb_Ratio_Compare_GREATER;
+    cmp = K_ATB_RATIO_CMP_GREATER;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
-    EXPECT_EQ(atb_Ratio_Compare_EQUAL, cmp);
+    EXPECT_EQ(K_ATB_RATIO_CMP_EQUAL, cmp);
     EXPECT_TRUE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_FALSE(atb_Ratio_Ne(lhs, rhs));
 
@@ -717,9 +717,9 @@ TEST(AtbRatioTest, Comparisons) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    cmp = atb_Ratio_Compare_EQUAL;
+    cmp = K_ATB_RATIO_CMP_EQUAL;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
-    EXPECT_NE(atb_Ratio_Compare_EQUAL, cmp);
+    EXPECT_NE(K_ATB_RATIO_CMP_EQUAL, cmp);
 
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
@@ -742,9 +742,9 @@ TEST(AtbRatioTest, Comparisons) {
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
 
-    cmp = atb_Ratio_Compare_EQUAL;
+    cmp = K_ATB_RATIO_CMP_EQUAL;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
-    EXPECT_EQ(atb_Ratio_Compare_GREATER, cmp);
+    EXPECT_EQ(K_ATB_RATIO_CMP_GREATER, cmp);
     EXPECT_TRUE(atb_Ratio_Ge(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Gt(lhs, rhs));
 
@@ -768,9 +768,9 @@ TEST(AtbRatioTest, Comparisons) {
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
 
-    cmp = atb_Ratio_Compare_EQUAL;
+    cmp = K_ATB_RATIO_CMP_EQUAL;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
-    EXPECT_EQ(atb_Ratio_Compare_LESS, cmp);
+    EXPECT_EQ(K_ATB_RATIO_CMP_LESS, cmp);
     EXPECT_TRUE(atb_Ratio_Le(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Lt(lhs, rhs));
 

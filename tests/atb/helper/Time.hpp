@@ -19,18 +19,18 @@ constexpr auto operator!=(timespec lhs, timespec rhs) -> bool {
   return !(lhs == rhs);
 }
 
-constexpr auto ToString(atb_timespec_Compare_Result cmp_res)
+constexpr auto ToString(ATB_TIMESPEC_CMP cmp_res)
     -> std::string_view {
   switch (cmp_res) {
-    case atb_timespec_Compare_EQUAL: return "EQUAL";
-    case atb_timespec_Compare_LESS: return "LESS";
-    case atb_timespec_Compare_GREATER: return "GREATER";
+    case K_ATB_TIMESPEC_CMP_EQUAL: return "EQUAL";
+    case K_ATB_TIMESPEC_CMP_LESS: return "LESS";
+    case K_ATB_TIMESPEC_CMP_GREATER: return "GREATER";
   }
   return "UNKNOWN";
 }
 
 inline auto operator<<(std::ostream &os,
-                       atb_timespec_Compare_Result cmp_res) -> std::ostream & {
+                       ATB_TIMESPEC_CMP cmp_res) -> std::ostream & {
   os << std::quoted(ToString(cmp_res)) << " (" << static_cast<int>(cmp_res)
      << ")";
   return os;

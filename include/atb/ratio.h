@@ -23,80 +23,80 @@ struct atb_Ratio {
 
 /* Format string helper ****************************************************/
 
-#define atb_Ratio_FMT "{.num=%jd, .den=%jd}"
+#define K_ATB_RATIO_FMT "{.num=%jd, .den=%jd}"
 #define atb_Ratio_FMT_VA_ARG(ratio) (intmax_t)(ratio).num, (intmax_t)(ratio).den
 
 /* Constant ****************************************************************/
 
 /// Initialize an atb_Ratio as n:1 (static initializer)
-#define atb_Ratio_INIT_(n) \
+#define K_ATB_RATIO_INIT_(n) \
   { .num = (n), .den = 1, }
 
 /// Initialize an atb_Ratio as 1:n (static initializer)
-#define atb_Ratio_INIT_1_(n) \
+#define K_ATB_RATIO_INIT_1_(n) \
   { .num = 1, .den = (n), }
 
 /* Requires 'atb_Ratio_elem_t' to be at least 8 bits */
-#define atb_Ratio_INIT_0 atb_Ratio_INIT_(0)
-#define atb_Ratio_INIT_1 atb_Ratio_INIT_(1)
+#define K_ATB_RATIO_INIT_0 K_ATB_RATIO_INIT_(0)
+#define K_ATB_RATIO_INIT_1 K_ATB_RATIO_INIT_(1)
 
-#define atb_Ratio_INIT_DECA atb_Ratio_INIT_(10)
-#define atb_Ratio_INIT_DECI atb_Ratio_INIT_1_(10)
+#define K_ATB_RATIO_INIT_DECA K_ATB_RATIO_INIT_(10)
+#define K_ATB_RATIO_INIT_DECI K_ATB_RATIO_INIT_1_(10)
 
-#define atb_Ratio_INIT_HECTO atb_Ratio_INIT_(100)
-#define atb_Ratio_INIT_CENTI atb_Ratio_INIT_1_(100)
+#define K_ATB_RATIO_INIT_HECTO K_ATB_RATIO_INIT_(100)
+#define K_ATB_RATIO_INIT_CENTI K_ATB_RATIO_INIT_1_(100)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 16 bits */
-#define atb_Ratio_INIT_KILO atb_Ratio_INIT_(1000)
-#define atb_Ratio_INIT_MILLI atb_Ratio_INIT_1_(1000)
+#define K_ATB_RATIO_INIT_KILO K_ATB_RATIO_INIT_(1000)
+#define K_ATB_RATIO_INIT_MILLI K_ATB_RATIO_INIT_1_(1000)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 32 bits */
-#define atb_Ratio_INIT_MEGA atb_Ratio_INIT_(1000000)
-#define atb_Ratio_INIT_MICRO atb_Ratio_INIT_1_(1000000)
+#define K_ATB_RATIO_INIT_MEGA K_ATB_RATIO_INIT_(1000000)
+#define K_ATB_RATIO_INIT_MICRO K_ATB_RATIO_INIT_1_(1000000)
 
-#define atb_Ratio_INIT_GIGA atb_Ratio_INIT_(1000000000)
-#define atb_Ratio_INIT_NANO atb_Ratio_INIT_1_(1000000000)
+#define K_ATB_RATIO_INIT_GIGA K_ATB_RATIO_INIT_(1000000000)
+#define K_ATB_RATIO_INIT_NANO K_ATB_RATIO_INIT_1_(1000000000)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 64 bits */
-/* #define atb_Ratio_INIT_TERA atb_Ratio_INIT_(1000000000000) */
-/* #define atb_Ratio_INIT_PICO atb_Ratio_INIT_1_(1000000000000) */
+/* #define K_ATB_RATIO_INIT_TERA K_ATB_RATIO_INIT_(1000000000000) */
+/* #define K_ATB_RATIO_INIT_PICO K_ATB_RATIO_INIT_1_(1000000000000) */
 
-/* #define atb_Ratio_INIT_PERA atb_Ratio_INIT_(1000000000000000) */
-/* #define atb_Ratio_INIT_FEMPTO atb_Ratio_INIT_1_(1000000000000000) */
+/* #define K_ATB_RATIO_INIT_PERA K_ATB_RATIO_INIT_(1000000000000000) */
+/* #define K_ATB_RATIO_INIT_FEMPTO K_ATB_RATIO_INIT_1_(1000000000000000) */
 
 /// Compound literal of a ratio corresponding to n:1
-#define atb_Ratio_(n) (struct atb_Ratio) atb_Ratio_INIT_(n)
+#define K_ATB_RATIO_(n) (struct atb_Ratio) K_ATB_RATIO_INIT_(n)
 
 /// Compound literal of a ratio corresponding to 1:n
-#define atb_Ratio_1_(n) (struct atb_Ratio) atb_Ratio_INIT_1_(n)
+#define K_ATB_RATIO_1_(n) (struct atb_Ratio) K_ATB_RATIO_INIT_1_(n)
 
 /* Requires 'atb_Ratio_elem_t' to be at least 8 bits */
-#define atb_Ratio_0 (struct atb_Ratio) atb_Ratio_INIT_0
-#define atb_Ratio_1 (struct atb_Ratio) atb_Ratio_INIT_1
+#define K_ATB_RATIO_0 (struct atb_Ratio) K_ATB_RATIO_INIT_0
+#define K_ATB_RATIO_1 (struct atb_Ratio) K_ATB_RATIO_INIT_1
 
-#define atb_Ratio_DECA (struct atb_Ratio) atb_Ratio_INIT_DECA
-#define atb_Ratio_DECI (struct atb_Ratio) atb_Ratio_INIT_DECI
+#define K_ATB_RATIO_DECA (struct atb_Ratio) K_ATB_RATIO_INIT_DECA
+#define K_ATB_RATIO_DECI (struct atb_Ratio) K_ATB_RATIO_INIT_DECI
 
-#define atb_Ratio_HECTO (struct atb_Ratio) atb_Ratio_INIT_HECTO
-#define atb_Ratio_CENTI (struct atb_Ratio) atb_Ratio_INIT_CENTI
+#define K_ATB_RATIO_HECTO (struct atb_Ratio) K_ATB_RATIO_INIT_HECTO
+#define K_ATB_RATIO_CENTI (struct atb_Ratio) K_ATB_RATIO_INIT_CENTI
 
 /* Requires 'atb_Ratio_elem_t' to be at least 16 bits */
-#define atb_Ratio_KILO (struct atb_Ratio) atb_Ratio_INIT_KILO
-#define atb_Ratio_MILLI (struct atb_Ratio) atb_Ratio_INIT_MILLI
+#define K_ATB_RATIO_KILO (struct atb_Ratio) K_ATB_RATIO_INIT_KILO
+#define K_ATB_RATIO_MILLI (struct atb_Ratio) K_ATB_RATIO_INIT_MILLI
 
 /* Requires 'atb_Ratio_elem_t' to be at least 32 bits */
-#define atb_Ratio_MEGA (struct atb_Ratio) atb_Ratio_INIT_MEGA
-#define atb_Ratio_MICRO (struct atb_Ratio) atb_Ratio_INIT_MICRO
+#define K_ATB_RATIO_MEGA (struct atb_Ratio) K_ATB_RATIO_INIT_MEGA
+#define K_ATB_RATIO_MICRO (struct atb_Ratio) K_ATB_RATIO_INIT_MICRO
 
-#define atb_Ratio_GIGA (struct atb_Ratio) atb_Ratio_INIT_GIGA
-#define atb_Ratio_NANO (struct atb_Ratio) atb_Ratio_INIT_NANO
+#define K_ATB_RATIO_GIGA (struct atb_Ratio) K_ATB_RATIO_INIT_GIGA
+#define K_ATB_RATIO_NANO (struct atb_Ratio) K_ATB_RATIO_INIT_NANO
 
 /* Requires 'atb_Ratio_elem_t' to be at least 64 bits */
-/* #define atb_Ratio_TERA (struct atb_Ratio)atb_Ratio_INIT_TERA */
-/* #define atb_Ratio_PICO (struct atb_Ratio)atb_Ratio_INIT_PICO */
+/* #define K_ATB_RATIO_TERA (struct atb_Ratio) K_ATB_RATIO_INIT_TERA */
+/* #define K_ATB_RATIO_PICO (struct atb_Ratio) K_ATB_RATIO_INIT_PICO */
 
-/* #define atb_Ratio_PERA (struct atb_Ratio)atb_Ratio_INIT_PERA */
-/* #define atb_Ratio_FEMPTO (struct atb_Ratio)atb_Ratio_INIT_FEMPTO */
+/* #define K_ATB_RATIO_PERA (struct atb_Ratio) K_ATB_RATIO_INIT_PERA */
+/* #define K_ATB_RATIO_FEMPTO (struct atb_Ratio) K_ATB_RATIO_INIT_FEMPTO */
 
 /* Conversion **************************************************************/
 
@@ -219,10 +219,10 @@ bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
  *  \brief Enum representing the result of the _Compare function
  */
 typedef enum {
-  atb_Ratio_Compare_LESS = -1,   /*!< LHS is LESS than RHS */
-  atb_Ratio_Compare_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
-  atb_Ratio_Compare_GREATER = 1, /*!< LHS is GREATER than RHS */
-} atb_Ratio_Compare_Result;
+  K_ATB_RATIO_CMP_LESS = -1,   /*!< LHS is LESS than RHS */
+  K_ATB_RATIO_CMP_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
+  K_ATB_RATIO_CMP_GREATER = 1, /*!< LHS is GREATER than RHS */
+} ATB_RATIO_CMP;
 
 /**
  *  \brief Compare 2 ratios with each other and set dest accordingly

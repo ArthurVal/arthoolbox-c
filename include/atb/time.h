@@ -14,8 +14,8 @@ extern "C" {
 
 /* Format string helper ****************************************************/
 
-#define atb_timespec_FMT_RAW "{.tv_sec=%li, .tv_nsec=%li}"
-#define atb_timespec_FMT "%li.%.9li"
+#define K_ATB_TIMESPEC_FMT_RAW "{.tv_sec=%li, .tv_nsec=%li}"
+#define K_ATB_TIMESPEC_FMT "%li.%.9li"
 
 #define atb_timespec_FMT_VA_ARG(ts) (ts).tv_sec, (ts).tv_nsec
 
@@ -23,29 +23,29 @@ extern "C" {
 
 /// Static initializer
 
-#define atb_INIT_NS atb_Ratio_INIT_NANO
-#define atb_INIT_US atb_Ratio_INIT_MICRO
-#define atb_INIT_MS atb_Ratio_INIT_MILLI
-#define atb_INIT_SEC atb_Ratio_INIT_1
-#define atb_INIT_MINUTES atb_Ratio_INIT_(60)
-#define atb_INIT_HOURS atb_Ratio_INIT_(60 * 60)
-#define atb_INIT_DAYS atb_Ratio_INIT_(60 * 60 * 24)
-#define atb_INIT_WEEKS atb_Ratio_INIT_(60 * 60 * 24 * 7)
-#define atb_INIT_MONTHS atb_Ratio_INIT_(2629746)
-#define atb_INIT_YEARS atb_Ratio_INIT_(31556952)
+#define K_ATB_INIT_NS K_ATB_RATIO_INIT_NANO
+#define K_ATB_INIT_US K_ATB_RATIO_INIT_MICRO
+#define K_ATB_INIT_MS K_ATB_RATIO_INIT_MILLI
+#define K_ATB_INIT_SEC K_ATB_RATIO_INIT_1
+#define K_ATB_INIT_MINUTES K_ATB_RATIO_INIT_(60)
+#define K_ATB_INIT_HOURS K_ATB_RATIO_INIT_(60 * 60)
+#define K_ATB_INIT_DAYS K_ATB_RATIO_INIT_(60 * 60 * 24)
+#define K_ATB_INIT_WEEKS K_ATB_RATIO_INIT_(60 * 60 * 24 * 7)
+#define K_ATB_INIT_MONTHS K_ATB_RATIO_INIT_(2629746)
+#define K_ATB_INIT_YEARS K_ATB_RATIO_INIT_(31556952)
 
 /// Compound literals
 
-#define atb_NS (struct atb_Ratio) atb_INIT_NS
-#define atb_US (struct atb_Ratio) atb_INIT_US
-#define atb_MS (struct atb_Ratio) atb_INIT_MS
-#define atb_SEC (struct atb_Ratio) atb_INIT_SEC
-#define atb_MINUTES (struct atb_Ratio) atb_INIT_MINUTES
-#define atb_HOURS (struct atb_Ratio) atb_INIT_HOURS
-#define atb_DAYS (struct atb_Ratio) atb_INIT_DAYS
-#define atb_WEEKS (struct atb_Ratio) atb_INIT_WEEKS
-#define atb_MONTHS (struct atb_Ratio) atb_INIT_MONTHS
-#define atb_YEARS (struct atb_Ratio) atb_INIT_YEARS
+#define K_ATB_NS (struct atb_Ratio) K_ATB_INIT_NS
+#define K_ATB_US (struct atb_Ratio) K_ATB_INIT_US
+#define K_ATB_MS (struct atb_Ratio) K_ATB_INIT_MS
+#define K_ATB_SEC (struct atb_Ratio) K_ATB_INIT_SEC
+#define K_ATB_MINUTES (struct atb_Ratio) K_ATB_INIT_MINUTES
+#define K_ATB_HOURS (struct atb_Ratio) K_ATB_INIT_HOURS
+#define K_ATB_DAYS (struct atb_Ratio) K_ATB_INIT_DAYS
+#define K_ATB_WEEKS (struct atb_Ratio) K_ATB_INIT_WEEKS
+#define K_ATB_MONTHS (struct atb_Ratio) K_ATB_INIT_MONTHS
+#define K_ATB_YEARS (struct atb_Ratio) K_ATB_INIT_YEARS
 
 /* Constructors **************************************************************/
 
@@ -66,7 +66,7 @@ extern "C" {
   {                                                         \
     .tv_sec = atb_Ratio_APPLY((to_sec), (stamp)),           \
     .tv_nsec = ((((stamp) * (to_sec).num) % (to_sec).den) * \
-                atb_Ratio_APPLY((to_sec), atb_NS.den)),     \
+                atb_Ratio_APPLY((to_sec), K_ATB_NS.den)),   \
   }
 
 /**
@@ -97,10 +97,10 @@ bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
  *  \brief Enum representing the result of the _Compare function
  */
 typedef enum {
-  atb_timespec_Compare_LESS = -1,   /*!< LHS is LESS than RHS */
-  atb_timespec_Compare_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
-  atb_timespec_Compare_GREATER = 1, /*!< LHS is GREATER than RHS */
-} atb_timespec_Compare_Result;
+  K_ATB_TIMESPEC_CMP_LESS = -1,   /*!< LHS is LESS than RHS */
+  K_ATB_TIMESPEC_CMP_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
+  K_ATB_TIMESPEC_CMP_GREATER = 1, /*!< LHS is GREATER than RHS */
+} ATB_TIMESPEC_CMP;
 
 /**
  * \brief Compare 2 timespecs with each other, following the 'three-way
@@ -114,8 +114,8 @@ typedef enum {
  * \li res == 0: lhs == rhs
  * \li res > 0 : lhs > rhs
  */
-atb_timespec_Compare_Result atb_timespec_Compare(
-    struct timespec lhs, struct timespec rhs) ATB_PUBLIC;
+ATB_TIMESPEC_CMP atb_timespec_Compare(struct timespec lhs,
+                                      struct timespec rhs) ATB_PUBLIC;
 
 /**@{*/
 /**

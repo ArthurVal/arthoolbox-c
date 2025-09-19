@@ -17,20 +17,20 @@ constexpr auto operator!=(atb_Ratio lhs, atb_Ratio rhs) -> bool {
   return !(lhs == rhs);
 }
 
-constexpr auto ToString(atb_Ratio_Compare_Result cmp_res) -> std::string_view {
+constexpr auto ToString(ATB_RATIO_CMP cmp_res) -> std::string_view {
   switch (cmp_res) {
-    case atb_Ratio_Compare_EQUAL:
+    case K_ATB_RATIO_CMP_EQUAL:
       return "EQUAL";
-    case atb_Ratio_Compare_LESS:
+    case K_ATB_RATIO_CMP_LESS:
       return "LESS";
-    case atb_Ratio_Compare_GREATER:
+    case K_ATB_RATIO_CMP_GREATER:
       return "GREATER";
   }
   return "";
 }
 
 inline auto operator<<(std::ostream &os,
-                       atb_Ratio_Compare_Result cmp_res) -> std::ostream & {
+                       ATB_RATIO_CMP cmp_res) -> std::ostream & {
   os << std::quoted(ToString(cmp_res)) << " (" << static_cast<int>(cmp_res)
      << ")";
   return os;

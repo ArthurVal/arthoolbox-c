@@ -225,11 +225,11 @@ bool atb_Ratio_Compare(struct atb_Ratio lhs, struct atb_Ratio rhs,
 
   if (success) {
     if (lhs.num == lhs.den) {
-      *dest = atb_Ratio_Compare_EQUAL;
+      *dest = K_ATB_RATIO_CMP_EQUAL;
     } else if (lhs.num > lhs.den) {
-      *dest = atb_Ratio_Compare_GREATER;
+      *dest = K_ATB_RATIO_CMP_GREATER;
     } else {
-      *dest = atb_Ratio_Compare_LESS;
+      *dest = K_ATB_RATIO_CMP_LESS;
     }
   }
 

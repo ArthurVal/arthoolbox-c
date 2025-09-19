@@ -7,11 +7,11 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
   assert(to_sec.den != 0);
   assert(dest != NULL);
 
-  if (!atb_Ratio_Eq(to_sec, atb_NS)) {
+  if (!atb_Ratio_Eq(to_sec, K_ATB_NS)) {
     /* Convert stamp to NS */
 
     /* -> Find the ratio to transform stamp into NS */
-    if (!(atb_Ratio_Div(to_sec, atb_NS, &(to_sec)) &&
+    if (!(atb_Ratio_Div(to_sec, K_ATB_NS, &(to_sec)) &&
           atb_Ratio_Reduce(to_sec, &(to_sec)))) {
       return false;
     }
@@ -31,7 +31,7 @@ bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
   assert(to_sec.den != 0);
   assert(dest != NULL);
 
-  if (atb_Ratio_Ge(to_sec, atb_Ratio_1)) {
+  if (atb_Ratio_Ge(to_sec, K_ATB_RATIO_1)) {
     if (!atb_Ratio_Apply_i64(to_sec, stamp, &(dest->tv_sec))) {
       return false;
     }
@@ -39,26 +39,26 @@ bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
   } else if (!stamp_ToNs(stamp, to_sec, &(stamp))) {
     return false;
   } else {
-    dest->tv_sec = stamp / atb_NS.den;
-    dest->tv_nsec = stamp % atb_NS.den;
+    dest->tv_sec = stamp / K_ATB_NS.den;
+    dest->tv_nsec = stamp % K_ATB_NS.den;
   }
 
   return true;
 }
 
-atb_timespec_Compare_Result atb_timespec_Compare(struct timespec lhs,
-                                                 struct timespec rhs) {
+ATB_TIMESPEC_CMP atb_timespec_Compare(struct timespec lhs,
+                                      struct timespec rhs) {
   if (lhs.tv_sec < rhs.tv_sec) {
-    return atb_timespec_Compare_LESS;
+    return K_ATB_TIMESPEC_CMP_LESS;
   } else if (lhs.tv_sec > rhs.tv_sec) {
-    return atb_timespec_Compare_GREATER;
+    return K_ATB_TIMESPEC_CMP_GREATER;
   } else {
     if (lhs.tv_nsec == rhs.tv_nsec) {
-      return atb_timespec_Compare_EQUAL;
+      return K_ATB_TIMESPEC_CMP_EQUAL;
     } else if (lhs.tv_nsec > rhs.tv_nsec) {
-      return atb_timespec_Compare_GREATER;
+      return K_ATB_TIMESPEC_CMP_GREATER;
     } else {
-      return atb_timespec_Compare_LESS;
+      return K_ATB_TIMESPEC_CMP_LESS;
     }
   }
 }

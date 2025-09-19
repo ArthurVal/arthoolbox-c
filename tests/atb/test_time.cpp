@@ -24,16 +24,16 @@ TEST(AtbTimeTest, From) {
   timespec ts;
 
   for (auto ratio : {
-           atb_NS,
-           atb_US,
-           atb_MS,
-           atb_SEC,
-           atb_MINUTES,
-           atb_HOURS,
-           atb_DAYS,
-           atb_WEEKS,
-           atb_MONTHS,
-           atb_YEARS,
+           K_ATB_NS,
+           K_ATB_US,
+           K_ATB_MS,
+           K_ATB_SEC,
+           K_ATB_MINUTES,
+           K_ATB_HOURS,
+           K_ATB_DAYS,
+           K_ATB_WEEKS,
+           K_ATB_MONTHS,
+           K_ATB_YEARS,
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_1(ratio));
 
@@ -42,52 +42,52 @@ TEST(AtbTimeTest, From) {
     EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 0}));
   }
 
-  EXPECT_TRUE(atb_timespec_From(100, atb_NS, &ts));
+  EXPECT_TRUE(atb_timespec_From(100, K_ATB_NS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(100, atb_US, &ts));
+  EXPECT_TRUE(atb_timespec_From(100, K_ATB_US, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(100, atb_MS, &ts));
+  EXPECT_TRUE(atb_timespec_From(100, K_ATB_MS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(1000, atb_MS, &ts));
+  EXPECT_TRUE(atb_timespec_From(1000, K_ATB_MS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 0}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(1300, atb_MS, &ts));
+  EXPECT_TRUE(atb_timespec_From(1300, K_ATB_MS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 300'000'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(-10300, atb_MS, &ts));
+  EXPECT_TRUE(atb_timespec_From(-10300, K_ATB_MS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{-10, -300'000'000}));
 
   // Failure
   ts = {-1, -1};
   EXPECT_FALSE(
-      atb_timespec_From(std::numeric_limits<int64_t>::max(), atb_YEARS, &ts));
+      atb_timespec_From(std::numeric_limits<int64_t>::max(), K_ATB_YEARS, &ts));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{-1, -1}));
 
   // Test _FROM
-  EXPECT_THAT((atb_timespec_FROM(100, atb_NS)),
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_NS)),
               helper::FieldsMatch(timespec{0, 100}));
 
-  EXPECT_THAT((atb_timespec_FROM(100, atb_US)),
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_US)),
               helper::FieldsMatch(timespec{0, 100'000}));
 
-  EXPECT_THAT((atb_timespec_FROM(100, atb_MS)),
+  EXPECT_THAT((atb_timespec_FROM(100, K_ATB_MS)),
               helper::FieldsMatch(timespec{0, 100'000'000}));
 
-  EXPECT_THAT((atb_timespec_FROM(1000, atb_MS)),
+  EXPECT_THAT((atb_timespec_FROM(1000, K_ATB_MS)),
               helper::FieldsMatch(timespec{1, 0}));
 
-  EXPECT_THAT((atb_timespec_FROM(1300, atb_MS)),
+  EXPECT_THAT((atb_timespec_FROM(1300, K_ATB_MS)),
               helper::FieldsMatch(timespec{1, 300'000'000}));
 
-  EXPECT_THAT((atb_timespec_FROM(-10300, atb_MS)),
+  EXPECT_THAT((atb_timespec_FROM(-10300, K_ATB_MS)),
               helper::FieldsMatch(timespec{-10, -300'000'000}));
 }
 
@@ -109,7 +109,7 @@ TEST(AtbTimeTest, Compare) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    EXPECT_EQ(atb_timespec_Compare_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_TIMESPEC_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Eq(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Ne(lhs, rhs));
 
@@ -127,7 +127,7 @@ TEST(AtbTimeTest, Compare) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    EXPECT_NE(atb_timespec_Compare_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_NE(K_ATB_TIMESPEC_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
   }
@@ -147,7 +147,7 @@ TEST(AtbTimeTest, Compare) {
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-    EXPECT_EQ(atb_timespec_Compare_GREATER, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_TIMESPEC_CMP_GREATER, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ge(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Gt(lhs, rhs));
 
@@ -170,7 +170,7 @@ TEST(AtbTimeTest, Compare) {
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-    EXPECT_EQ(atb_timespec_Compare_LESS, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_TIMESPEC_CMP_LESS, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Le(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Lt(lhs, rhs));
 
