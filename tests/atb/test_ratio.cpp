@@ -575,6 +575,8 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{k_max, k_max}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{1, 1}},
            std::array{atb_Ratio{k_max, k_max}, atb_Ratio{4, 4}},
+           std::array{atb_Ratio{0, k_max}, atb_Ratio{0, 1}},
+           std::array{atb_Ratio{0, k_max}, atb_Ratio{0, 5}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -592,6 +594,7 @@ TEST(AtbRatioTest, Comparisons) {
   for (auto [lhs, rhs] : std::array{
            std::array{atb_Ratio{1, 2}, atb_Ratio{1, 3}},
            std::array{atb_Ratio{394, 2}, atb_Ratio{2, 4}},
+           std::array{atb_Ratio{0, k_max}, atb_Ratio{1, 5}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -608,6 +611,8 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{3, 2}, atb_Ratio{1, 2}},
            std::array{atb_Ratio{3, 4}, atb_Ratio{1, 2}},
            std::array{atb_Ratio{3, 2}, atb_Ratio{k_max, k_max}},
+           std::array{atb_Ratio{1, 5}, atb_Ratio{0, 2}},
+           std::array{atb_Ratio{1, 5}, atb_Ratio{0, k_max}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
@@ -629,6 +634,8 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 2}},
            std::array{atb_Ratio{1, 2}, atb_Ratio{3, 4}},
            std::array{atb_Ratio{1, 2}, atb_Ratio{k_max, k_max}},
+           std::array{atb_Ratio{0, 2}, atb_Ratio{1, 5}},
+           std::array{atb_Ratio{0, k_max}, atb_Ratio{1, 5}},
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
