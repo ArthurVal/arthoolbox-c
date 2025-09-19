@@ -36,7 +36,7 @@ bool atb_timespec_Set(struct timespec *const self, uint64_t stamp,
 
   if (atb_Ratio_Ge(to_sec, K_ATB_RATIO_1)) {
     if (atb_Ratio_Apply_u64(to_sec, stamp, &(stamp)) && (stamp <= INT64_MAX)) {
-      self->tv_sec = (int64_t)stamp;
+      self->tv_sec = (__typeof__(self->tv_sec))stamp;
       self->tv_nsec = 0;
     } else {
       success = false;
