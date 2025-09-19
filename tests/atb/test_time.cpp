@@ -38,37 +38,37 @@ TEST(AtbTimeTest, From) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_1(ratio));
 
     ts = {-1, -1};
-    EXPECT_TRUE(atb_timespec_From(0, ratio, &ts));
+    EXPECT_TRUE(atb_timespec_Set(&ts, 0, ratio));
     EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 0}));
   }
 
-  EXPECT_TRUE(atb_timespec_From(100, K_ATB_NS, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_NS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(100, K_ATB_US, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_US));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(100, K_ATB_MS, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_MS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(1000, K_ATB_MS, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 1000, K_ATB_MS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 0}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(1300, K_ATB_MS, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, 1300, K_ATB_MS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 300'000'000}));
 
   ts = {-1, -1};
-  EXPECT_TRUE(atb_timespec_From(-10300, K_ATB_MS, &ts));
+  EXPECT_TRUE(atb_timespec_Set(&ts, -10300, K_ATB_MS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{-10, -300'000'000}));
 
   // Failure
   ts = {-1, -1};
   EXPECT_FALSE(
-      atb_timespec_From(std::numeric_limits<int64_t>::max(), K_ATB_YEARS, &ts));
+      atb_timespec_Set(&ts, std::numeric_limits<int64_t>::max(), K_ATB_YEARS));
   EXPECT_THAT(ts, helper::FieldsMatch(timespec{-1, -1}));
 
   // Test _FROM
@@ -93,9 +93,8 @@ TEST(AtbTimeTest, From) {
 
 TEST(AtbTimeDeathTest, From) {
   timespec ts;
-  EXPECT_DEBUG_DEATH({ atb_timespec_From(0, {1, 0}, &ts); }, "den != 0");
-  EXPECT_DEBUG_DEATH(
-      { atb_timespec_From(0, {1, 1}, nullptr); }, "dest != NULL");
+  EXPECT_DEBUG_DEATH({ atb_timespec_Set(nullptr, 0, {1, 1}); }, "self != NULL");
+  EXPECT_DEBUG_DEATH({ atb_timespec_Set(&ts, 0, {1, 0}); }, "den != 0");
 }
 
 TEST(AtbTimeTest, Compare) {

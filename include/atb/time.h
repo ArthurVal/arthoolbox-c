@@ -80,16 +80,15 @@ extern "C" {
  *
  *  \param[in] stamp Raw timestamps
  *  \param[in] to_sec Ratio to seconds of the given raw timestamp
- *  \param[out] dest Ptr to the timespec we wish to update
  *
  *  \pre to_sec.den != 0
- *  \pre dest != NULL
+ *  \pre self != NULL
  *
  *  \return bool True when the operation succeed. False when the operation
  *               induce an overflows/underflows.
  */
-bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
-                       struct timespec *const dest) ATB_PUBLIC;
+bool atb_timespec_Set(struct timespec *const self, int64_t stamp,
+                      struct atb_Ratio to_sec) ATB_PUBLIC;
 
 /* Comparisons *************************************************************/
 

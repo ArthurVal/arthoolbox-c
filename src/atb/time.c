@@ -26,24 +26,27 @@ static bool stamp_ToNs(int64_t stamp, struct atb_Ratio to_sec,
   return true;
 }
 
-bool atb_timespec_From(int64_t stamp, struct atb_Ratio to_sec,
-                       struct timespec *const dest) {
+bool atb_timespec_Set(struct timespec *const self, int64_t stamp,
+                      struct atb_Ratio to_sec) {
+  assert(self != NULL);
   assert(to_sec.den != 0);
-  assert(dest != NULL);
+
+  bool success = true;
 
   if (atb_Ratio_Ge(to_sec, K_ATB_RATIO_1)) {
-    if (!atb_Ratio_Apply_i64(to_sec, stamp, &(dest->tv_sec))) {
-      return false;
+    if (atb_Ratio_Apply_i64(to_sec, stamp, &(self->tv_sec))) {
+      self->tv_nsec = 0;
+    } else {
+      success = false;
     }
-    dest->tv_nsec = 0;
-  } else if (!stamp_ToNs(stamp, to_sec, &(stamp))) {
-    return false;
+  } else if (stamp_ToNs(stamp, to_sec, &(stamp))) {
+    self->tv_sec = stamp / K_ATB_NS.den;
+    self->tv_nsec = stamp % K_ATB_NS.den;
   } else {
-    dest->tv_sec = stamp / K_ATB_NS.den;
-    dest->tv_nsec = stamp % K_ATB_NS.den;
+    success = false;
   }
 
-  return true;
+  return success;
 }
 
 ATB_TIMESPEC_CMP atb_timespec_Compare(struct timespec lhs,
