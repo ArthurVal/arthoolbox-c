@@ -8,7 +8,7 @@ static bool stamp_ToNs(uint64_t stamp, struct atb_Ratio to_sec,
   assert(to_sec.den != 0);
   assert(dest != NULL);
 
-  if (!atb_Ratio_Eq(to_sec, K_ATB_NS)) {
+  if (atb_Ratio_Ne(to_sec, K_ATB_NS)) {
     /* Convert stamp to NS */
 
     /* -> Find the ratio to transform stamp into NS */
