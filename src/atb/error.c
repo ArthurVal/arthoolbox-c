@@ -9,65 +9,6 @@
 #define MIN(a, b) (a) < (b) ? (a) : (b)
 #define MAX(a, b) (a) > (b) ? (a) : (b)
 
-typedef enum {
-  K_INT_DECIMAL = 10,
-  K_INT_HEXADECIMAL = 16,
-} INT_BASE;
-
-static size_t IntToString_Width_10_u(uintmax_t value) {
-  size_t width = 1;
-
-  if (value != 0) {
-    width += (size_t)log10((double)value);
-  }
-
-  return width;
-}
-
-static size_t IntToString_Width_10_i(intmax_t value) {
-  size_t width = 0;
-
-  if (value < 0) {
-    width = 1 + IntToString_Width_10_u((uintmax_t)(~value + 1));
-  } else {
-    width = IntToString_Width_10_u((uintmax_t)value);
-  }
-
-  return width;
-}
-
-static char *IntToString_u(uintmax_t value, INT_BASE base, char *d_first,
-                           size_t d_size) {
-  const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  assert((1 < base) && (base < atb_Array_Size(digits) - 1));
-
-  char *const d_last = d_first + d_size;
-  char *d_byte = d_last;
-
-  do {
-    *(--d_byte) = digits[value % base];
-    value /= base;
-  } while ((value != 0) && (d_byte >= d_first));
-
-  /* if value != 0, it means that we reached the end of the buffer before ending
-   * the convertion... */
-  assert(value == 0);
-
-  return d_byte;
-}
-
-static char *IntToString_i(intmax_t value, INT_BASE base, char *d_first,
-                           size_t d_size) {
-  if (value < 0) {
-    *d_first++ = '-';
-    d_size -= 1;
-
-    return IntToString_u((uintmax_t)(~value + 1), base, d_first, d_size);
-  } else {
-    return IntToString_u((uintmax_t)value, base, d_first, d_size);
-  }
-}
-
 struct String {
   size_t size;
   char data[1 << 6];
@@ -90,12 +31,6 @@ static bool StringView_Set(struct StringView *const view,
   view->size = size;
 
   return true;
-}
-
-static bool StringView_Set_FromString(struct StringView *const view,
-                                      struct String const *const other) {
-  assert(other != NULL);
-  return StringView_Set(view, other->data, other->size);
 }
 
 static bool StringView_Set_FromNullTerminated(struct StringView *const view,
@@ -196,6 +131,67 @@ static bool String_CopyInto(struct String const *const str, bool truncate_str,
                             size_t *const written) {
   return StringView_CopyInto(StringView_FromString(str), truncate_str, d_first,
                              d_size, written);
+}
+
+typedef enum {
+  K_INT_DECIMAL = 10,
+  K_INT_HEXADECIMAL = 16,
+} INT_BASE;
+
+static size_t IntToString_Width_10_u(uintmax_t value) {
+  size_t width = 1;
+
+  if (value != 0) {
+    width += (size_t)log10((double)value);
+  }
+
+  return width;
+}
+
+static size_t IntToString_Width_10_i(intmax_t value) {
+  size_t width = 0;
+
+  if (value < 0) {
+    width = 1 + IntToString_Width_10_u((uintmax_t)(~value + 1));
+  } else {
+    width = IntToString_Width_10_u((uintmax_t)value);
+  }
+
+  return width;
+}
+
+static char *IntToString_u(uintmax_t value, INT_BASE base, char *d_first,
+                           size_t d_size) {
+  const struct StringView digits =
+      StringView_FromLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+  assert((1 < base) && (base < digits.size));
+
+  char *const d_last = d_first + d_size;
+  char *d_byte = d_last;
+
+  do {
+    *(--d_byte) = digits.data[value % base];
+    value /= base;
+  } while ((value != 0) && (d_byte >= d_first));
+
+  /* if value != 0, it means that we reached the end of the buffer before ending
+   * the convertion... */
+  assert(value == 0);
+
+  return d_byte;
+}
+
+static char *IntToString_i(intmax_t value, INT_BASE base, char *d_first,
+                           size_t d_size) {
+  if (value < 0) {
+    *d_first++ = '-';
+    d_size -= 1;
+
+    return IntToString_u((uintmax_t)(~value + 1), base, d_first, d_size);
+  } else {
+    return IntToString_u((uintmax_t)value, base, d_first, d_size);
+  }
 }
 
 static bool ErrorFormatter_IsValid(
