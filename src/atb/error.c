@@ -104,45 +104,40 @@ static bool StringView_Set_FromNullTerminated(struct StringView *const view,
   return StringView_Set(view, other, strlen(other));
 }
 
-static bool StringView_ShrinkFront(struct StringView *const view,
-                                   size_t offset) {
-  assert(view != NULL);
-
-  offset = MIN(view->size, offset);
-  view->data += offset;
-  view->size -= offset;
-
-  return true;
+static struct StringView StringView_From(char const *const other, size_t size) {
+  assert(other != NULL);
+  struct StringView view;
+  StringView_Set(&view, other, size);
+  return view;
 }
 
-static bool StringView_ShrinkBack(struct StringView *const view,
-                                  size_t offset) {
-  assert(view != NULL);
-
-  view->size -= MIN(view->size, offset);
-  return true;
+static struct StringView StringView_FromString(
+    struct String const *const other) {
+  assert(other != NULL);
+  return StringView_From(other->data, other->size);
 }
 
-static bool StringView_Slice(struct StringView *const view, size_t offset,
-                             size_t new_size) {
-  return StringView_ShrinkFront(view, offset) &&
-         StringView_ShrinkBack(view, view->size - new_size);
+static struct StringView StringView_FromNullTerminated(
+    char const *const other) {
+  assert(other != NULL);
+  struct StringView view;
+  StringView_Set_FromNullTerminated(&view, other);
+  return view;
 }
 
-static bool StringView_CopyInto(struct StringView const *const view,
-                                bool truncate_view, char *d_first,
-                                size_t d_size, size_t *const written) {
-  assert(view != NULL);
+static bool StringView_CopyInto(struct StringView view, bool truncate_view,
+                                char *d_first, size_t d_size,
+                                size_t *const written) {
   assert(d_first != NULL);
   assert(written != NULL);
 
   bool success = true;
 
-  if (view->size <= d_size) {
-    memcpy(d_first, view->data, view->size);
-    *written = view->size;
+  if (view.size <= d_size) {
+    memcpy(d_first, view.data, view.size);
+    *written = view.size;
   } else if (truncate_view) {
-    memcpy(d_first, view->data, d_size);
+    memcpy(d_first, view.data, d_size);
     *written = d_size;
   } else {
     success = false;
@@ -151,28 +146,28 @@ static bool StringView_CopyInto(struct StringView const *const view,
   return success;
 }
 
+#define String_FromLiteral(str) \
+  { .size = (atb_Array_Size(str) - 1), .data = str, }
+
 static size_t String_Capacity(struct String const *const str) {
   assert(str != NULL);
   return atb_Array_Size(str->data);
 }
 
-#define String_FromLiteral(str) \
-  { .size = (atb_Array_Size(str) - 1), .data = str, }
-
-static bool String_Set_From(struct String *const str, char const *const other,
-                            size_t other_size, bool truncate_other) {
+static bool String_Set_From(struct String *const str, bool truncate_other,
+                            struct StringView other) {
   assert(str != NULL);
-  assert(other != NULL);
+  assert(other.data != NULL);
 
   bool success = false;
 
   if (truncate_other) {
-    other_size = MIN(other_size, String_Capacity(str));
+    other.size = MIN(other.size, String_Capacity(str));
   }
 
-  if (other_size <= String_Capacity(str)) {
-    memcpy(str->data, other, other_size);
-    str->size = other_size;
+  if (other.size <= String_Capacity(str)) {
+    memcpy(str->data, other.data, other.size);
+    str->size = other.size;
     success = true;
   }
 
@@ -180,11 +175,13 @@ static bool String_Set_From(struct String *const str, char const *const other,
 }
 
 static bool String_Set_FromNullTerminated(struct String *const str,
-                                          char const *const other,
-                                          bool truncate_other) {
+                                          bool truncate_other,
+                                          const char *other) {
   assert(str != NULL);
   assert(other != NULL);
-  return String_Set_From(str, other, strlen(other), truncate_other);
+
+  return String_Set_From(str, truncate_other,
+                         StringView_FromNullTerminated(other));
 }
 
 static void String_Clear(struct String *const str) {
@@ -197,9 +194,8 @@ static void String_Clear(struct String *const str) {
 static bool String_CopyInto(struct String const *const str, bool truncate_str,
                             char *d_first, size_t d_size,
                             size_t *const written) {
-  struct StringView view;
-  return StringView_Set_FromString(&view, str) &&
-         StringView_CopyInto(&view, truncate_str, d_first, d_size, written);
+  return StringView_CopyInto(StringView_FromString(str), truncate_str, d_first,
+                             d_size, written);
 }
 
 static bool ErrorFormatter_IsValid(
@@ -284,7 +280,7 @@ static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
      * No checks on return values NOR we update d_size since we know for sure
      * that the size is big enough
      */
-    StringView_CopyInto(&category_header, false, d_first, category_header.size,
+    StringView_CopyInto(category_header, false, d_first, category_header.size,
                         &d_size);
     d_first += category_header.size;
 
@@ -294,11 +290,9 @@ static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
                               category_value_size);
     /* ... It can then be used to fill the remaining bytes with '0' */
     while (end-- != d_first) *end = '0';
-
-    /* Advance at the end of the category section */
     d_first += category_value_size;
 
-    StringView_CopyInto(&category_footer, false, d_first, category_footer.size,
+    StringView_CopyInto(category_footer, false, d_first, category_footer.size,
                         &d_size);
     d_first += category_footer.size;
 
@@ -385,7 +379,7 @@ static bool NamedErrorFormatter_Describe(struct NamedErrorFormatter *const self,
        */
 
       String_CopyInto(&(self->name), false, d_first, self->name.size, &d_size);
-      StringView_CopyInto(&separator, false, d_first + self->name.size,
+      StringView_CopyInto(separator, false, d_first + self->name.size,
                           separator.size, &d_size);
       *written = expected_size;
     } else {
@@ -408,12 +402,11 @@ bool atb_ErrorCategory_AddFormatter(atb_ErrorCategory_t category,
   assert(fmt.Describe != NULL);
 
   bool success = false;
-
   struct NamedErrorFormatter *named_fmt = NamedErrorFormatter_Get(category);
 
   if (NamedErrorFormatter_IsValid(named_fmt)) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
-  } else if (!String_Set_FromNullTerminated(&(named_fmt->name), name, false)) {
+  } else if (!String_Set_FromNullTerminated(&(named_fmt->name), false, name)) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
   } else {
     named_fmt->fmt = fmt;
