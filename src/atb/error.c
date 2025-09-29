@@ -214,60 +214,6 @@ static bool ErrorFormatter_Describe(struct atb_ErrorFormatter *const self,
   return self->Describe(self->data, code, d_first, d_size, written);
 }
 
-static bool UnknownError_Describe(struct atb_Error const *const err,
-                                  char *d_first, size_t d_size,
-                                  size_t *written) {
-  assert(written != NULL);
-
-  bool success = true;
-
-  const struct StringView category_header = StringView_FromLiteral("0x");
-  const size_t category_value_size = sizeof(atb_ErrorCategory_t) * 2;
-  const struct StringView category_footer = StringView_FromLiteral(": ");
-
-  const size_t expected_category_size =
-      category_header.size + category_value_size + category_footer.size;
-
-  const size_t expected_size =
-      expected_category_size + IntToString_Width_10_i(err->code);
-
-  if (d_first == NULL) {
-    *written = expected_size;
-  } else if (d_size < expected_size) {
-    success = false;
-  } else {
-    /* NOTE:
-     * No checks on return values NOR we update d_size since we know for sure
-     * that the size is big enough
-     */
-
-    StringView_CopyInto(&category_header, false, d_first, category_header.size,
-                        written);
-    d_first += *written;
-
-    /* IntToString always fills the buffer BACKWARD AND returns the last byte
-     * written, in case of we didn't fill the buffer... */
-    char *end = IntToString_u(err->category, K_INT_HEXADECIMAL, d_first,
-                              category_value_size);
-    /* ... It can then be used to fill the remaining bytes with '0' */
-    while (end-- != d_first) *end = '0';
-
-    /* Advance at the end of the category section */
-    d_first += category_value_size;
-
-    StringView_CopyInto(&category_footer, false, d_first, category_footer.size,
-                        written);
-    d_first += *written;
-
-    IntToString_i(err->code, K_INT_DECIMAL, d_first,
-                  expected_size - expected_category_size);
-
-    *written = expected_size;
-  }
-
-  return success;
-}
-
 static bool RawError_Describe(void *data, atb_ErrorCode_t code, char *d_first,
                               size_t d_size, size_t *written) {
   (void)data;
@@ -307,6 +253,59 @@ static bool GenericError_Describe(void *self, atb_ErrorCode_t code,
   } else {
     memcpy(d_first, generic_descr, generic_descr_size);
     *written = generic_descr_size;
+  }
+
+  return success;
+}
+
+static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
+                                          char *d_first, size_t d_size,
+                                          size_t *written) {
+  assert(written != NULL);
+
+  bool success = true;
+
+  const struct StringView category_header = StringView_FromLiteral("0x");
+  const size_t category_value_size = sizeof(atb_ErrorCategory_t) * 2;
+  const struct StringView category_footer = StringView_FromLiteral(": ");
+
+  const size_t expected_category_size =
+      category_header.size + category_value_size + category_footer.size;
+
+  const size_t expected_size =
+      expected_category_size + IntToString_Width_10_i(err->code);
+
+  if (d_first == NULL) {
+    *written = expected_size;
+  } else if (d_size < expected_size) {
+    success = false;
+  } else {
+    /* NOTE:
+     * No checks on return values NOR we update d_size since we know for sure
+     * that the size is big enough
+     */
+    StringView_CopyInto(&category_header, false, d_first, category_header.size,
+                        &d_size);
+    d_first += category_header.size;
+
+    /* IntToString always fills the buffer BACKWARD AND returns the last byte
+     * written, in case of we didn't fill the buffer... */
+    char *end = IntToString_u(err->category, K_INT_HEXADECIMAL, d_first,
+                              category_value_size);
+    /* ... It can then be used to fill the remaining bytes with '0' */
+    while (end-- != d_first) *end = '0';
+
+    /* Advance at the end of the category section */
+    d_first += category_value_size;
+
+    StringView_CopyInto(&category_footer, false, d_first, category_footer.size,
+                        &d_size);
+    d_first += category_footer.size;
+
+    IntToString_i(err->code, K_INT_DECIMAL, d_first,
+                  (expected_size - expected_category_size));
+
+    *written = expected_size;
   }
 
   return success;
@@ -366,33 +365,32 @@ static bool NamedErrorFormatter_Describe(struct NamedErrorFormatter *const self,
   assert(written != NULL);
 
   const struct StringView separator = StringView_FromLiteral(": ");
-  bool success = true;
-
   size_t expected_size = 0;
-  ErrorFormatter_Describe(&(self->fmt), code, NULL, 0, &expected_size);
-  expected_size += self->name.size + separator.size;
+  bool success =
+      ErrorFormatter_Describe(&(self->fmt), code, NULL, 0, &expected_size);
 
-  if (d_first == NULL) {
-    *written = expected_size;
-  } else if (d_size < expected_size) {
-    success = false;
-  } else {
-    /* NOTE:
-     * No checks on return values NOR we update d_size since we know for sure
-     * that the size is big enough
-     */
+  if (success) {
+    expected_size += self->name.size + separator.size;
 
-    String_CopyInto(&(self->name), false, d_first, self->name.size, written);
-    d_first += *written;
-    d_size -= *written;
+    if (d_first == NULL) {
+      *written = expected_size;
+    } else if ((expected_size <= d_size) &&
+               ErrorFormatter_Describe(
+                   &(self->fmt), code,
+                   d_first + (self->name.size + separator.size),
+                   d_size - (self->name.size + separator.size), &d_size)) {
+      /* NOTE:
+       * No checks on return values NOR we update d_size since we know for sure
+       * that the size is big enough
+       */
 
-    StringView_CopyInto(&separator, false, d_first, separator.size, written);
-    d_first += *written;
-    d_size -= *written;
-
-    ErrorFormatter_Describe(&(self->fmt), code, d_first, d_size, written);
-
-    *written = expected_size;
+      String_CopyInto(&(self->name), false, d_first, self->name.size, &d_size);
+      StringView_CopyInto(&separator, false, d_first + self->name.size,
+                          separator.size, &d_size);
+      *written = expected_size;
+    } else {
+      success = false;
+    }
   }
 
   return success;
@@ -443,13 +441,13 @@ bool atb_Error_Describe(struct atb_Error const *const self, char *d_first,
   assert(written != NULL);
 
   bool success = false;
-
   struct NamedErrorFormatter *fmt = NamedErrorFormatter_Get(self->category);
+
   if (atb_ErrorCategory_HasFormatter(self->category)) {
     success =
         NamedErrorFormatter_Describe(fmt, self->code, d_first, d_size, written);
   } else {
-    success = UnknownError_Describe(self, d_first, d_size, written);
+    success = Error_DescribeUnknownCategory(self, d_first, d_size, written);
   }
   return success;
 }

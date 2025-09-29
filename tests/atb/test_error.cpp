@@ -383,28 +383,31 @@ TEST_F(AtbErrorTest, Describe) {
 
   constexpr auto str_written = "ABC"sv;
 
-  MockError_Set(&err, 10);
+  MockError_Set(&err, 217282817);
 
   EXPECT_CALL(mock, Describe(err.code, nullptr, 0, Ne(nullptr)))
-      .WillOnce(DoAll(SetArgPointee<3>(20), Return(true)))
-      .WillOnce(DoAll(SetArgPointee<3>(str_written.size()), Return(true)))
-      .WillRepeatedly(DoAll(SetArgPointee<3>(std::size(str) + 1), Return(true)))
+      .WillOnce(DoAll(SetArgPointee<3>(20), Return(true)))                 // #0
+      .WillOnce(DoAll(SetArgPointee<3>(str_written.size()), Return(true))) // #1
+      .WillOnce(
+          DoAll(SetArgPointee<3>(std::size(str) + 20), Return(true)))      // #2
+      .WillOnce(DoAll(SetArgPointee<3>(str_written.size()), Return(true))) // #3
+      .WillRepeatedly(Return(false))                                       // #4
       .RetiresOnSaturation();
+
+  EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written)); // #0
+  EXPECT_EQ(written, expected_mock_header.size() + 20);
 
   EXPECT_CALL(
       mock, Describe(err.code, std::next(str, expected_mock_header.size()),
                      std::size(str) - expected_mock_header.size(), Ne(nullptr)))
-      .Times(1)
       .WillOnce(
           DoAll(SetArrayArgument<1>(str_written.cbegin(), str_written.cend()),
-                SetArgPointee<3>(str_written.size()), Return(true)))
+                SetArgPointee<3>(str_written.size()), Return(true))) // #1
+      .WillRepeatedly(Return(false))                                 // #3
       .RetiresOnSaturation();
 
-  EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written));
-  EXPECT_EQ(written, expected_mock_header.size() + 20);
-
   written = 0;
-  EXPECT_TRUE(atb_Error_Describe(&err, str, std::size(str), &written));
+  EXPECT_TRUE(atb_Error_Describe(&err, str, std::size(str), &written)); // #1
   EXPECT_EQ(written, expected_mock_header.size() + str_written.size());
   EXPECT_EQ(std::string_view(str, written),
             expected_mock_header + std::string{str_written});
@@ -413,7 +416,21 @@ TEST_F(AtbErrorTest, Describe) {
   std::fill(std::begin(str), std::end(str), '\0');
 
   // Mock Describe too large
-  EXPECT_FALSE(atb_Error_Describe(&err, str, std::size(str), &written));
+  written = 0;
+  EXPECT_FALSE(atb_Error_Describe(&err, str, std::size(str), &written)); // #2
+  EXPECT_EQ(written, 0);
+  EXPECT_EQ(str[0], '\0');
+
+  // Mock Describe size OK but description failed
+  written = 0;
+  EXPECT_FALSE(atb_Error_Describe(&err, str, std::size(str), &written)); // #3
+  EXPECT_EQ(written, 0);
+  EXPECT_EQ(str[0], '\0');
+
+  // Mock Describe size failed
+  written = 0;
+  EXPECT_FALSE(atb_Error_Describe(&err, str, std::size(str), &written)); // #4
+  EXPECT_EQ(written, 0);
   EXPECT_EQ(str[0], '\0');
 }
 
