@@ -109,16 +109,6 @@ static bool String_Set_From(struct String *const str, bool truncate_other,
   return success;
 }
 
-static bool String_Set_FromNullTerminated(struct String *const str,
-                                          bool truncate_other,
-                                          const char *other) {
-  assert(str != NULL);
-  assert(other != NULL);
-
-  return String_Set_From(str, truncate_other,
-                         StringView_FromNullTerminated(other));
-}
-
 static void String_Clear(struct String *const str) {
   assert(str != NULL);
 
@@ -194,18 +184,6 @@ static char *IntToString_i(intmax_t value, INT_BASE base, char *d_first,
   }
 }
 
-static bool ErrorFormatter_IsValid(
-    struct atb_ErrorFormatter const *const self) {
-  return (self != NULL) && (self->Describe != NULL);
-}
-
-static bool ErrorFormatter_Describe(struct atb_ErrorFormatter *const self,
-                                    atb_ErrorCode_t code, char *d_first,
-                                    size_t d_size, size_t *written) {
-  assert(ErrorFormatter_IsValid(self));
-  return self->Describe(self->data, code, d_first, d_size, written);
-}
-
 static bool RawError_Describe(void *data, atb_ErrorCode_t code, char *d_first,
                               size_t d_size, size_t *written) {
   (void)data;
@@ -232,19 +210,15 @@ static bool GenericError_Describe(void *self, atb_ErrorCode_t code,
                                   size_t *written) {
   (void)self;
 
-  assert(written != NULL);
+  struct StringView const gen_error_str =
+      StringView_FromNullTerminated(strerror(code));
 
   bool success = true;
-  char const *const generic_descr = strerror(code);
-  const size_t generic_descr_size = strlen(generic_descr);
-
   if (d_first == NULL) {
-    *written = generic_descr_size;
-  } else if (d_size < generic_descr_size) {
-    success = false;
+    *written = gen_error_str.size;
   } else {
-    memcpy(d_first, generic_descr, generic_descr_size);
-    *written = generic_descr_size;
+    success =
+        StringView_CopyInto(gen_error_str, false, d_first, d_size, written);
   }
 
   return success;
@@ -299,6 +273,18 @@ static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
   }
 
   return success;
+}
+
+static bool ErrorFormatter_IsValid(
+    struct atb_ErrorFormatter const *const self) {
+  return (self != NULL) && (self->Describe != NULL);
+}
+
+static bool ErrorFormatter_Describe(struct atb_ErrorFormatter *const self,
+                                    atb_ErrorCode_t code, char *d_first,
+                                    size_t d_size, size_t *written) {
+  assert(ErrorFormatter_IsValid(self));
+  return self->Describe(self->data, code, d_first, d_size, written);
 }
 
 struct NamedErrorFormatter {
@@ -402,7 +388,8 @@ bool atb_ErrorCategory_AddFormatter(atb_ErrorCategory_t category,
 
   if (NamedErrorFormatter_IsValid(named_fmt)) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
-  } else if (!String_Set_FromNullTerminated(&(named_fmt->name), false, name)) {
+  } else if (!String_Set_From(&(named_fmt->name), false,
+                              StringView_FromNullTerminated(name))) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
   } else {
     named_fmt->fmt = fmt;
