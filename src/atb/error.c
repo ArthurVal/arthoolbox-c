@@ -15,8 +15,8 @@ struct String {
 };
 
 struct StringView {
-  char const *data;
   size_t size;
+  char const *data;
 };
 
 #define StringView_FromLiteral(str) \
@@ -68,12 +68,13 @@ static bool StringView_CopyInto(struct StringView view, bool truncate_view,
 
   bool success = true;
 
+  if (truncate_view) {
+    view.size = MIN(view.size, d_size);
+  }
+
   if (view.size <= d_size) {
     memcpy(d_first, view.data, view.size);
     *written = view.size;
-  } else if (truncate_view) {
-    memcpy(d_first, view.data, d_size);
-    *written = d_size;
   } else {
     success = false;
   }
@@ -94,7 +95,7 @@ static bool String_Set_From(struct String *const str, bool truncate_other,
   assert(str != NULL);
   assert(other.data != NULL);
 
-  bool success = false;
+  bool success = true;
 
   if (truncate_other) {
     other.size = MIN(other.size, String_Capacity(str));
@@ -103,7 +104,8 @@ static bool String_Set_From(struct String *const str, bool truncate_other,
   if (other.size <= String_Capacity(str)) {
     memcpy(str->data, other.data, other.size);
     str->size = other.size;
-    success = true;
+  } else {
+    success = false;
   }
 
   return success;
@@ -195,11 +197,11 @@ static bool RawError_Describe(void *data, atb_ErrorCode_t code, char *d_first,
 
   if (d_first == NULL) {
     *written = expected_size;
-  } else if (d_size < expected_size) {
-    success = false;
-  } else {
+  } else if (expected_size <= d_size) {
     IntToString_i(code, K_INT_DECIMAL, d_first, expected_size);
     *written = expected_size;
+  } else {
+    success = false;
   }
 
   return success;
@@ -243,9 +245,7 @@ static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
 
   if (d_first == NULL) {
     *written = expected_size;
-  } else if (d_size < expected_size) {
-    success = false;
-  } else {
+  } else if (expected_size <= d_size) {
     /* NOTE:
      * No checks on return values NOR we update d_size since we know for sure
      * that the size is big enough
@@ -270,6 +270,8 @@ static bool Error_DescribeUnknownCategory(struct atb_Error const *const err,
                   (expected_size - expected_category_size));
 
     *written = expected_size;
+  } else {
+    success = false;
   }
 
   return success;
@@ -383,29 +385,31 @@ bool atb_ErrorCategory_AddFormatter(atb_ErrorCategory_t category,
   assert(name != NULL);
   assert(fmt.Describe != NULL);
 
-  bool success = false;
+  bool success = true;
   struct NamedErrorFormatter *named_fmt = NamedErrorFormatter_Get(category);
 
   if (NamedErrorFormatter_IsValid(named_fmt)) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
+    success = false;
   } else if (!String_Set_From(&(named_fmt->name), false,
                               StringView_FromNullTerminated(name))) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
+    success = false;
   } else {
     named_fmt->fmt = fmt;
-    success = true;
   }
 
   return success;
 }
 
 bool atb_ErrorCategory_RemoveFormatter(atb_ErrorCategory_t category) {
-  bool success = false;
+  bool success = true;
 
   struct NamedErrorFormatter *fmt = NamedErrorFormatter_Get(category);
   if (NamedErrorFormatter_IsValid(fmt)) {
     NamedErrorFormatter_Clear(fmt);
-    success = true;
+  } else {
+    success = false;
   }
 
   return success;
@@ -416,7 +420,7 @@ bool atb_Error_Describe(struct atb_Error const *const self, char *d_first,
   assert(self != NULL);
   assert(written != NULL);
 
-  bool success = false;
+  bool success = true;
   struct NamedErrorFormatter *fmt = NamedErrorFormatter_Get(self->category);
 
   if (atb_ErrorCategory_HasFormatter(self->category)) {
