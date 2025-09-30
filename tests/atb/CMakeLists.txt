@@ -7,7 +7,6 @@ add_executable(${PROJECT_NAME}-test
   test_ints.cpp
   test_ratio.cpp
   test_time.cpp
-  test_str_view.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test

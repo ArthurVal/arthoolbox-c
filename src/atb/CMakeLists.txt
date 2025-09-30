@@ -2,8 +2,6 @@ add_library(${PROJECT_NAME}
   ratio.c
   time.c
   error.c
-  memory/view.c
-  str_view.c
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
