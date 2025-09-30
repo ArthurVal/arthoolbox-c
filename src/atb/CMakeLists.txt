@@ -1,6 +1,7 @@
 add_library(${PROJECT_NAME}
   ratio.c
   time.c
+  string.c
   error.c
 )
 
