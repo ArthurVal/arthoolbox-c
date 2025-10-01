@@ -56,13 +56,19 @@ bool atb_StrView_CopyInto(struct atb_StrView view, struct atb_StrSpan dest,
   return true;
 }
 
+enum {
+  K_CMP_LT = -1,
+  K_CMP_EQ = 0,
+  K_CMP_GT = 1,
+};
+
 extern int atb_StrView_Compare(struct atb_StrView lhs, struct atb_StrView rhs) {
   assert(atb_StrView_IsValid(lhs));
   assert(atb_StrView_IsValid(rhs));
   if (lhs.size > rhs.size) {
-    return 1;
+    return K_CMP_GT;
   } else if (lhs.size < rhs.size) {
-    return -1;
+    return K_CMP_LT;
   } else {
     return memcmp(lhs.data, rhs.data, lhs.size);
   }
