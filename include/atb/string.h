@@ -21,7 +21,7 @@ extern "C" {
 
 /* StrSpan *******************************************************************/
 
-/// Non-owing view of a MODIFIABLE string (meant to be modified)
+/// Non-owning view of a MODIFIABLE string (meant to be modified)
 struct atb_StrSpan {
   char *data;  /*!< Begin of the span */
   size_t size; /*!< Size of the span (in bytes) */
@@ -103,7 +103,7 @@ inline static struct atb_StrSpan atb_StrSpan_ShrinkBack(struct atb_StrSpan span,
 
 /* StrView *******************************************************************/
 
-/// Non-owing view of a CONSTANT string (not meant to be modified)
+/// Non-owning view of a CONSTANT string (not meant to be modified)
 struct atb_StrView {
   char const *data; /*!< Begin  of the view */
   size_t size;      /*!< Size of the view (in bytes) */
@@ -253,7 +253,7 @@ ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_StrView_,
 /*                         STATIC INLINE DEFINITIONS                         */
 /*****************************************************************************/
 
-/* StrSpan *****************************************************************/
+/* StrSpan *******************************************************************/
 
 static inline struct atb_StrSpan atb_StrSpan_From(char *other, size_t size) {
   struct atb_StrSpan span;
