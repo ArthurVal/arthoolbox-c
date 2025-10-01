@@ -169,18 +169,31 @@ extern "C" {
  *       - Compare(a, b) > 0 when a > b;
  */
 #define ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(SPECIFIER, PREFIX, T) \
-                                                                     \
   SPECIFIER bool PREFIX##Eq(T lhs, T rhs) {                          \
     return PREFIX##Compare(lhs, rhs) == 0;                           \
   }                                                                  \
                                                                      \
-  ATB_CMP_DEFINE_FROM_EQ(SPECIFIER, PREFIX, T);                      \
+  SPECIFIER bool PREFIX##Ne(T lhs, T rhs) {                          \
+    return PREFIX##Compare(lhs, rhs) != 0;                           \
+  }                                                                  \
                                                                      \
   SPECIFIER bool PREFIX##Gt(T lhs, T rhs) {                          \
     return PREFIX##Compare(lhs, rhs) > 0;                            \
   }                                                                  \
                                                                      \
-  ATB_CMP_DEFINE_FROM_GT(SPECIFIER, PREFIX, T)
+  SPECIFIER bool PREFIX##Lt(T lhs, T rhs) {                          \
+    return PREFIX##Compare(lhs, rhs) < 0;                            \
+  }                                                                  \
+                                                                     \
+  SPECIFIER bool PREFIX##Ge(T lhs, T rhs) {                          \
+    return PREFIX##Compare(lhs, rhs) >= 0;                           \
+  }                                                                  \
+                                                                     \
+  SPECIFIER bool PREFIX##Le(T lhs, T rhs) {                          \
+    return PREFIX##Compare(lhs, rhs) <= 0;                           \
+  }                                                                  \
+                                                                     \
+  static_assert(true, "SEMI-COLON NEEDED HERE")
 
 /**
  *  \brief Define ALL comparison functions (Eq, Ne, Gt, Lt, Gt, Ge) using
