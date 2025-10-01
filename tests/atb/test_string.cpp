@@ -59,20 +59,6 @@ TEST(AtbStringTest, ViewFromNullTerminated) {
             "Coucou"sv);
 }
 
-TEST(AtbStringTest, ViewSet) {
-  constexpr auto str = "Coucou"sv;
-  atb_StrView view = K_ATB_STRVIEW_INVALID;
-  atb_StrView_Set(&view, str.data(), str.size());
-  EXPECT_EQ(ToSV(view), str);
-}
-
-TEST(AtbStringTest, ViewSetNullTerminated) {
-  constexpr char null_terminated_str[] = "Coucou";
-  atb_StrView view = K_ATB_STRVIEW_INVALID;
-  atb_StrView_Set_NullTerminated(&view, null_terminated_str);
-  EXPECT_EQ(ToSV(view), "Coucou"sv);
-}
-
 TEST(AtbStringTest, ViewIsValid) {
   atb_StrView view = K_ATB_STRVIEW_INVALID;
   EXPECT_PRED1(DoNot(atb_StrView_IsValid), view);
@@ -97,20 +83,6 @@ TEST(AtbStringTest, SpanFromNullTerminated) {
   char null_terminated_str[] = "Coucou";
   EXPECT_EQ(ToSV(atb_StrSpan_From_NullTerminated(null_terminated_str)),
             "Coucou"sv);
-}
-
-TEST(AtbStringTest, SpanSet) {
-  std::string str = "Coucou";
-  atb_StrSpan span = K_ATB_STRSPAN_INVALID;
-  atb_StrSpan_Set(&span, str.data(), str.size());
-  EXPECT_EQ(ToSV(span), str);
-}
-
-TEST(AtbStringTest, SpanSetNullTerminated) {
-  char null_terminated_str[] = "Coucou";
-  atb_StrSpan span = K_ATB_STRSPAN_INVALID;
-  atb_StrSpan_Set_NullTerminated(&span, null_terminated_str);
-  EXPECT_EQ(ToSV(span), "Coucou"sv);
 }
 
 TEST(AtbStringTest, SpanIsValid) {

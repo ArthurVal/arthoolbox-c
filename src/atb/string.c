@@ -12,33 +12,8 @@
     size = MIN(new_size, (size - begin));      \
   } while (0)
 
-void atb_StrView_Set(struct atb_StrView *const view, const char *other,
-                     size_t size) {
-  assert(view != NULL);
-  view->data = other;
-  view->size = size;
-}
-
-void atb_StrView_Set_NullTerminated(struct atb_StrView *const view,
-                                    const char *other) {
-  atb_StrView_Set(view, other, strlen(other));
-}
-
-struct atb_StrView atb_StrView_Slice(struct atb_StrView view, size_t offset,
-                                     size_t new_size) {
-  assert(atb_StrView_IsValid(view));
-  Str_Slice(view.data, view.size, offset, new_size);
-  return view;
-}
-
-void atb_StrSpan_Set(struct atb_StrSpan *span, char *other, size_t size) {
-  assert(span != NULL);
-  span->data = other;
-  span->size = size;
-}
-
-void atb_StrSpan_Set_NullTerminated(struct atb_StrSpan *view, char *other) {
-  atb_StrSpan_Set(view, other, strlen(other));
+struct atb_StrSpan atb_StrSpan_From_NullTerminated(char *other) {
+  return atb_StrSpan_From(other, strlen(other));
 }
 
 struct atb_StrSpan atb_StrSpan_Slice(struct atb_StrSpan span, size_t offset,
@@ -46,6 +21,17 @@ struct atb_StrSpan atb_StrSpan_Slice(struct atb_StrSpan span, size_t offset,
   assert(atb_StrSpan_IsValid(span));
   Str_Slice(span.data, span.size, offset, new_size);
   return span;
+}
+
+struct atb_StrView atb_StrView_From_NullTerminated(const char *other) {
+  return atb_StrView_From(other, strlen(other));
+}
+
+struct atb_StrView atb_StrView_Slice(struct atb_StrView view, size_t offset,
+                                     size_t new_size) {
+  assert(atb_StrView_IsValid(view));
+  Str_Slice(view.data, view.size, offset, new_size);
+  return view;
 }
 
 bool atb_StrView_CopyInto(struct atb_StrView view, struct atb_StrSpan dest,
