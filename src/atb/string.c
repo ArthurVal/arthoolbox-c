@@ -39,29 +39,26 @@ bool atb_StrView_CopyInto(struct atb_StrView view, struct atb_StrSpan dest,
   assert(atb_StrView_IsValid(view));
   assert(atb_StrSpan_IsValid(dest));
 
-  bool success = true;
-
   if (opt.truncate) {
     view.size = MIN(view.size, dest.size);
   }
 
-  if (view.size <= dest.size) {
-    if (opt.overlap) {
-      memmove(dest.data, view.data, view.size);
-    } else {
-      memcpy(dest.data, view.data, view.size);
-    }
-  } else {
-    success = false;
+  if (view.size > dest.size) {
+    return false;
   }
 
-  return success;
+  if (opt.overlap) {
+    memmove(dest.data, view.data, view.size);
+  } else {
+    memcpy(dest.data, view.data, view.size);
+  }
+
+  return true;
 }
 
 extern int atb_StrView_Compare(struct atb_StrView lhs, struct atb_StrView rhs) {
   assert(atb_StrView_IsValid(lhs));
   assert(atb_StrView_IsValid(rhs));
-
   if (lhs.size > rhs.size) {
     return 1;
   } else if (lhs.size < rhs.size) {
@@ -69,6 +66,4 @@ extern int atb_StrView_Compare(struct atb_StrView lhs, struct atb_StrView rhs) {
   } else {
     return memcmp(lhs.data, rhs.data, lhs.size);
   }
-
-  return 0;
 }
