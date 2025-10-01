@@ -19,10 +19,12 @@ extern "C" {
 #define K_ATB_STR_FMT "%.*s"
 #define atb_Str_FMT_VA_ARG(str) (int)(str).size, (str).data
 
+/* StrSpan *******************************************************************/
+
 /// Non-owing view of a MODIFIABLE string (meant to be modified)
 struct atb_StrSpan {
-  char *data;
-  size_t size;
+  char *data;  /*!< Begin of the span */
+  size_t size; /*!< Size of the span (in bytes) */
 };
 
 /// An invalid StrSpan (usable as static initializer)
@@ -31,8 +33,6 @@ struct atb_StrSpan {
 
 /// An invalid StrSpan (compound literal)
 #define K_ATB_STRSPAN_INVALID (struct atb_StrSpan) K_ATB_STRSPAN_INVALID_INIT
-
-/* StrSpan *******************************************************************/
 
 /* -- Ctor/Setters ***********************************************************/
 
@@ -105,8 +105,8 @@ inline static struct atb_StrSpan atb_StrSpan_ShrinkBack(struct atb_StrSpan span,
 
 /// Non-owing view of a CONSTANT string (not meant to be modified)
 struct atb_StrView {
-  char const *data;
-  size_t size;
+  char const *data; /*!< Begin  of the view */
+  size_t size;      /*!< Size of the view (in bytes) */
 };
 
 /* -- Ctor/Setters ***********************************************************/
@@ -250,7 +250,7 @@ ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_StrView_,
 /**@}*/
 
 /*****************************************************************************/
-/*                         STATIC INLINE DEFINITIONS */
+/*                         STATIC INLINE DEFINITIONS                         */
 /*****************************************************************************/
 
 /* StrSpan *****************************************************************/
