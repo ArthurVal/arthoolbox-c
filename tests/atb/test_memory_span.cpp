@@ -198,15 +198,22 @@ struct Dummy {
 };
 
 TEST(AtbMemorySpanTest, Fill) {
-  auto v = ~((uint64_t)0);
+  auto u64 = ~((uint64_t)0);
+  EXPECT_NE(u64, 0);
 
-  EXPECT_NE(v, 0);
-  atb_MemSpan_Fill(atb_MemSpan_From_Value(v), 0x00);
-  EXPECT_EQ(v, 0);
+  atb_MemSpan_Fill(atb_MemSpan_From_Value(u64), 0x00);
+  EXPECT_EQ(u64, 0);
+
+  uint64_t u64_array[200];
+  std::fill(std::begin(u64_array), std::end(u64_array), ~((uint64_t)0));
+  EXPECT_THAT(u64_array, testing::Not(testing::Each(0)));
+
+  atb_MemSpan_Fill(atb_MemSpan_From_Array(u64_array), 0x00);
+  EXPECT_THAT(u64_array, testing::Each(0));
 
   Dummy d;
   d.i32 = -15;
-  d.u64 = ~((uint64_t)0);
+  d.u64 = 3141592;
   std::fill(std::begin(d.str), std::end(d.str), 'A');
 
   atb_MemSpan_Fill(atb_MemSpan_From_Value(d), 0x00);
