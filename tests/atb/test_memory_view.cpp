@@ -329,8 +329,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
   uint8_t dest[4];
   std::fill(std::begin(dest), std::end(dest), 0);
 
-  EXPECT_TRUE(atb_MemView_CopyInto(atb_MemView_From_Value(from),
-                                   atb_MemSpan_From_Value(dest),
+  EXPECT_TRUE(atb_MemView_CopyInto(atb_MemView_From_Array(from),
+                                   atb_MemSpan_From_Array(dest),
                                    {
                                        .truncate = false,
                                        .overlap = false,
@@ -342,8 +342,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
   std::fill(std::begin(dest), std::end(dest), 0);
 
   EXPECT_FALSE(atb_MemView_CopyInto(
-      atb_MemView_From_Value(from),
-      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Value(dest), 1),
+      atb_MemView_From_Array(from),
+      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
       {
           .truncate = false,
           .overlap = false,
@@ -351,8 +351,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
   EXPECT_THAT(dest, testing::Each(0));
 
   EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_From_Value(from),
-      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Value(dest), 1),
+      atb_MemView_From_Array(from),
+      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
       {
           .truncate = true,
           .overlap = false,
@@ -362,8 +362,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
 
   // Overlap - view after dest
   EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_Slice(atb_MemView_From_Value(dest), 2, 2),
-      atb_MemSpan_Slice(atb_MemSpan_From_Value(dest), 1, 2),
+      atb_MemView_Slice(atb_MemView_From_Array(dest), 2, 2),
+      atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
       {
           .truncate = false,
           .overlap = true,
@@ -372,8 +372,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
 
   // Overlap - view before dest
   EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_Slice(atb_MemView_From_Value(dest), 0, 2),
-      atb_MemSpan_Slice(atb_MemSpan_From_Value(dest), 1, 2),
+      atb_MemView_Slice(atb_MemView_From_Array(dest), 0, 2),
+      atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
       {
           .truncate = false,
           .overlap = true,
