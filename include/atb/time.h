@@ -93,15 +93,6 @@ bool atb_timespec_Set(struct timespec *const self, uint64_t stamp,
 /* Comparisons *************************************************************/
 
 /**
- *  \brief Enum representing the result of the _Compare function
- */
-typedef enum {
-  K_ATB_TIMESPEC_CMP_LESS = -1,   /*!< LHS is LESS than RHS */
-  K_ATB_TIMESPEC_CMP_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
-  K_ATB_TIMESPEC_CMP_GREATER = 1, /*!< LHS is GREATER than RHS */
-} ATB_TIMESPEC_CMP;
-
-/**
  * \brief Compare 2 timespecs with each other, following the 'three-way
  *        comparison' paradigm
  *
@@ -113,8 +104,8 @@ typedef enum {
  * \li res == 0: lhs == rhs
  * \li res > 0 : lhs > rhs
  */
-ATB_TIMESPEC_CMP atb_timespec_Compare(struct timespec lhs,
-                                      struct timespec rhs) ATB_PUBLIC;
+atb_Cmp_t atb_timespec_Compare(struct timespec lhs,
+                               struct timespec rhs) ATB_PUBLIC;
 
 /**@{*/
 /**

@@ -8,6 +8,13 @@
 extern "C" {
 #endif
 
+/// Generic Three-way compare result enumeration
+typedef enum {
+  K_ATB_CMP_LESS = -1,
+  K_ATB_CMP_EQUAL = 0,
+  K_ATB_CMP_GREATER = 1,
+} atb_Cmp_t;
+
 /**
  *  \brief Define 'Not Equal' function `FooNe(lhs, rhs) -> bool` using the
  *         already defined `FooEq(...) -> bool`, corresponding to 'Is Equal'.

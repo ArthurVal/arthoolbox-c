@@ -218,15 +218,6 @@ bool atb_Ratio_Div(struct atb_Ratio lhs, struct atb_Ratio rhs,
 /* Comparison **************************************************************/
 
 /**
- *  \brief Enum representing the result of the _Compare function
- */
-typedef enum {
-  K_ATB_RATIO_CMP_LESS = -1,   /*!< LHS is LESS than RHS */
-  K_ATB_RATIO_CMP_EQUAL = 0,   /*!< LHS is EQUAL to RHS */
-  K_ATB_RATIO_CMP_GREATER = 1, /*!< LHS is GREATER than RHS */
-} ATB_RATIO_CMP;
-
-/**
  *  \brief Compare 2 ratios with each other and set dest accordingly
  *
  *  \param[in] lhs, rhs Both ratios we wish to compare

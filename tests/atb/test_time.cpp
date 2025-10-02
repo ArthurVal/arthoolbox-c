@@ -107,7 +107,7 @@ TEST(AtbTimeTest, Compare) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    EXPECT_EQ(K_ATB_TIMESPEC_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Eq(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Ne(lhs, rhs));
 
@@ -125,7 +125,7 @@ TEST(AtbTimeTest, Compare) {
        }) {
     SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
 
-    EXPECT_NE(K_ATB_TIMESPEC_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
+    EXPECT_NE(K_ATB_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
   }
@@ -145,7 +145,7 @@ TEST(AtbTimeTest, Compare) {
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-    EXPECT_EQ(K_ATB_TIMESPEC_CMP_GREATER, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_CMP_GREATER, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ge(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Gt(lhs, rhs));
 
@@ -168,7 +168,7 @@ TEST(AtbTimeTest, Compare) {
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
 
-    EXPECT_EQ(K_ATB_TIMESPEC_CMP_LESS, atb_timespec_Compare(lhs, rhs));
+    EXPECT_EQ(K_ATB_CMP_LESS, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Le(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Lt(lhs, rhs));
 

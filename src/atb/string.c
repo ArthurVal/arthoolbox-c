@@ -40,10 +40,8 @@ bool atb_StrView_CopyInto(struct atb_StrView view, struct atb_StrSpan dest,
   assert(atb_StrSpan_IsValid(dest));
 
   if (opt.truncate) {
-    view.size = MIN(view.size, dest.size);
-  }
-
-  if (view.size > dest.size) {
+    view = atb_StrView_Slice(view, 0, dest.size);
+  } else if (view.size > dest.size) {
     return false;
   }
 

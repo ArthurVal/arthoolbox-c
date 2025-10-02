@@ -3,7 +3,9 @@
 #include <chrono>
 #include <ostream>
 
+#include "Compare.hpp"
 #include "Core.hpp"
+#include "Ratio.hpp"
 #include "atb/time.h"
 
 inline auto operator<<(std::ostream &os, timespec ts) -> std::ostream & {
@@ -19,24 +21,8 @@ constexpr auto operator!=(timespec lhs, timespec rhs) -> bool {
   return !(lhs == rhs);
 }
 
-constexpr auto ToString(ATB_TIMESPEC_CMP cmp_res)
-    -> std::string_view {
-  switch (cmp_res) {
-    case K_ATB_TIMESPEC_CMP_EQUAL: return "EQUAL";
-    case K_ATB_TIMESPEC_CMP_LESS: return "LESS";
-    case K_ATB_TIMESPEC_CMP_GREATER: return "GREATER";
-  }
-  return "UNKNOWN";
-}
-
-inline auto operator<<(std::ostream &os,
-                       ATB_TIMESPEC_CMP cmp_res) -> std::ostream & {
-  os << std::quoted(ToString(cmp_res)) << " (" << static_cast<int>(cmp_res)
-     << ")";
-  return os;
-}
-
 namespace std {
+
 template <class Rep, class Period>
 constexpr auto operator<<(
     std::ostream &os, std::chrono::duration<Rep, Period> d) -> std::ostream & {
@@ -57,7 +43,9 @@ constexpr auto operator<<(
 
   return os;
 }
+
 } // namespace std
+
 namespace helper {
 
 DefineFieldsMatchFor(timespec, 2, tv_sec, tv_nsec);

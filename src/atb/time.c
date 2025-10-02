@@ -13,7 +13,7 @@ static bool stamp_ToNs(uint64_t stamp, struct atb_Ratio to_sec,
 
   if (!atb_Ratio_Compare(to_sec, K_ATB_NS, &cmp)) {
     success = false;
-  } else if (cmp != K_ATB_RATIO_CMP_EQUAL) {
+  } else if (cmp != K_ATB_CMP_EQUAL) {
     success = atb_Ratio_Div(to_sec, K_ATB_NS, &(to_sec)) &&
               atb_Ratio_Reduce(to_sec, &(to_sec)) &&
               atb_Ratio_Apply_u64(to_sec, stamp, &(stamp));
@@ -51,19 +51,18 @@ bool atb_timespec_Set(struct timespec *const self, uint64_t stamp,
   return success;
 }
 
-ATB_TIMESPEC_CMP atb_timespec_Compare(struct timespec lhs,
-                                      struct timespec rhs) {
+atb_Cmp_t atb_timespec_Compare(struct timespec lhs, struct timespec rhs) {
   if (lhs.tv_sec < rhs.tv_sec) {
-    return K_ATB_TIMESPEC_CMP_LESS;
+    return K_ATB_CMP_LESS;
   } else if (lhs.tv_sec > rhs.tv_sec) {
-    return K_ATB_TIMESPEC_CMP_GREATER;
+    return K_ATB_CMP_GREATER;
   } else {
     if (lhs.tv_nsec == rhs.tv_nsec) {
-      return K_ATB_TIMESPEC_CMP_EQUAL;
+      return K_ATB_CMP_EQUAL;
     } else if (lhs.tv_nsec > rhs.tv_nsec) {
-      return K_ATB_TIMESPEC_CMP_GREATER;
+      return K_ATB_CMP_GREATER;
     } else {
-      return K_ATB_TIMESPEC_CMP_LESS;
+      return K_ATB_CMP_LESS;
     }
   }
 }
