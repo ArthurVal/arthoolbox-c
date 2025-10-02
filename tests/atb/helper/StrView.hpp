@@ -1,75 +1,60 @@
 #pragma once
 
-#include "Core.hpp"
-
-#include "atb/str_view.h"
-
 #include <ostream>
 #include <string_view>
 
-inline std::ostream &operator<<(std::ostream &os, atb_StrView str) noexcept {
-  os << helper::MakeStringFromFmt(atb_StrView_FMT, atb_StrView_FMT_VA_ARG(str));
-  if (str.data != nullptr) {
-    os << " => "
-       << helper::MakeStringFromFmt("\"" atb_Str_FMT "\"",
-                                    atb_Str_FMT_VA_ARG(str));
+#include "Compare.hpp"
+#include "Core.hpp"
+#include "atb/string/format.h"
+#include "atb/string/view.h"
+
+constexpr auto ToSV(atb_StrView atb_view) -> std::string_view {
+  return std::string_view(atb_view.data, atb_view.size);
+}
+
+inline auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream & {
+  using helper::MakeStringFromFmt;
+
+  os << MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(view));
+
+  if (view.data != nullptr) {
+    os << " --> "
+       << MakeStringFromFmt(K_ATB_FMT_STR_QUOTED,
+                            ATB_FMT_VA_ARG_STR_QUOTED(view));
   }
+
   return os;
 }
 
-inline std::ostream &operator<<(std::ostream &os,
-                                atb_StrView_Compare_Result res) noexcept {
-  os << (int)res;
-  os << " (=\"" << [res]() {
-    switch (res) {
-    case atb_StrView_Compare_LESS:
-      return "LESS";
-    case atb_StrView_Compare_EQUAL:
-      return "EQUAL";
-    case atb_StrView_Compare_GREATER:
-      return "GREATER";
-    }
-    return "UNKNOWN";
-  }() << "\")";
-  return os;
-}
-
-constexpr auto ToStringView(struct atb_StrView str) -> std::string_view {
-  return std::string_view(str.data, str.size);
-}
-
-// StrView
 // Cmp to std::string_view ////////////////////////////////////////////////////
-constexpr bool operator==(struct atb_StrView lhs, std::string_view rhs) {
-  return ToStringView(lhs) == rhs;
+constexpr bool operator==(atb_StrView lhs, std::string_view rhs) {
+  return ToSV(lhs) == rhs;
 }
 
-constexpr bool operator==(std::string_view lhs, struct atb_StrView rhs) {
+constexpr bool operator==(std::string_view lhs, atb_StrView rhs) {
   return rhs == lhs;
 }
 
 // Cmp to itself //////////////////////////////////////////////////////////////
-constexpr bool operator==(struct atb_StrView lhs, struct atb_StrView rhs) {
-  return lhs == ToStringView(rhs);
+constexpr bool operator==(atb_StrView lhs, atb_StrView rhs) {
+  return lhs == ToSV(rhs);
 }
 
-constexpr bool operator!=(struct atb_StrView lhs, struct atb_StrView rhs) {
+constexpr bool operator!=(atb_StrView lhs, atb_StrView rhs) {
   return not(lhs == rhs);
 }
 
-constexpr bool operator<(struct atb_StrView lhs, struct atb_StrView rhs) {
-  return ToStringView(lhs) < ToStringView(rhs);
+constexpr bool operator<(atb_StrView lhs, atb_StrView rhs) {
+  return ToSV(lhs) < ToSV(rhs);
 }
 
-constexpr bool operator>(struct atb_StrView lhs, struct atb_StrView rhs) {
-  return rhs < lhs;
-}
+constexpr bool operator>(atb_StrView lhs, atb_StrView rhs) { return rhs < lhs; }
 
-constexpr bool operator<=(struct atb_StrView lhs, struct atb_StrView rhs) {
+constexpr bool operator<=(atb_StrView lhs, atb_StrView rhs) {
   return not(lhs > rhs);
 }
 
-constexpr bool operator>=(struct atb_StrView lhs, struct atb_StrView rhs) {
+constexpr bool operator>=(atb_StrView lhs, atb_StrView rhs) {
   return not(lhs < rhs);
 }
 

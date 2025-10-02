@@ -47,51 +47,12 @@ constexpr auto DoNot(Pred &&pred) {
   };
 }
 
-struct FormatOptions {
-  std::size_t base = 10;
-  std::optional<char> fill = std::nullopt;
-};
-
-template <typename Integer>
-constexpr auto IntToStr(char *d_first, char *d_last, Integer val,
-                        FormatOptions options = FormatOptions{})
-    -> std::optional<char *> {
-  static_assert(std::is_integral_v<Integer>);
-
-  constexpr char digit_available[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  if ((options.base <= 1) or (std::size(digit_available) <= options.base)) {
-    return std::nullopt;
-  }
-
-  if (d_first == d_last) {
-    return d_first;
-  }
-
-  if constexpr (std::is_signed_v<Integer>) {
-    if (val < 0) {
-      *d_first++ = '-';
-      val = (~val + 1);
-    }
-  }
-
-  auto d_byte = d_last;
-
-  while (d_byte != d_first) {
-    auto idx = val % options.base;
-    val = val / options.base;
-
-    *(--d_byte) = digit_available[idx];
-
-    if (val == 0) break;
-  }
-
-  if (options.fill.has_value()) {
-    std::fill(d_first, d_byte, *(options.fill));
-    return d_last;
-  } else {
-    return std::move(d_byte, d_last, d_first);
-  }
-}
+#define EXPECT_NPRED1(pred, v1) EXPECT_PRED1(helper::DoNot(pred), v1)
+#define EXPECT_NPRED2(pred, v1, v2) EXPECT_PRED2(helper::DoNot(pred), v1, v2)
+#define EXPECT_NPRED3(pred, v1, v2, v3) \
+  EXPECT_PRED3(helper::DoNot(pred), v1, v2, v3)
+#define EXPECT_NPRED4(pred, v1, v2, v3, v4) \
+  EXPECT_PRED4(helper::DoNot(pred), v1, v2, v3, v4)
 
 #define AddFieldMatchFor_1(type, val, p1) testing::Field(#p1, &type::p1, val.p1)
 

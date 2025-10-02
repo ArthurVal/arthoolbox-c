@@ -1,5 +1,3 @@
-#include <iomanip>
-#include <ostream>
 #include <string>
 #include <string_view>
 using namespace std::string_view_literals;
@@ -7,39 +5,8 @@ using namespace std::string_view_literals;
 #include "atb/string.h"
 #include "gtest/gtest.h"
 #include "helper/Core.hpp"
-using helper::DoNot;
-using helper::MakeStringFromFmt;
-
-constexpr auto ToSV(atb_StrView atb_view) -> std::string_view {
-  return std::string_view(atb_view.data, atb_view.size);
-}
-
-constexpr auto ToSV(atb_StrSpan atb_span) -> std::string_view {
-  return std::string_view(atb_span.data, atb_span.size);
-}
-
-inline auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream & {
-  os << MakeStringFromFmt(K_ATB_STR_FMT_RAW, atb_Str_FMT_RAW_VA_ARG(view));
-
-  if (view.data != nullptr) {
-    os << " --> " << std::quoted(ToSV(view));
-  }
-
-  return os;
-}
-
-inline auto operator<<(std::ostream &os, atb_StrSpan span) -> std::ostream & {
-  return os << atb_StrView_From_Span(span);
-}
-
-inline auto operator<<(std::ostream &os,
-                       atb_StrView_CopyInto_Opt opt) -> std::ostream & {
-  os << '{';
-  os << ".truncate=" << (opt.truncate ? "True"sv : "False"sv) << ", ";
-  os << ".overlap=" << (opt.overlap ? "True"sv : "False"sv) << ", ";
-  os << '}';
-  return os;
-}
+#include "helper/StrSpan.hpp"
+#include "helper/StrView.hpp"
 
 namespace {
 
@@ -61,7 +28,7 @@ TEST(AtbStringTest, ViewFromNullTerminated) {
 
 TEST(AtbStringTest, ViewIsValid) {
   atb_StrView view = K_ATB_STRVIEW_INVALID;
-  EXPECT_PRED1(DoNot(atb_StrView_IsValid), view);
+  EXPECT_NPRED1(atb_StrView_IsValid, view);
 
   constexpr auto str = "Coucou"sv;
   view = atb_StrView_From(str.data(), str.size());
@@ -87,7 +54,7 @@ TEST(AtbStringTest, SpanFromNullTerminated) {
 
 TEST(AtbStringTest, SpanIsValid) {
   atb_StrSpan span = K_ATB_STRSPAN_INVALID;
-  EXPECT_PRED1(DoNot(atb_StrSpan_IsValid), span);
+  EXPECT_NPRED1(atb_StrSpan_IsValid, span);
 
   std::string str = "Coucou";
   span = atb_StrSpan_From(str.data(), str.size());
@@ -112,11 +79,11 @@ TEST(AtbStringTest, ViewCopyInto) {
   // Failure - Span too small - No Truncate
   view = atb_StrView_From_Literal("View too large");
   std::fill(std::begin(str), std::end(str), '\0');
-  EXPECT_PRED3(DoNot(atb_StrView_CopyInto), view, str_span,
-               (atb_StrView_CopyInto_Opt_t{
-                   .truncate = false,
-                   .overlap = false,
-               }));
+  EXPECT_NPRED3(atb_StrView_CopyInto, view, str_span,
+                (atb_StrView_CopyInto_Opt_t{
+                    .truncate = false,
+                    .overlap = false,
+                }));
   EXPECT_NE(ToSV(str_span), ToSV(view));
 
   // Truncate
@@ -256,24 +223,24 @@ TEST(AtbStringTest, ViewCompare) {
   EXPECT_LT(atb_StrView_Compare(atb_StrView_From_Literal("Coucot"), view), 0);
 
   EXPECT_PRED2(atb_StrView_Eq, view, view);
-  EXPECT_PRED2(DoNot(atb_StrView_Ne), view, view);
+  EXPECT_NPRED2(atb_StrView_Ne, view, view);
   EXPECT_PRED2(atb_StrView_Ge, view, view);
   EXPECT_PRED2(atb_StrView_Le, view, view);
-  EXPECT_PRED2(DoNot(atb_StrView_Gt), view, view);
-  EXPECT_PRED2(DoNot(atb_StrView_Lt), view, view);
+  EXPECT_NPRED2(atb_StrView_Gt, view, view);
+  EXPECT_NPRED2(atb_StrView_Lt, view, view);
 
-  EXPECT_PRED2(DoNot(atb_StrView_Eq), view, atb_StrView_ShrinkBack(view, 1));
+  EXPECT_NPRED2(atb_StrView_Eq, view, atb_StrView_ShrinkBack(view, 1));
   EXPECT_PRED2(atb_StrView_Ne, view, atb_StrView_ShrinkBack(view, 1));
   EXPECT_PRED2(atb_StrView_Ge, view, atb_StrView_ShrinkBack(view, 1));
-  EXPECT_PRED2(DoNot(atb_StrView_Le), view, atb_StrView_ShrinkBack(view, 1));
+  EXPECT_NPRED2(atb_StrView_Le, view, atb_StrView_ShrinkBack(view, 1));
   EXPECT_PRED2(atb_StrView_Gt, view, atb_StrView_ShrinkBack(view, 1));
-  EXPECT_PRED2(DoNot(atb_StrView_Lt), view, atb_StrView_ShrinkBack(view, 1));
+  EXPECT_NPRED2(atb_StrView_Lt, view, atb_StrView_ShrinkBack(view, 1));
 
-  EXPECT_PRED2(DoNot(atb_StrView_Eq), atb_StrView_ShrinkBack(view, 1), view);
+  EXPECT_NPRED2(atb_StrView_Eq, atb_StrView_ShrinkBack(view, 1), view);
   EXPECT_PRED2(atb_StrView_Ne, atb_StrView_ShrinkBack(view, 1), view);
-  EXPECT_PRED2(DoNot(atb_StrView_Ge), atb_StrView_ShrinkBack(view, 1), view);
+  EXPECT_NPRED2(atb_StrView_Ge, atb_StrView_ShrinkBack(view, 1), view);
   EXPECT_PRED2(atb_StrView_Le, atb_StrView_ShrinkBack(view, 1), view);
-  EXPECT_PRED2(DoNot(atb_StrView_Gt), atb_StrView_ShrinkBack(view, 1), view);
+  EXPECT_NPRED2(atb_StrView_Gt, atb_StrView_ShrinkBack(view, 1), view);
   EXPECT_PRED2(atb_StrView_Lt, atb_StrView_ShrinkBack(view, 1), view);
 }
 
