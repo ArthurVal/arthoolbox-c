@@ -25,6 +25,31 @@ TEST(AtbStringViewTest, FromNullTerminated) {
             "Coucou"sv);
 }
 
+TEST(AtbStringViewTest, Format) {
+  using helper::MakeStringFromFmt;
+
+  constexpr char str[] = "Coucou";
+  const atb_StrView view = atb_StrView_From_NullTerminated(str);
+
+  auto expected_str = std::string{str};
+  EXPECT_EQ(MakeStringFromFmt(K_ATB_FMT_STR, ATB_FMT_VA_ARG_STR(view)),
+            expected_str);
+
+  expected_str = '"' + expected_str + '"';
+  EXPECT_EQ(
+      MakeStringFromFmt(K_ATB_FMT_STR_QUOTED, ATB_FMT_VA_ARG_STR_QUOTED(view)),
+      expected_str);
+
+  {
+    std::stringstream ss;
+    ss << "{.data=" << (void *)str << ", .size=" << (std::size(str) - 1) << '}';
+    expected_str = ss.str();
+  }
+
+  EXPECT_EQ(MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(view)),
+            expected_str);
+}
+
 TEST(AtbStringViewTest, IsValid) {
   atb_StrView view = K_ATB_STRVIEW_INVALID;
   EXPECT_NPRED1(atb_StrView_IsValid, view);

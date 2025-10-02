@@ -9,8 +9,8 @@ extern "C" {
 #define K_ATB_FMT_STR "%.*s"
 #define ATB_FMT_VA_ARG_STR(str) (int)(str).size, (str).data
 
-#define K_ATB_FMT_STR_QUOTED "\"%.*s\""
-#define ATB_FMT_VA_ARG_STR_QUOTED(str) (int)(str).size, (str).data
+#define K_ATB_FMT_STR_QUOTED "\"" K_ATB_FMT_STR "\""
+#define ATB_FMT_VA_ARG_STR_QUOTED(str) ATB_FMT_VA_ARG_STR(str)
 
 #define K_ATB_FMT_STR_RAW "{.data=%p, .size=%zu}"
 #define ATB_FMT_VA_ARG_STR_RAW(str) (str).data, (str).size
