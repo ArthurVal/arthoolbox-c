@@ -90,6 +90,16 @@ static inline struct atb_StrSpan atb_StrSpan_ShrinkFront(
 static inline struct atb_StrSpan atb_StrSpan_ShrinkBack(struct atb_StrSpan span,
                                                         size_t n);
 
+/**
+ *  \brief Fill a span with the given char
+ *
+ *  \param[in] span StrSpan we wish to fill
+ *  \param[in] c Character used to fill the span
+ *
+ *  \pre atb_StrSpan_IsValid(span) == true
+ */
+static inline void atb_StrSpan_Fill(struct atb_StrSpan span, char c);
+
 /*****************************************************************************/
 /*                         STATIC INLINE DEFINITIONS                         */
 /*****************************************************************************/
@@ -140,6 +150,11 @@ static inline struct atb_StrSpan atb_StrSpan_ShrinkBack(struct atb_StrSpan span,
   span.size -= n;
 
   return span;
+}
+
+static inline void atb_StrSpan_Fill(struct atb_StrSpan span, char c) {
+  assert(atb_StrSpan_IsValid(span));
+  memset(span.data, c, span.size);
 }
 
 #if defined(__cplusplus)
