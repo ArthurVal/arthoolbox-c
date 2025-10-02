@@ -4,14 +4,25 @@
 #include <string_view>
 
 #include "Core.hpp"
-#include "StrView.hpp"
+#include "atb/string/format.h"
+#include "atb/string/span.h"
 
 constexpr auto ToSV(atb_StrSpan atb_span) -> std::string_view {
   return std::string_view(atb_span.data, atb_span.size);
 }
 
 inline auto operator<<(std::ostream &os, atb_StrSpan span) -> std::ostream & {
-  return os << atb_StrView_From_Span(span);
+  using helper::MakeStringFromFmt;
+
+  os << MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(span));
+
+  if (span.data != nullptr) {
+    os << " --> "
+       << MakeStringFromFmt(K_ATB_FMT_STR_QUOTED,
+                            ATB_FMT_VA_ARG_STR_QUOTED(span));
+  }
+
+  return os;
 }
 
 // Cmp to std::string_view ////////////////////////////////////////////////////

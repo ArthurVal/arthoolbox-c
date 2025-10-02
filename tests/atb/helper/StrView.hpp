@@ -5,6 +5,7 @@
 
 #include "Compare.hpp"
 #include "Core.hpp"
+#include "StrSpan.hpp"
 #include "atb/string/format.h"
 #include "atb/string/view.h"
 

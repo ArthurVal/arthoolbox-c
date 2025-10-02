@@ -2,31 +2,30 @@
 #include <string_view>
 using namespace std::string_view_literals;
 
-#include "atb/string.h"
+#include "atb/string/view.h"
 #include "gtest/gtest.h"
 #include "helper/Core.hpp"
-#include "helper/StrSpan.hpp"
 #include "helper/StrView.hpp"
 
 namespace {
 
-TEST(AtbStringTest, ViewFromLiteral) {
+TEST(AtbStringViewTest, FromLiteral) {
   atb_StrView view = atb_StrView_From_Literal("Coucou");
   EXPECT_EQ(ToSV(view), "Coucou"sv);
 }
 
-TEST(AtbStringTest, ViewFrom) {
+TEST(AtbStringViewTest, From) {
   constexpr auto str = "Coucou"sv;
   EXPECT_EQ(ToSV(atb_StrView_From(str.data(), str.size())), str);
 }
 
-TEST(AtbStringTest, ViewFromNullTerminated) {
+TEST(AtbStringViewTest, FromNullTerminated) {
   constexpr char null_terminated_str[] = "Coucou";
   EXPECT_EQ(ToSV(atb_StrView_From_NullTerminated(null_terminated_str)),
             "Coucou"sv);
 }
 
-TEST(AtbStringTest, ViewIsValid) {
+TEST(AtbStringViewTest, IsValid) {
   atb_StrView view = K_ATB_STRVIEW_INVALID;
   EXPECT_NPRED1(atb_StrView_IsValid, view);
 
@@ -35,33 +34,7 @@ TEST(AtbStringTest, ViewIsValid) {
   EXPECT_PRED1(atb_StrView_IsValid, view);
 }
 
-TEST(AtbStringTest, SpanFromArray) {
-  char str[] = {'C', 'o', 'u', 'c', 'o', 'u'};
-  atb_StrSpan span = atb_StrSpan_From_Array(str);
-  EXPECT_EQ(ToSV(span), "Coucou"sv);
-}
-
-TEST(AtbStringTest, SpanFrom) {
-  std::string str = "Coucou";
-  EXPECT_EQ(ToSV(atb_StrSpan_From(str.data(), str.size())), str);
-}
-
-TEST(AtbStringTest, SpanFromNullTerminated) {
-  char null_terminated_str[] = "Coucou";
-  EXPECT_EQ(ToSV(atb_StrSpan_From_NullTerminated(null_terminated_str)),
-            "Coucou"sv);
-}
-
-TEST(AtbStringTest, SpanIsValid) {
-  atb_StrSpan span = K_ATB_STRSPAN_INVALID;
-  EXPECT_NPRED1(atb_StrSpan_IsValid, span);
-
-  std::string str = "Coucou";
-  span = atb_StrSpan_From(str.data(), str.size());
-  EXPECT_PRED1(atb_StrSpan_IsValid, span);
-}
-
-TEST(AtbStringTest, ViewCopyInto) {
+TEST(AtbStringViewTest, CopyInto) {
   auto view = atb_StrView_From_Literal("ABCDE");
 
   char str[5];
@@ -121,7 +94,7 @@ TEST(AtbStringTest, ViewCopyInto) {
   EXPECT_EQ(std::string_view(str), "eewe "sv);
 }
 
-TEST(AtbStringDeathTest, ViewCopyInto) {
+TEST(AtbStringViewDeathTest, CopyInto) {
   char str[5];
   auto valid_span = atb_StrSpan_From_Array(str);
   auto valid_view = atb_StrView_From_Literal("Coucou");
@@ -139,8 +112,8 @@ TEST(AtbStringDeathTest, ViewCopyInto) {
       "atb_StrSpan_IsValid\\\(dest\\)");
 }
 
-TEST(AtbStringTest, Slice) {
-  char str[] = "Coucou";
+TEST(AtbStringViewTest, Slice) {
+  const char str[] = "Coucou";
 
   auto view = atb_StrView_From_NullTerminated(str);
   EXPECT_EQ(ToSV(atb_StrView_Slice(view, 0, view.size)), ToSV(view));
@@ -166,48 +139,17 @@ TEST(AtbStringTest, Slice) {
             ToSV(view).substr(0, 0));
   EXPECT_EQ(ToSV(atb_StrView_ShrinkBack(view, view.size + 20)),
             ToSV(view).substr(0, 0));
-
-  auto span = atb_StrSpan_From_Array(str);
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, 0, span.size)), ToSV(span));
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, 2, 0)), ToSV(span).substr(2, 0));
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, 1, 1)), ToSV(span).substr(1, 1));
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, 0, span.size + 10)), ToSV(span));
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, span.size, 0)),
-            ToSV(span).substr(span.size, 0));
-  EXPECT_EQ(ToSV(atb_StrSpan_Slice(span, span.size, span.size + 10)),
-            ToSV(span).substr(span.size, 0));
-
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkFront(span, 0)), ToSV(span));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkFront(span, 2)), ToSV(span).substr(2));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkFront(span, span.size)),
-            ToSV(span).substr(span.size));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkFront(span, span.size + 20)),
-            ToSV(span).substr(span.size));
-
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkBack(span, 0)), ToSV(span));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkBack(span, 2)),
-            ToSV(span).substr(0, span.size - 2));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkBack(span, span.size)),
-            ToSV(span).substr(0, 0));
-  EXPECT_EQ(ToSV(atb_StrSpan_ShrinkBack(span, span.size + 20)),
-            ToSV(span).substr(0, 0));
 }
 
-TEST(AtbStringDeathTest, Slice) {
+TEST(AtbStringViewDeathTest, Slice) {
   EXPECT_DEBUG_DEATH(atb_StrView_Slice(K_ATB_STRVIEW_INVALID, 0, 0),
                      "atb_StrView_IsValid\\\(view\\)");
 
   EXPECT_DEBUG_DEATH(atb_StrView_ShrinkBack(K_ATB_STRVIEW_INVALID, 0),
                      "atb_StrView_IsValid\\\(view\\)");
-
-  EXPECT_DEBUG_DEATH(atb_StrSpan_Slice(K_ATB_STRSPAN_INVALID, 0, 0),
-                     "atb_StrSpan_IsValid\\\(span\\)");
-
-  EXPECT_DEBUG_DEATH(atb_StrSpan_ShrinkBack(K_ATB_STRSPAN_INVALID, 0),
-                     "atb_StrSpan_IsValid\\\(span\\)");
 }
 
-TEST(AtbStringTest, ViewCompare) {
+TEST(AtbStringViewTest, Compare) {
   auto view = atb_StrView_From_Literal("Coucou");
 
   EXPECT_EQ(atb_StrView_Compare(view, view), 0);
@@ -244,7 +186,7 @@ TEST(AtbStringTest, ViewCompare) {
   EXPECT_PRED2(atb_StrView_Lt, atb_StrView_ShrinkBack(view, 1), view);
 }
 
-TEST(AtbStringDeathTest, ViewCompare) {
+TEST(AtbStringViewDeathTest, Compare) {
   EXPECT_DEBUG_DEATH(
       atb_StrView_Compare(K_ATB_STRVIEW_INVALID, K_ATB_STRVIEW_INVALID),
       "atb_StrView_IsValid\\\(lhs\\)");
