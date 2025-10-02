@@ -327,7 +327,9 @@ TEST(AtbMemoryViewDeathTest, CopyInto) {
 TEST(AtbMemoryViewTest, CopyInto) {
   const uint8_t from[4] = {1, 2, 3, 4};
   uint8_t dest[4];
+
   std::fill(std::begin(dest), std::end(dest), 0);
+  EXPECT_THAT(dest, testing::ElementsAre(0, 0, 0, 0));
 
   EXPECT_TRUE(atb_MemView_CopyInto(atb_MemView_From_Array(from),
                                    atb_MemSpan_From_Array(dest),
@@ -335,12 +337,10 @@ TEST(AtbMemoryViewTest, CopyInto) {
                                        .truncate = false,
                                        .overlap = false,
                                    }));
-
-  EXPECT_THAT(dest, testing::ContainerEq(from));
+  EXPECT_THAT(dest, testing::ElementsAre(1, 2, 3, 4));
 
   // Truncate
   std::fill(std::begin(dest), std::end(dest), 0);
-
   EXPECT_FALSE(atb_MemView_CopyInto(
       atb_MemView_From_Array(from),
       atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
@@ -348,7 +348,7 @@ TEST(AtbMemoryViewTest, CopyInto) {
           .truncate = false,
           .overlap = false,
       }));
-  EXPECT_THAT(dest, testing::Each(0));
+  EXPECT_THAT(dest, testing::ElementsAre(0, 0, 0, 0));
 
   EXPECT_TRUE(atb_MemView_CopyInto(
       atb_MemView_From_Array(from),
@@ -357,7 +357,6 @@ TEST(AtbMemoryViewTest, CopyInto) {
           .truncate = true,
           .overlap = false,
       }));
-
   EXPECT_THAT(dest, testing::ElementsAre(1, 2, 3, 0));
 
   // Overlap - view after dest
