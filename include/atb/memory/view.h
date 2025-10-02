@@ -167,20 +167,20 @@ static inline atb_Cmp_t atb_MemView_Compare(struct atb_MemView lhs,
 
 /**@{*/
 /**
- * \returns bool True when \a lhs is [Eq, Ne, Lt, Gt, Le, Ge] than \a rhs.
+ *  \returns bool True when \a lhs is [Eq, Ne, Lt, Gt, Le, Ge] than \a rhs.
  *
- * \param[in] lhs, rhs MemView we wish to compare
+ *  \param[in] lhs, rhs MemView we wish to compare
  *
  *  \pre atb_MemView_IsValid(lhs) == true
  *  \pre atb_MemView_IsValid(rhs) == true
  *
- * \note
- * \li Eq = Equals (lhs == rhs)
- * \li Ne = Not Equals (lhs != rhs)
- * \li Lt = Less than (lhs < rhs)
- * \li Gt = Greater than (lhs > rhs)
- * \li Le = Less or equals (lhs <= rhs)
- * \li Ge = Greater or equals (lhs >= rhs)
+ *  \note
+ *  \li Eq = Equals (lhs == rhs)
+ *  \li Ne = Not Equals (lhs != rhs)
+ *  \li Lt = Less than (lhs < rhs)
+ *  \li Gt = Greater than (lhs > rhs)
+ *  \li Le = Less or equals (lhs <= rhs)
+ *  \li Ge = Greater or equals (lhs >= rhs)
  */
 ATB_CMP_DEFINE_ALL_FROM_UNSAFE_COMPARE(static inline, atb_MemView_,
                                        struct atb_MemView);
