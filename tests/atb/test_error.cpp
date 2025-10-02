@@ -9,8 +9,6 @@ using namespace std::literals::string_view_literals;
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "helper/Core.hpp"
-using helper::DoNot;
-
 #include "helper/Error.hpp"
 
 namespace {
@@ -99,32 +97,32 @@ TEST_F(AtbErrorCategoryTest, AddAndRemoveFormatter) {
   atb_Error err;
   auto mock_itf = BindFormatterTo(mock);
 
-  EXPECT_PRED4(DoNot(atb_ErrorCategory_AddFormatter), K_ATB_ERROR_GENERIC,
-               "TOTO", mock_itf, &err);
+  EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, K_ATB_ERROR_GENERIC, "TOTO",
+                mock_itf, &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
 
-  EXPECT_PRED4(DoNot(atb_ErrorCategory_AddFormatter), K_ATB_ERROR_RAW, "TOTO",
-               mock_itf, &err);
+  EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, K_ATB_ERROR_RAW, "TOTO",
+                mock_itf, &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
 
   auto available_cat = FindAvailableCategory();
   ASSERT_TRUE(available_cat.has_value());
 
-  EXPECT_PRED4(DoNot(atb_ErrorCategory_AddFormatter), *available_cat,
-               name_too_long.data(), mock_itf, &err);
+  EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, *available_cat,
+                name_too_long.data(), mock_itf, &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
 
-  EXPECT_PRED1(DoNot(atb_ErrorCategory_HasFormatter), *available_cat);
-  EXPECT_PRED1(DoNot(atb_ErrorCategory_RemoveFormatter), *available_cat);
+  EXPECT_NPRED1(atb_ErrorCategory_HasFormatter, *available_cat);
+  EXPECT_NPRED1(atb_ErrorCategory_RemoveFormatter, *available_cat);
   EXPECT_PRED4(atb_ErrorCategory_AddFormatter, *available_cat, "TOTO", mock_itf,
                &err);
   EXPECT_PRED1(atb_ErrorCategory_HasFormatter, *available_cat);
 
   EXPECT_PRED1(atb_ErrorCategory_RemoveFormatter, *available_cat);
-  EXPECT_PRED1(DoNot(atb_ErrorCategory_HasFormatter), *available_cat);
+  EXPECT_NPRED1(atb_ErrorCategory_HasFormatter, *available_cat);
 }
 
 struct AtbErrorTest : AtbErrorCategoryTest {
@@ -163,7 +161,7 @@ TEST_F(AtbErrorTest, Ignored) {
   EXPECT_PRED1(atb_Error_IsIgnored, (atb_Error *)K_ATB_ERROR_IGNORED);
 
   atb_Error err;
-  EXPECT_PRED1(DoNot(atb_Error_IsIgnored), &err);
+  EXPECT_NPRED1(atb_Error_IsIgnored, &err);
 }
 
 TEST_F(AtbErrorTest, Set) {
