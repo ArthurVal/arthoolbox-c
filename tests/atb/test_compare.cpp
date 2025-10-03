@@ -1,7 +1,6 @@
 #include "test_compare.hpp"
 
-#include "gtest/gtest.h"
-
+namespace atb {
 namespace {
 
 TEST(AtbCompareTest, AtbCmpType) {
@@ -11,6 +10,8 @@ TEST(AtbCompareTest, AtbCmpType) {
 }
 
 } // namespace
+
+} // namespace atb
 
 auto operator<<(std::ostream &os, atb_Cmp_t cmp_res) -> std::ostream & {
   os << static_cast<int>(cmp_res);

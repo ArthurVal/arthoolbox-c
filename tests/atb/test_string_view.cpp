@@ -5,6 +5,7 @@ using namespace std::string_view_literals;
 #include "atb/string/format.h"
 #include "test_string_view.hpp"
 
+namespace atb {
 namespace {
 
 TEST(AtbStringViewTest, FromLiteral) {
@@ -24,8 +25,6 @@ TEST(AtbStringViewTest, FromNullTerminated) {
 }
 
 TEST(AtbStringViewTest, Format) {
-  using atb::MakeStringFromFmt;
-
   constexpr char str[] = "Coucou";
   const atb_StrView view = atb_StrView_From_NullTerminated(str);
 
@@ -224,6 +223,7 @@ TEST(AtbStringViewDeathTest, Compare) {
 
 } // namespace
 
+} // namespace atb
 
 auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream & {
   using atb::MakeStringFromFmt;

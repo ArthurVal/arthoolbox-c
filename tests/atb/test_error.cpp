@@ -6,8 +6,8 @@
 using namespace std::literals::string_view_literals;
 
 #include "test_error.hpp"
-#include "utils.hpp"
 
+namespace atb {
 namespace {
 
 struct ErrorFormatterMock {
@@ -228,8 +228,7 @@ TEST_F(AtbErrorTest, DescribeUnknownCat) {
 
     SCOPED_TRACE(ToString(NVALUE(err)));
 
-    auto expected_str =
-        atb::MakeStringFromFmt("0x%.2x: %i", err.category, err.code);
+    auto expected_str = MakeStringFromFmt("0x%.2x: %i", err.category, err.code);
 
     written = 0;
     EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written));
@@ -285,7 +284,7 @@ TEST_F(AtbErrorTest, DescribeRawError) {
 
     SCOPED_TRACE(ToString(NVALUE(err)));
 
-    auto expected_str = atb::MakeStringFromFmt("raw: %i", err.code);
+    auto expected_str = MakeStringFromFmt("raw: %i", err.code);
 
     written = 0;
     EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written));
@@ -431,13 +430,15 @@ TEST_F(AtbErrorTest, Describe) {
 
 } // namespace
 
+} // namespace atb
+
 auto operator<<(std::ostream &os, const atb_Error &err) -> std::ostream & {
   os << "atb_Error"
      << atb::MakeStringFromFmt(K_ATB_ERROR_FMT, atb_Error_FMT_VA_ARG(err));
   return os;
 }
 
-inline auto operator<<(std::ostream &os,
-                       const atb_Error *const err) -> std::ostream & {
+auto operator<<(std::ostream &os,
+                const atb_Error *const err) -> std::ostream & {
   return atb::PrintPtrTo(os, err);
 }

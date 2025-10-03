@@ -2,6 +2,7 @@
 
 #include "atb/memory/format.h"
 
+namespace atb {
 namespace {
 
 TEST(AtbMemoryViewTest, From) {
@@ -42,8 +43,6 @@ TEST(AtbMemoryViewTest, From) {
 }
 
 TEST(AtbMemoryViewTest, Format) {
-  using atb::MakeStringFromFmt;
-
   char str[] = "Coucou";
   auto view = atb_MemView_From(str, std::size(str));
 
@@ -118,8 +117,6 @@ TEST(AtbMemoryViewDeathTest, Slice) {
 }
 
 TEST(AtbMemoryViewTest, Slice) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto view = atb_MemView_From_Array(str);
@@ -172,8 +169,6 @@ TEST(AtbMemoryViewDeathTest, ShrinkFront) {
 }
 
 TEST(AtbMemoryViewTest, ShrinkFront) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto view = atb_MemView_From_Array(str);
@@ -206,8 +201,6 @@ TEST(AtbMemoryViewDeathTest, ShrinkBack) {
 }
 
 TEST(AtbMemoryViewTest, ShrinkBack) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto view = atb_MemView_From_Array(str);
@@ -378,6 +371,8 @@ TEST(AtbMemoryViewTest, CopyInto) {
 }
 
 } // namespace
+
+} // namespace atb
 
 std::ostream &operator<<(std::ostream &os, atb_MemView mem) {
   os << atb::MakeStringFromFmt(K_ATB_FMT_MEM, ATB_FMT_VA_ARG_MEM(mem));

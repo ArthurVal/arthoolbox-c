@@ -2,6 +2,7 @@
 
 #include "atb/memory/format.h"
 
+namespace atb {
 namespace {
 
 TEST(AtbMemorySpanTest, From) {
@@ -42,8 +43,6 @@ TEST(AtbMemorySpanTest, From) {
 }
 
 TEST(AtbMemorySpanTest, Format) {
-  using atb::MakeStringFromFmt;
-
   char str[] = "Coucou";
   auto span = atb_MemSpan_From(str, std::size(str));
 
@@ -69,8 +68,6 @@ TEST(AtbMemorySpanDeathTest, Slice) {
 }
 
 TEST(AtbMemorySpanTest, Slice) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto span = atb_MemSpan_From_Array(str);
@@ -123,8 +120,6 @@ TEST(AtbMemorySpanDeathTest, ShrinkFront) {
 }
 
 TEST(AtbMemorySpanTest, ShrinkFront) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto span = atb_MemSpan_From_Array(str);
@@ -157,8 +152,6 @@ TEST(AtbMemorySpanDeathTest, ShrinkBack) {
 }
 
 TEST(AtbMemorySpanTest, ShrinkBack) {
-  using atb::FieldsMatch;
-
   char str[] = "Coucou";
 
   auto span = atb_MemSpan_From_Array(str);
@@ -220,6 +213,8 @@ TEST(AtbMemorySpanTest, Fill) {
 }
 
 } // namespace
+
+} // namespace atb
 
 std::ostream &operator<<(std::ostream &os, atb_MemSpan mem) {
   os << atb::MakeStringFromFmt(K_ATB_FMT_MEM, ATB_FMT_VA_ARG_MEM(mem));

@@ -5,6 +5,7 @@ using namespace std::string_view_literals;
 #include "atb/string/format.h"
 #include "test_string_span.hpp"
 
+namespace atb {
 namespace {
 
 TEST(AtbStringSpanTest, FromArray) {
@@ -25,8 +26,6 @@ TEST(AtbStringSpanTest, FromNullTerminated) {
 }
 
 TEST(AtbStringSpanTest, Format) {
-  using atb::MakeStringFromFmt;
-
   char str[] = "Coucou";
   const atb_StrSpan span = atb_StrSpan_From_NullTerminated(str);
 
@@ -96,6 +95,8 @@ TEST(AtbStringSpanDeathTest, Slice) {
 }
 
 } // namespace
+
+} // namespace atb
 
 auto operator<<(std::ostream &os, atb_StrSpan span) -> std::ostream & {
   using atb::MakeStringFromFmt;

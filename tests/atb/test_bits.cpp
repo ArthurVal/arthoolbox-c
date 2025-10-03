@@ -1,6 +1,7 @@
 #include "atb/bits.h"
 #include "gtest/gtest.h"
 
+namespace atb {
 namespace {
 
 TEST(AtbBitsTest, Mask) {
@@ -62,3 +63,4 @@ TEST(AtbBitsTest, Unset) {
 }
 
 } // namespace
+} // namespace atb

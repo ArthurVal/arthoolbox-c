@@ -1,9 +1,9 @@
 #pragma once
 
 #include <optional>
-#include <ostream>
 
 #include "atb/compare.h"
+#include "utils.hpp"
 
 namespace atb {
 

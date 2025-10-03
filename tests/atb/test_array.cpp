@@ -1,6 +1,7 @@
 #include "atb/array.h"
 #include "gtest/gtest.h"
 
+namespace atb {
 namespace {
 
 TEST(AtbArrayTest, Size) {
@@ -49,3 +50,5 @@ TEST(AtbArrayTest, ForEach) {
 }
 
 } // namespace
+
+} // namespace atb

@@ -2,6 +2,7 @@
 
 #include <limits>
 
+namespace atb {
 namespace {
 
 constexpr auto k_max = std::numeric_limits<atb_Ratio_elem_t>::max();
@@ -682,6 +683,8 @@ TEST(AtbRatioDeathTest, Comparisons) {
 }
 
 } // namespace
+
+} // namespace atb
 
 auto operator<<(std::ostream &os, atb_Ratio ratio) -> std::ostream & {
   return os << "Ratio{" << ratio.num << ", " << ratio.den << "}";
