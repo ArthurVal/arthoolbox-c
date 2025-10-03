@@ -1,28 +1,15 @@
 #pragma once
 
 #include <cstdio>
-#include <iterator>
-#include <optional>
 #include <string>
-#include <type_traits>
+#include <string_view>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#define SCOPE_MSG_ENTRY(val) "\n - " #val ": " << (val)
-#define SCOPE_LOOP_MSG_1(val) (testing::Message() << SCOPE_MSG_ENTRY(val))
-#define SCOPE_LOOP_MSG_2(val_1, val_2) \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2))
-#define SCOPE_LOOP_MSG_3(val_1, val_2, val_3)                             \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
-                      << SCOPE_MSG_ENTRY(val_3))
-#define SCOPE_LOOP_MSG_4(val_1, val_2, val_3, val_4)                      \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
-                      << SCOPE_MSG_ENTRY(val_3) << SCOPE_MSG_ENTRY(val_4))
-
 namespace helper {
 
-template <typename... Args>
+template <class... Args>
 auto MakeStringFromFmt(const char *fmt, Args &&...args) -> std::string {
   std::string out;
   out.resize(std::snprintf(nullptr, 0, fmt, std::forward<Args>(args)...));
@@ -46,6 +33,19 @@ constexpr auto DoNot(Pred &&pred) {
     return not pred(std::forward<decltype(args)>(args)...);
   };
 }
+
+} // namespace helper
+
+#define SCOPE_MSG_ENTRY(val) "\n - " #val ": " << (val)
+#define SCOPE_LOOP_MSG_1(val) (testing::Message() << SCOPE_MSG_ENTRY(val))
+#define SCOPE_LOOP_MSG_2(val_1, val_2) \
+  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2))
+#define SCOPE_LOOP_MSG_3(val_1, val_2, val_3)                             \
+  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
+                      << SCOPE_MSG_ENTRY(val_3))
+#define SCOPE_LOOP_MSG_4(val_1, val_2, val_3, val_4)                      \
+  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
+                      << SCOPE_MSG_ENTRY(val_3) << SCOPE_MSG_ENTRY(val_4))
 
 #define EXPECT_NPRED1(pred, v1) EXPECT_PRED1(helper::DoNot(pred), v1)
 #define EXPECT_NPRED2(pred, v1, v2) EXPECT_PRED2(helper::DoNot(pred), v1, v2)
@@ -78,5 +78,3 @@ constexpr auto DoNot(Pred &&pred) {
     return testing::AllOf(AddFieldMatchFor_##count(type, arg, ##__VA_ARGS__)); \
   }                                                                            \
   static_assert(true)
-
-} // namespace helper
