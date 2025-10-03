@@ -2,10 +2,8 @@
 #include <string_view>
 using namespace std::string_view_literals;
 
-#include "atb/string/view.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/StrView.hpp"
+#include "atb/string/format.h"
+#include "test_string_view.hpp"
 
 namespace {
 
@@ -26,7 +24,7 @@ TEST(AtbStringViewTest, FromNullTerminated) {
 }
 
 TEST(AtbStringViewTest, Format) {
-  using helper::MakeStringFromFmt;
+  using atb::MakeStringFromFmt;
 
   constexpr char str[] = "Coucou";
   const atb_StrView view = atb_StrView_From_NullTerminated(str);
@@ -225,3 +223,18 @@ TEST(AtbStringViewDeathTest, Compare) {
 }
 
 } // namespace
+
+
+auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream & {
+  using atb::MakeStringFromFmt;
+
+  os << MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(view));
+
+  if (view.data != nullptr) {
+    os << " --> "
+       << MakeStringFromFmt(K_ATB_FMT_STR_QUOTED,
+                            ATB_FMT_VA_ARG_STR_QUOTED(view));
+  }
+
+  return os;
+}

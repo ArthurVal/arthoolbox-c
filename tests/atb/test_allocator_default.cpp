@@ -1,7 +1,8 @@
 #include "atb/allocator/default.h"
 #include "gtest/gtest.h"
-#include "helper/Error.hpp"
-#include "helper/MemSpan.hpp"
+#include "test_error.hpp"
+#include "test_memory_span.hpp"
+
 namespace {
 
 TEST(AtbAllocatorDefaultTest, AllocFree) {
@@ -13,7 +14,7 @@ TEST(AtbAllocatorDefaultTest, AllocFree) {
   EXPECT_PRED5(atb_Allocator_Alloc, atb_DefaultAllocator(), mem, 10, &mem, &err)
       << err;
 
-  EXPECT_THAT(mem, testing::Not(helper::FieldsMatch(K_ATB_MEMSPAN_INVALID)));
+  EXPECT_THAT(mem, testing::Not(atb::FieldsMatch(K_ATB_MEMSPAN_INVALID)));
   EXPECT_EQ(mem.size, 10);
 
   // Seg fault ?
@@ -24,7 +25,7 @@ TEST(AtbAllocatorDefaultTest, AllocFree) {
   // realloc
   EXPECT_PRED5(atb_Allocator_Alloc, atb_DefaultAllocator(), mem, 20, &mem, &err)
       << err;
-  EXPECT_THAT(mem, testing::Not(helper::FieldsMatch(previous)));
+  EXPECT_THAT(mem, testing::Not(atb::FieldsMatch(previous)));
   EXPECT_EQ(mem.size, 20);
 
   // Seg fault ?
@@ -32,7 +33,7 @@ TEST(AtbAllocatorDefaultTest, AllocFree) {
 
   // free
   EXPECT_PRED3(atb_Allocator_Free, atb_DefaultAllocator(), &mem, &err) << err;
-  EXPECT_THAT(mem, helper::FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
 }
 
 } // namespace

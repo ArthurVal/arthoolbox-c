@@ -2,12 +2,11 @@
 
 #include <cstdio>
 #include <string>
-#include <string_view>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace helper {
+namespace atb {
 
 template <class... Args>
 auto MakeStringFromFmt(const char *fmt, Args &&...args) -> std::string {
@@ -20,6 +19,7 @@ auto MakeStringFromFmt(const char *fmt, Args &&...args) -> std::string {
 template <class T>
 auto PrintPtrTo(std::ostream &os, T const *const ptr) -> std::ostream & {
   os << (void *)ptr;
+
   if (ptr != nullptr) {
     os << " -> " << *ptr;
   }
@@ -27,32 +27,51 @@ auto PrintPtrTo(std::ostream &os, T const *const ptr) -> std::ostream & {
   return os;
 }
 
-template <typename Pred>
+template <class Pred>
 constexpr auto DoNot(Pred &&pred) {
   return [&](auto &&...args) -> bool {
     return not pred(std::forward<decltype(args)>(args)...);
   };
 }
 
-} // namespace helper
+template <class T>
+struct NamedValue {
+  using value_type = T;
 
-#define SCOPE_MSG_ENTRY(val) "\n - " #val ": " << (val)
-#define SCOPE_LOOP_MSG_1(val) (testing::Message() << SCOPE_MSG_ENTRY(val))
-#define SCOPE_LOOP_MSG_2(val_1, val_2) \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2))
-#define SCOPE_LOOP_MSG_3(val_1, val_2, val_3)                             \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
-                      << SCOPE_MSG_ENTRY(val_3))
-#define SCOPE_LOOP_MSG_4(val_1, val_2, val_3, val_4)                      \
-  (testing::Message() << SCOPE_MSG_ENTRY(val_1) << SCOPE_MSG_ENTRY(val_2) \
-                      << SCOPE_MSG_ENTRY(val_3) << SCOPE_MSG_ENTRY(val_4))
+  std::string_view name;
+  const T &value;
+};
 
-#define EXPECT_NPRED1(pred, v1) EXPECT_PRED1(helper::DoNot(pred), v1)
-#define EXPECT_NPRED2(pred, v1, v2) EXPECT_PRED2(helper::DoNot(pred), v1, v2)
+#define NVALUE(v) \
+  atb::NamedValue<std::decay_t<decltype(v)>> { #v, v, }
+
+template <class Sink, class T, class... Others>
+constexpr auto FormatTo(Sink &&sink, const NamedValue<T> &nv,
+                        const NamedValue<Others> &...others) -> Sink && {
+  if constexpr (sizeof...(others) == 0) {
+    sink << "\n - " << nv.name << ": " << nv.value;
+    return std::forward<Sink>(sink);
+  } else {
+    return std::forward<Sink>(
+        FormatTo(FormatTo(std::forward<Sink>(sink), nv), others...));
+  }
+}
+
+template <class T, class... Others>
+auto ToString(const NamedValue<T> &nv,
+              const NamedValue<Others> &...others) -> std::string {
+  std::stringstream ss;
+  return FormatTo(ss, nv, others...).str();
+}
+
+} // namespace atb
+
+#define EXPECT_NPRED1(pred, v1) EXPECT_PRED1(atb::DoNot(pred), v1)
+#define EXPECT_NPRED2(pred, v1, v2) EXPECT_PRED2(atb::DoNot(pred), v1, v2)
 #define EXPECT_NPRED3(pred, v1, v2, v3) \
-  EXPECT_PRED3(helper::DoNot(pred), v1, v2, v3)
+  EXPECT_PRED3(atb::DoNot(pred), v1, v2, v3)
 #define EXPECT_NPRED4(pred, v1, v2, v3, v4) \
-  EXPECT_PRED4(helper::DoNot(pred), v1, v2, v3, v4)
+  EXPECT_PRED4(atb::DoNot(pred), v1, v2, v3, v4)
 
 #define AddFieldMatchFor_1(type, val, p1) testing::Field(#p1, &type::p1, val.p1)
 

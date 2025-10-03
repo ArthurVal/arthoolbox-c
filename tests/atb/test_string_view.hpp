@@ -3,28 +3,13 @@
 #include <ostream>
 #include <string_view>
 
-#include "Core.hpp"
-#include "StrSpan.hpp"
-#include "atb/string/format.h"
 #include "atb/string/view.h"
 #include "test_compare.hpp"
+#include "test_string_span.hpp"
+#include "utils.hpp"
 
 constexpr auto ToSV(atb_StrView atb_view) -> std::string_view {
   return std::string_view(atb_view.data, atb_view.size);
-}
-
-inline auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream & {
-  using helper::MakeStringFromFmt;
-
-  os << MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(view));
-
-  if (view.data != nullptr) {
-    os << " --> "
-       << MakeStringFromFmt(K_ATB_FMT_STR_QUOTED,
-                            ATB_FMT_VA_ARG_STR_QUOTED(view));
-  }
-
-  return os;
 }
 
 // Cmp to std::string_view ////////////////////////////////////////////////////
@@ -59,6 +44,8 @@ constexpr bool operator>=(atb_StrView lhs, atb_StrView rhs) {
   return not(lhs < rhs);
 }
 
-namespace helper {
+auto operator<<(std::ostream &os, atb_StrView view) -> std::ostream &;
+
+namespace atb {
 DefineFieldsMatchFor(atb_StrView, 2, data, size);
 }

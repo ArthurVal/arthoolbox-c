@@ -5,11 +5,8 @@
 #include <string_view>
 using namespace std::literals::string_view_literals;
 
-#include "atb/error.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/Error.hpp"
+#include "test_error.hpp"
+#include "utils.hpp"
 
 namespace {
 
@@ -229,10 +226,10 @@ TEST_F(AtbErrorTest, DescribeUnknownCat) {
        }) {
     err.code = code;
 
-    SCOPED_TRACE(SCOPE_LOOP_MSG_1(err));
+    SCOPED_TRACE(ToString(NVALUE(err)));
 
     auto expected_str =
-        helper::MakeStringFromFmt("0x%.2x: %i", err.category, err.code);
+        atb::MakeStringFromFmt("0x%.2x: %i", err.category, err.code);
 
     written = 0;
     EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written));
@@ -286,9 +283,9 @@ TEST_F(AtbErrorTest, DescribeRawError) {
        }) {
     err.code = code;
 
-    SCOPED_TRACE(SCOPE_LOOP_MSG_1(err));
+    SCOPED_TRACE(ToString(NVALUE(err)));
 
-    auto expected_str = helper::MakeStringFromFmt("raw: %i", err.code);
+    auto expected_str = atb::MakeStringFromFmt("raw: %i", err.code);
 
     written = 0;
     EXPECT_TRUE(atb_Error_Describe(&err, nullptr, 0, &written));
@@ -333,7 +330,7 @@ TEST_F(AtbErrorTest, DescribeGeneric) {
        }) {
     err.code = code;
 
-    SCOPED_TRACE(SCOPE_LOOP_MSG_1(err));
+    SCOPED_TRACE(ToString(NVALUE(err)));
 
     auto expected_str = std::string{"generic: "} + std::strerror(code);
 
@@ -433,3 +430,14 @@ TEST_F(AtbErrorTest, Describe) {
 }
 
 } // namespace
+
+auto operator<<(std::ostream &os, const atb_Error &err) -> std::ostream & {
+  os << "atb_Error"
+     << atb::MakeStringFromFmt(K_ATB_ERROR_FMT, atb_Error_FMT_VA_ARG(err));
+  return os;
+}
+
+inline auto operator<<(std::ostream &os,
+                       const atb_Error *const err) -> std::ostream & {
+  return atb::PrintPtrTo(os, err);
+}

@@ -1,9 +1,6 @@
+#include "test_memory_span.hpp"
+
 #include "atb/memory/format.h"
-#include "atb/memory/span.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/MemSpan.hpp"
 
 namespace {
 
@@ -45,7 +42,7 @@ TEST(AtbMemorySpanTest, From) {
 }
 
 TEST(AtbMemorySpanTest, Format) {
-  using helper::MakeStringFromFmt;
+  using atb::MakeStringFromFmt;
 
   char str[] = "Coucou";
   auto span = atb_MemSpan_From(str, std::size(str));
@@ -72,7 +69,7 @@ TEST(AtbMemorySpanDeathTest, Slice) {
 }
 
 TEST(AtbMemorySpanTest, Slice) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -126,7 +123,7 @@ TEST(AtbMemorySpanDeathTest, ShrinkFront) {
 }
 
 TEST(AtbMemorySpanTest, ShrinkFront) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -160,7 +157,7 @@ TEST(AtbMemorySpanDeathTest, ShrinkBack) {
 }
 
 TEST(AtbMemorySpanTest, ShrinkBack) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -223,3 +220,25 @@ TEST(AtbMemorySpanTest, Fill) {
 }
 
 } // namespace
+
+std::ostream &operator<<(std::ostream &os, atb_MemSpan mem) {
+  os << atb::MakeStringFromFmt(K_ATB_FMT_MEM, ATB_FMT_VA_ARG_MEM(mem));
+
+  if (mem.data == nullptr) {
+    os << " -> /!\\ INVALID";
+  } else if (mem.size != 0) {
+    const uint8_t *byte = (const uint8_t *)mem.data;
+    const uint8_t *const end = (byte + mem.size);
+
+    os << " -> 0x";
+
+    const auto flags = os.flags();
+
+    os << std::hex;
+    while (byte != end) os << " " << (int)(*byte++);
+
+    os.flags(flags);
+  }
+
+  return os;
+}

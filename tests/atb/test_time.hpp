@@ -3,14 +3,16 @@
 #include <chrono>
 #include <ostream>
 
-#include "Core.hpp"
-#include "Ratio.hpp"
 #include "atb/time.h"
 #include "test_compare.hpp"
+#include "test_ratio.hpp"
+#include "utils.hpp"
 
-inline auto operator<<(std::ostream &os, timespec ts) -> std::ostream & {
-  return os << "timespec{.tv_sec=" << ts.tv_sec << ", .tv_nsec=" << ts.tv_nsec
-            << "}";
+constexpr auto ToTimespec(std::chrono::nanoseconds d) -> timespec {
+  return {
+      .tv_sec = d.count() / 1'000'000'000,
+      .tv_nsec = d.count() % 1'000'000'000,
+  };
 }
 
 constexpr auto operator==(timespec lhs, timespec rhs) -> bool {
@@ -20,6 +22,8 @@ constexpr auto operator==(timespec lhs, timespec rhs) -> bool {
 constexpr auto operator!=(timespec lhs, timespec rhs) -> bool {
   return !(lhs == rhs);
 }
+
+auto operator<<(std::ostream &os, timespec ts) -> std::ostream &;
 
 namespace std {
 
@@ -46,8 +50,8 @@ constexpr auto operator<<(
 
 } // namespace std
 
-namespace helper {
+namespace atb {
 
 DefineFieldsMatchFor(timespec, 2, tv_sec, tv_nsec);
 
-} // namespace helper
+} // namespace atb

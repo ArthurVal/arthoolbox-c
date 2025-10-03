@@ -1,9 +1,6 @@
+#include "test_memory_view.hpp"
+
 #include "atb/memory/format.h"
-#include "atb/memory/view.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/MemView.hpp"
 
 namespace {
 
@@ -45,7 +42,7 @@ TEST(AtbMemoryViewTest, From) {
 }
 
 TEST(AtbMemoryViewTest, Format) {
-  using helper::MakeStringFromFmt;
+  using atb::MakeStringFromFmt;
 
   char str[] = "Coucou";
   auto view = atb_MemView_From(str, std::size(str));
@@ -121,7 +118,7 @@ TEST(AtbMemoryViewDeathTest, Slice) {
 }
 
 TEST(AtbMemoryViewTest, Slice) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -175,7 +172,7 @@ TEST(AtbMemoryViewDeathTest, ShrinkFront) {
 }
 
 TEST(AtbMemoryViewTest, ShrinkFront) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -209,7 +206,7 @@ TEST(AtbMemoryViewDeathTest, ShrinkBack) {
 }
 
 TEST(AtbMemoryViewTest, ShrinkBack) {
-  using helper::FieldsMatch;
+  using atb::FieldsMatch;
 
   char str[] = "Coucou";
 
@@ -381,3 +378,25 @@ TEST(AtbMemoryViewTest, CopyInto) {
 }
 
 } // namespace
+
+std::ostream &operator<<(std::ostream &os, atb_MemView mem) {
+  os << atb::MakeStringFromFmt(K_ATB_FMT_MEM, ATB_FMT_VA_ARG_MEM(mem));
+
+  if (mem.data == nullptr) {
+    os << " -> /!\\ INVALID";
+  } else if (mem.size != 0) {
+    const uint8_t *byte = (const uint8_t *)mem.data;
+    const uint8_t *const end = (byte + mem.size);
+
+    os << " -> 0x";
+
+    const auto flags = os.flags();
+
+    os << std::hex;
+    while (byte != end) os << " " << (int)(*byte++);
+
+    os.flags(flags);
+  }
+
+  return os;
+}

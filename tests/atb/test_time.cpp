@@ -1,37 +1,24 @@
-#include <chrono>
+#include "test_time.hpp"
 using namespace std::chrono_literals;
 
-#include "atb/time.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "helper/Ratio.hpp"
-#include "helper/Time.hpp"
-
 namespace {
-
-constexpr auto ToTimespec(std::chrono::nanoseconds d) -> timespec {
-  return {
-      .tv_sec = d.count() / 1'000'000'000,
-      .tv_nsec = d.count() % 1'000'000'000,
-  };
-}
 
 TEST(AtbTimeTest, From) {
   // Test _FROM
   EXPECT_THAT((atb_timespec_FROM(100, K_ATB_NS)),
-              helper::FieldsMatch(timespec{0, 100}));
+              atb::FieldsMatch(timespec{0, 100}));
 
   EXPECT_THAT((atb_timespec_FROM(100, K_ATB_US)),
-              helper::FieldsMatch(timespec{0, 100'000}));
+              atb::FieldsMatch(timespec{0, 100'000}));
 
   EXPECT_THAT((atb_timespec_FROM(100, K_ATB_MS)),
-              helper::FieldsMatch(timespec{0, 100'000'000}));
+              atb::FieldsMatch(timespec{0, 100'000'000}));
 
   EXPECT_THAT((atb_timespec_FROM(1000, K_ATB_MS)),
-              helper::FieldsMatch(timespec{1, 0}));
+              atb::FieldsMatch(timespec{1, 0}));
 
   EXPECT_THAT((atb_timespec_FROM(1300, K_ATB_MS)),
-              helper::FieldsMatch(timespec{1, 300'000'000}));
+              atb::FieldsMatch(timespec{1, 300'000'000}));
 }
 
 TEST(AtbTimeTest, Set) {
@@ -49,45 +36,45 @@ TEST(AtbTimeTest, Set) {
            K_ATB_MONTHS,
            K_ATB_YEARS,
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_1(ratio));
+    SCOPED_TRACE(ToString(NVALUE(ratio)));
 
     ts = {-1, -1};
     EXPECT_TRUE(atb_timespec_Set(&ts, 0, ratio));
-    EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 0}));
+    EXPECT_THAT(ts, atb::FieldsMatch(timespec{0, 0}));
   }
 
   EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_NS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{0, 100}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_US));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{0, 100'000}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 100, K_ATB_MS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{0, 100'000'000}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{0, 100'000'000}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 1000, K_ATB_MS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 0}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{1, 0}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 1300, K_ATB_MS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 300'000'000}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{1, 300'000'000}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 3, {1, 3}));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 0}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{1, 0}));
 
   ts = {-1, -1};
   EXPECT_TRUE(atb_timespec_Set(&ts, 4, {1, 3}));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{1, 333'333'333}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{1, 333'333'333}));
 
   // Failure
   ts = {-1, -1};
   EXPECT_FALSE(
       atb_timespec_Set(&ts, std::numeric_limits<uint64_t>::max(), K_ATB_YEARS));
-  EXPECT_THAT(ts, helper::FieldsMatch(timespec{-1, -1}));
+  EXPECT_THAT(ts, atb::FieldsMatch(timespec{-1, -1}));
 }
 
 TEST(AtbTimeDeathTest, Set) {
@@ -105,7 +92,7 @@ TEST(AtbTimeTest, Compare) {
            std::array{timespec{-3, -2}, timespec{-3, -2}},
            std::array{ToTimespec(10s), ToTimespec(10000ms)},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_EQ(K_ATB_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Eq(lhs, rhs));
@@ -123,7 +110,7 @@ TEST(AtbTimeTest, Compare) {
            std::array{timespec{1, -2}, timespec{-1, -2}},
            std::array{ToTimespec(10s), ToTimespec(10ms)},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_NE(K_ATB_CMP_EQUAL, atb_timespec_Compare(lhs, rhs));
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
@@ -140,7 +127,7 @@ TEST(AtbTimeTest, Compare) {
            std::array{timespec{-1, 4}, timespec{-20, 40}},
            std::array{ToTimespec(10s), ToTimespec(10ms)},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
@@ -163,7 +150,7 @@ TEST(AtbTimeTest, Compare) {
            std::array{timespec{-20, 40}, timespec{-1, 4}},
            std::array{ToTimespec(10us), ToTimespec(10ms)},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_FALSE(atb_timespec_Eq(lhs, rhs));
     EXPECT_TRUE(atb_timespec_Ne(lhs, rhs));
@@ -251,7 +238,7 @@ TEST(AtbTimeTest, RetryCall) {
 
   auto expected = (count * delay);
   EXPECT_LE(abs(elapsed - expected), expected * 0.05) // 5% error ?
-      << SCOPE_LOOP_MSG_2(elapsed, expected);
+      << ToString(NVALUE(elapsed), NVALUE(expected));
 
   ASSERT_GE(stamps.size(), 1);
   EXPECT_EQ(stamps.size(), count + 1);
@@ -270,7 +257,7 @@ TEST(AtbTimeTest, RetryCall) {
     // Compare to the expected value
     expected = delay;
     EXPECT_LE(abs(elapsed - expected), expected * 0.05) // 5% error ?
-        << SCOPE_LOOP_MSG_2(elapsed, expected);
+        << ToString(NVALUE(elapsed), NVALUE(expected));
   }
 }
 
@@ -280,3 +267,8 @@ TEST(AtbTimeDeathTest, RetryCall) {
 }
 
 } // namespace
+
+auto operator<<(std::ostream &os, timespec ts) -> std::ostream & {
+  return os << "timespec{.tv_sec=" << ts.tv_sec << ", .tv_nsec=" << ts.tv_nsec
+            << "}";
+}

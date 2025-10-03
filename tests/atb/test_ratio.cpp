@@ -1,8 +1,6 @@
-#include <limits>
+#include "test_ratio.hpp"
 
-#include "atb/ratio.h"
-#include "gtest/gtest.h"
-#include "helper/Ratio.hpp"
+#include <limits>
 
 namespace {
 
@@ -578,7 +576,7 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{0, k_max}, atb_Ratio{0, 1}},
            std::array{atb_Ratio{0, k_max}, atb_Ratio{0, 5}},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     cmp = K_ATB_CMP_GREATER;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
@@ -596,7 +594,7 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{394, 2}, atb_Ratio{2, 4}},
            std::array{atb_Ratio{0, k_max}, atb_Ratio{1, 5}},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     cmp = K_ATB_CMP_EQUAL;
     EXPECT_TRUE(atb_Ratio_Compare(lhs, rhs, &cmp));
@@ -614,7 +612,7 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{1, 5}, atb_Ratio{0, 2}},
            std::array{atb_Ratio{1, 5}, atb_Ratio{0, k_max}},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
@@ -637,7 +635,7 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{0, 2}, atb_Ratio{1, 5}},
            std::array{atb_Ratio{0, k_max}, atb_Ratio{1, 5}},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     EXPECT_FALSE(atb_Ratio_Eq(lhs, rhs));
     EXPECT_TRUE(atb_Ratio_Ne(lhs, rhs));
@@ -658,7 +656,7 @@ TEST(AtbRatioTest, Comparisons) {
            std::array{atb_Ratio{k_max, 2}, atb_Ratio{k_min, k_max}},
            std::array{atb_Ratio{k_min, k_max}, atb_Ratio{k_max, 2}},
        }) {
-    SCOPED_TRACE(SCOPE_LOOP_MSG_2(lhs, rhs));
+    SCOPED_TRACE(ToString(NVALUE(lhs), NVALUE(rhs)));
 
     cmp = 20;
     EXPECT_FALSE(atb_Ratio_Compare(lhs, rhs, &cmp));
@@ -684,3 +682,7 @@ TEST(AtbRatioDeathTest, Comparisons) {
 }
 
 } // namespace
+
+auto operator<<(std::ostream &os, atb_Ratio ratio) -> std::ostream & {
+  return os << "Ratio{" << ratio.num << ", " << ratio.den << "}";
+}

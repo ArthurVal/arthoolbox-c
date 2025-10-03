@@ -1,9 +1,6 @@
 #include "atb/allocator.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/Error.hpp"
-#include "helper/MemSpan.hpp"
+#include "test_error.hpp"
+#include "test_memory_span.hpp"
 
 namespace {
 
@@ -60,7 +57,7 @@ using AtbAllocatorDeathTest = AtbAllocatorTest;
 TEST_F(AtbAllocatorDeathTest, Alloc) {
   atb_MemSpan res;
 
-  ON_CALL(mock_allocator, Alloc(helper::FieldsMatch(K_ATB_MEMSPAN_INVALID), 2,
+  ON_CALL(mock_allocator, Alloc(atb::FieldsMatch(K_ATB_MEMSPAN_INVALID), 2,
                                 &res, K_ATB_ERROR_IGNORED))
       .WillByDefault(testing::Return(true));
 
@@ -93,7 +90,7 @@ TEST_F(AtbAllocatorTest, Alloc) {
   atb_MemSpan orig = K_ATB_MEMSPAN_INVALID;
   atb_MemSpan res;
   EXPECT_CALL(mock_allocator,
-              Alloc(helper::FieldsMatch(orig), 42, &res, K_ATB_ERROR_IGNORED))
+              Alloc(atb::FieldsMatch(orig), 42, &res, K_ATB_ERROR_IGNORED))
       .WillOnce(Return(false))
       .WillOnce(
           DoAll(SetArgPointee<2>(atb_MemSpan{.data = nullptr, .size = 42}),
@@ -106,7 +103,7 @@ TEST_F(AtbAllocatorTest, Alloc) {
                                   K_ATB_ERROR_IGNORED));
 
   atb_Error err;
-  EXPECT_CALL(mock_allocator, Alloc(helper::FieldsMatch(orig), 42, &res, &err))
+  EXPECT_CALL(mock_allocator, Alloc(atb::FieldsMatch(orig), 42, &res, &err))
       .WillOnce(
           DoAll(SetArgPointee<2>(atb_MemSpan{.data = nullptr, .size = 42}),
                 Return(true)))
@@ -142,27 +139,26 @@ TEST_F(AtbAllocatorTest, Free) {
 
   EXPECT_TRUE(
       atb_Allocator_Free(&mock_allocator_itf, &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, helper::FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
 
   EXPECT_TRUE(atb_Allocator_Free(&mock_allocator_itf, &mem, &err));
-  EXPECT_THAT(mem, helper::FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
 
   int v;
   mem = atb_MemSpan_From_Value(v);
 
-  EXPECT_CALL(mock_allocator,
-              Free(helper::FieldsMatch(mem), K_ATB_ERROR_IGNORED))
+  EXPECT_CALL(mock_allocator, Free(atb::FieldsMatch(mem), K_ATB_ERROR_IGNORED))
       .WillOnce(Return(false))
       .WillOnce(Return(true))
       .RetiresOnSaturation();
 
   EXPECT_FALSE(
       atb_Allocator_Free(&mock_allocator_itf, &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, helper::FieldsMatch(atb_MemSpan_From_Value(v)));
+  EXPECT_THAT(mem, atb::FieldsMatch(atb_MemSpan_From_Value(v)));
 
   EXPECT_TRUE(
       atb_Allocator_Free(&mock_allocator_itf, &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, helper::FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
 }
 
 } // namespace

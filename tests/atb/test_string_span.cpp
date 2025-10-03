@@ -2,10 +2,8 @@
 #include <string_view>
 using namespace std::string_view_literals;
 
-#include "atb/string/span.h"
-#include "gtest/gtest.h"
-#include "helper/Core.hpp"
-#include "helper/StrSpan.hpp"
+#include "atb/string/format.h"
+#include "test_string_span.hpp"
 
 namespace {
 
@@ -27,7 +25,7 @@ TEST(AtbStringSpanTest, FromNullTerminated) {
 }
 
 TEST(AtbStringSpanTest, Format) {
-  using helper::MakeStringFromFmt;
+  using atb::MakeStringFromFmt;
 
   char str[] = "Coucou";
   const atb_StrSpan span = atb_StrSpan_From_NullTerminated(str);
@@ -98,3 +96,17 @@ TEST(AtbStringSpanDeathTest, Slice) {
 }
 
 } // namespace
+
+auto operator<<(std::ostream &os, atb_StrSpan span) -> std::ostream & {
+  using atb::MakeStringFromFmt;
+
+  os << MakeStringFromFmt(K_ATB_FMT_STR_RAW, ATB_FMT_VA_ARG_STR_RAW(span));
+
+  if (span.data != nullptr) {
+    os << " --> "
+       << MakeStringFromFmt(K_ATB_FMT_STR_QUOTED,
+                            ATB_FMT_VA_ARG_STR_QUOTED(span));
+  }
+
+  return os;
+}

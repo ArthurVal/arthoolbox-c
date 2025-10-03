@@ -13,7 +13,8 @@ TEST(AtbCompareTest, AtbCmpType) {
 } // namespace
 
 auto operator<<(std::ostream &os, atb_Cmp_t cmp_res) -> std::ostream & {
-  os << std::quoted(ToString(cmp_res).value_or("<UNKNOWN>")) << " ("
-     << static_cast<int>(cmp_res) << ")";
+  os << static_cast<int>(cmp_res);
+  os << "(= " << std::quoted(atb::ToString(cmp_res).value_or("<UNKNOWN>"))
+     << ')';
   return os;
 }
