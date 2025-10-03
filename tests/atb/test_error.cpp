@@ -10,23 +10,6 @@ using namespace std::literals::string_view_literals;
 namespace atb {
 namespace {
 
-struct ErrorFormatterMock {
-  MOCK_METHOD(size_t, Describe, (atb_ErrorCode_t, char *, size_t, size_t *));
-};
-
-auto Describe_Mock(void *data, atb_ErrorCode_t code, char *d_first,
-                   size_t d_size, size_t *written) -> bool {
-  return reinterpret_cast<ErrorFormatterMock *>(data)->Describe(
-      code, d_first, d_size, written);
-}
-
-auto BindFormatterTo(ErrorFormatterMock &mock) -> atb_ErrorFormatter {
-  atb_ErrorFormatter fmt;
-  fmt.data = &(mock);
-  fmt.Describe = Describe_Mock;
-  return fmt;
-}
-
 auto FindAvailableCategory() -> std::optional<atb_ErrorCategory_t> {
   atb_ErrorCategory_t cat = K_ATB_ERROR_GENERIC;
   while ((++cat != K_ATB_ERROR_GENERIC) &&
@@ -52,7 +35,7 @@ struct AtbErrorCategoryTest : testing::Test {
   virtual ~AtbErrorCategoryTest() {}
   static void TearDownTestSuite() {}
 
-  ErrorFormatterMock mock;
+  MockErrorFormatter mock;
 };
 
 using AtbErrorCategoryDeathTest = AtbErrorCategoryTest;
@@ -68,13 +51,11 @@ TEST_F(AtbErrorCategoryTest, HasFormatter) {
 
 TEST_F(AtbErrorCategoryDeathTest, AddAndRemoveFormatter) {
   const auto str = "Coucou";
-  const auto itf = BindFormatterTo(mock);
-
   EXPECT_DEBUG_DEATH(
-      atb_ErrorCategory_AddFormatter(2, NULL, itf, K_ATB_ERROR_IGNORED),
+      atb_ErrorCategory_AddFormatter(2, NULL, *mock.Itf(), K_ATB_ERROR_IGNORED),
       "name != NULL");
 
-  auto wrong_itf = itf;
+  auto wrong_itf = *mock.Itf();
   wrong_itf.Describe = nullptr;
   EXPECT_DEBUG_DEATH(
       atb_ErrorCategory_AddFormatter(2, str, wrong_itf, K_ATB_ERROR_IGNORED),
@@ -92,15 +73,14 @@ TEST_F(AtbErrorCategoryTest, AddAndRemoveFormatter) {
 
   // We look for any available category
   atb_Error err;
-  auto mock_itf = BindFormatterTo(mock);
 
   EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, K_ATB_ERROR_GENERIC, "TOTO",
-                mock_itf, &err);
+                *mock.Itf(), &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
 
   EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, K_ATB_ERROR_RAW, "TOTO",
-                mock_itf, &err);
+                *mock.Itf(), &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
 
@@ -108,14 +88,14 @@ TEST_F(AtbErrorCategoryTest, AddAndRemoveFormatter) {
   ASSERT_TRUE(available_cat.has_value());
 
   EXPECT_NPRED4(atb_ErrorCategory_AddFormatter, *available_cat,
-                name_too_long.data(), mock_itf, &err);
+                name_too_long.data(), *mock.Itf(), &err);
   EXPECT_EQ(err.category, K_ATB_ERROR_GENERIC);
   EXPECT_EQ(err.code, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
 
   EXPECT_NPRED1(atb_ErrorCategory_HasFormatter, *available_cat);
   EXPECT_NPRED1(atb_ErrorCategory_RemoveFormatter, *available_cat);
-  EXPECT_PRED4(atb_ErrorCategory_AddFormatter, *available_cat, "TOTO", mock_itf,
-               &err);
+  EXPECT_PRED4(atb_ErrorCategory_AddFormatter, *available_cat, "TOTO",
+               *mock.Itf(), &err);
   EXPECT_PRED1(atb_ErrorCategory_HasFormatter, *available_cat);
 
   EXPECT_PRED1(atb_ErrorCategory_RemoveFormatter, *available_cat);
@@ -136,7 +116,7 @@ struct AtbErrorTest : AtbErrorCategoryTest {
 
     mock_category = std::move(*available_cat);
     ASSERT_PRED4(atb_ErrorCategory_AddFormatter, mock_category, mock_fmt_name,
-                 BindFormatterTo(mock), &err)
+                 *mock.Itf(), &err)
         << err;
   }
 
@@ -429,6 +409,23 @@ TEST_F(AtbErrorTest, Describe) {
 }
 
 } // namespace
+
+MockErrorFormatter::MockErrorFormatter()
+    : m_itf({
+          .data = this,
+          .Describe = MockErrorFormatter::DoDescribe,
+      }) {}
+
+auto MockErrorFormatter::Itf() const -> const atb_ErrorFormatter * {
+  return &(m_itf);
+}
+
+auto MockErrorFormatter::DoDescribe(void *data, atb_ErrorCode_t code,
+                                    char *d_first, size_t d_size,
+                                    size_t *written) -> bool {
+  return reinterpret_cast<MockErrorFormatter *>(data)->Describe(
+      code, d_first, d_size, written);
+}
 
 } // namespace atb
 
