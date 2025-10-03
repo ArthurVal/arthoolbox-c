@@ -3,11 +3,11 @@
 #include <ostream>
 #include <string_view>
 
-#include "Compare.hpp"
 #include "Core.hpp"
 #include "StrSpan.hpp"
 #include "atb/string/format.h"
 #include "atb/string/view.h"
+#include "test_compare.hpp"
 
 constexpr auto ToSV(atb_StrView atb_view) -> std::string_view {
   return std::string_view(atb_view.data, atb_view.size);

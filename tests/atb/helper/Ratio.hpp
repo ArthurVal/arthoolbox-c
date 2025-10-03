@@ -2,9 +2,9 @@
 
 #include <ostream>
 
-#include "Compare.hpp"
 #include "Core.hpp"
 #include "atb/ratio.h"
+#include "test_compare.hpp"
 
 inline auto operator<<(std::ostream &os, atb_Ratio ratio) -> std::ostream & {
   return os << "Ratio{" << ratio.num << ", " << ratio.den << "}";

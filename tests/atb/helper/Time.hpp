@@ -3,10 +3,10 @@
 #include <chrono>
 #include <ostream>
 
-#include "Compare.hpp"
 #include "Core.hpp"
 #include "Ratio.hpp"
 #include "atb/time.h"
+#include "test_compare.hpp"
 
 inline auto operator<<(std::ostream &os, timespec ts) -> std::ostream & {
   return os << "timespec{.tv_sec=" << ts.tv_sec << ", .tv_nsec=" << ts.tv_nsec
