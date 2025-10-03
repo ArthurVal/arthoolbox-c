@@ -2,6 +2,7 @@ add_library(${PROJECT_NAME}
   ratio.c
   time.c
   error.c
+  allocator/default.c
 )
 
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

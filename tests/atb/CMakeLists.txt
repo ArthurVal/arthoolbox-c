@@ -11,6 +11,8 @@ add_executable(${PROJECT_NAME}-test
   test_memory_view.cpp
   test_string_span.cpp
   test_string_view.cpp
+  test_allocator.cpp
+  test_allocator_default.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test
