@@ -1,27 +1,6 @@
 #include "test_allocator.hpp"
 
 namespace atb {
-
-MockAllocator::MockAllocator()
-    : m_itf(atb_Allocator{
-          this,
-          MockAllocator::DoAlloc,
-          MockAllocator::DoFree,
-      }) {}
-
-auto MockAllocator::Itf() const -> const atb_Allocator * { return &(m_itf); }
-
-bool MockAllocator::DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
-                            struct atb_MemSpan *const out,
-                            struct atb_Error *const err) {
-  return reinterpret_cast<MockAllocator *>(mock)->Alloc(orig, size, out, err);
-}
-
-bool MockAllocator::DoFree(void *mock, struct atb_MemSpan mem,
-                           struct atb_Error *const err) {
-  return reinterpret_cast<MockAllocator *>(mock)->Free(mem, err);
-}
-
 namespace {
 
 struct AtbAllocatorTest : testing::Test {
@@ -145,6 +124,27 @@ TEST_F(AtbAllocatorTest, Free) {
 }
 
 } // namespace
+
+MockAllocator::MockAllocator()
+    : m_itf(atb_Allocator{
+          this,
+          MockAllocator::DoAlloc,
+          MockAllocator::DoFree,
+      }) {}
+
+auto MockAllocator::Itf() const -> const atb_Allocator * { return &(m_itf); }
+
+bool MockAllocator::DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
+                            struct atb_MemSpan *const out,
+                            struct atb_Error *const err) {
+  return reinterpret_cast<MockAllocator *>(mock)->Alloc(orig, size, out, err);
+}
+
+bool MockAllocator::DoFree(void *mock, struct atb_MemSpan mem,
+                           struct atb_Error *const err) {
+  return reinterpret_cast<MockAllocator *>(mock)->Free(mem, err);
+}
+
 } // namespace atb
 
 auto operator<<(std::ostream &os, const atb_Allocator &a) -> std::ostream & {

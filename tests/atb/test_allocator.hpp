@@ -16,6 +16,7 @@ struct MockAllocator {
               (struct atb_MemSpan mem, struct atb_Error *const err));
 
   MockAllocator();
+
   auto Itf() const -> const atb_Allocator *;
 
  private:
