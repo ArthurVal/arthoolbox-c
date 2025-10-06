@@ -46,7 +46,7 @@ static_assert(sizeof(struct atb_Error) == sizeof(uint64_t), "");
 
 /// Sentinel value used to signal that we wish to ignore an error when calling a
 /// function
-#define K_ATB_ERROR_IGNORED NULL
+#define K_ATB_ERROR_IGNORED (struct atb_Error*)NULL
 
 /* Operations **************************************************************/
 
@@ -164,11 +164,11 @@ extern bool atb_ErrorCategory_RemoveFormatter(atb_ErrorCategory_t category)
 /***************************************************************************/
 
 /// Raw code error category - Simply output the raw code value as description
-#define K_ATB_ERROR_RAW 0
+#define K_ATB_ERROR_RAW (atb_ErrorCategory_t)(0U)
 
 /// Generic errno error category - Used to propagate errno values with their
 /// strerror() description
-#define K_ATB_ERROR_GENERIC K_ATB_ERROR_RAW + 1
+#define K_ATB_ERROR_GENERIC (atb_ErrorCategory_t)(K_ATB_ERROR_RAW + 1U)
 
 /* RAW - (No category) *******************************************************/
 
