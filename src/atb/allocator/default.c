@@ -32,6 +32,7 @@ static bool DefaultAllocator_Release(void *data, struct atb_MemSpan mem,
 struct atb_Allocator const *atb_DefaultAllocator(void) {
   static struct atb_Allocator const m_default_allocator = {
       .data = NULL,
+      .Delete = NULL,
       .Alloc = DefaultAllocator_Alloc,
       .Release = DefaultAllocator_Release,
   };
