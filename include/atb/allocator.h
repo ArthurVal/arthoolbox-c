@@ -20,7 +20,8 @@ struct atb_Allocator {
                 struct atb_MemSpan *const out, struct atb_Error *const err);
 
   /// Interface in charge of freeing/releasing a memory block
-  bool (*Free)(void *data, struct atb_MemSpan mem, struct atb_Error *const err);
+  bool (*Release)(void *data, struct atb_MemSpan mem,
+                  struct atb_Error *const err);
 };
 
 /**
@@ -56,9 +57,9 @@ static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
  *  \pre self->Free != NULL
  *  \pre mem != NULL
  */
-static inline bool atb_Allocator_Free(struct atb_Allocator const *const self,
-                                      struct atb_MemSpan *const mem,
-                                      struct atb_Error *const err);
+static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
+                                         struct atb_MemSpan *const mem,
+                                         struct atb_Error *const err);
 
 /*****************************************************************************/
 /*                         STATIC INLINE DEFINITIONS */
@@ -82,17 +83,17 @@ static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
   return success;
 }
 
-static inline bool atb_Allocator_Free(struct atb_Allocator const *const self,
-                                      struct atb_MemSpan *const mem,
-                                      struct atb_Error *const err) {
+static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
+                                         struct atb_MemSpan *const mem,
+                                         struct atb_Error *const err) {
   assert(self != NULL);
-  assert(self->Free != NULL);
+  assert(self->Release != NULL);
   assert(mem != NULL);
 
   bool success = true;
 
   if (atb_MemSpan_IsValid(*mem)) {
-    if (self->Free(self->data, *mem, err)) {
+    if (self->Release(self->data, *mem, err)) {
       *mem = K_ATB_MEMSPAN_INVALID;
     } else {
       success = false;

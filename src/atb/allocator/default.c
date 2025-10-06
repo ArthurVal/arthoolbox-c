@@ -21,8 +21,8 @@ static bool DefaultAllocator_Alloc(void *data, struct atb_MemSpan orig,
   }
 }
 
-static bool DefaultAllocator_Free(void *data, struct atb_MemSpan mem,
-                                  struct atb_Error *const err) {
+static bool DefaultAllocator_Release(void *data, struct atb_MemSpan mem,
+                                     struct atb_Error *const err) {
   (void)data;
   (void)err;
   free(mem.data);
@@ -33,7 +33,7 @@ struct atb_Allocator const *atb_DefaultAllocator(void) {
   static struct atb_Allocator const m_default_allocator = {
       .data = NULL,
       .Alloc = DefaultAllocator_Alloc,
-      .Free = DefaultAllocator_Free,
+      .Release = DefaultAllocator_Release,
   };
 
   return &(m_default_allocator);

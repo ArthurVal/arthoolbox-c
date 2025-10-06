@@ -12,7 +12,7 @@ struct MockAllocator {
               (struct atb_MemSpan orig, size_t size,
                struct atb_MemSpan *const out, struct atb_Error *const err));
 
-  MOCK_METHOD(bool, Free,
+  MOCK_METHOD(bool, Release,
               (struct atb_MemSpan mem, struct atb_Error *const err));
 
   MockAllocator();
@@ -24,8 +24,8 @@ struct MockAllocator {
                       struct atb_MemSpan *const out,
                       struct atb_Error *const err);
 
-  static bool DoFree(void *mock, struct atb_MemSpan mem,
-                     struct atb_Error *const err);
+  static bool DoRelease(void *mock, struct atb_MemSpan mem,
+                        struct atb_Error *const err);
 
   const atb_Allocator m_itf;
 };

@@ -5,7 +5,7 @@
 
 namespace {
 
-TEST(AtbAllocatorDefaultTest, AllocFree) {
+TEST(AtbAllocatorDefaultTest, AllocRelease) {
   atb_Error err;
 
   auto mem = K_ATB_MEMSPAN_INVALID;
@@ -32,7 +32,8 @@ TEST(AtbAllocatorDefaultTest, AllocFree) {
   atb_MemSpan_Fill(mem, 0xAB);
 
   // free
-  EXPECT_PRED3(atb_Allocator_Free, atb_DefaultAllocator(), &mem, &err) << err;
+  EXPECT_PRED3(atb_Allocator_Release, atb_DefaultAllocator(), &mem, &err)
+      << err;
   EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
 }
 

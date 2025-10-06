@@ -10,7 +10,7 @@ struct AtbAllocatorTest : testing::Test {
     using testing::_;
     using testing::Return;
     ON_CALL(mock, Alloc(_, _, _, _)).WillByDefault(Return(false));
-    ON_CALL(mock, Free(_, _)).WillByDefault(Return(false));
+    ON_CALL(mock, Release(_, _)).WillByDefault(Return(false));
   }
 
   void TearDown() override {}
@@ -79,47 +79,47 @@ TEST_F(AtbAllocatorTest, Alloc) {
   EXPECT_FALSE(atb_Allocator_Alloc(mock.Itf(), orig, 42, &res, &err));
 }
 
-TEST_F(AtbAllocatorDeathTest, Free) {
+TEST_F(AtbAllocatorDeathTest, Release) {
   atb_MemSpan mem;
 
-  EXPECT_DEBUG_DEATH(atb_Allocator_Free(nullptr, &mem, K_ATB_ERROR_IGNORED),
+  EXPECT_DEBUG_DEATH(atb_Allocator_Release(nullptr, &mem, K_ATB_ERROR_IGNORED),
                      "self != NULL");
 
   EXPECT_DEBUG_DEATH(
-      atb_Allocator_Free(mock.Itf(), nullptr, K_ATB_ERROR_IGNORED),
+      atb_Allocator_Release(mock.Itf(), nullptr, K_ATB_ERROR_IGNORED),
       "mem != NULL");
 
   atb_Allocator wrong_alloc;
-  wrong_alloc.Free = nullptr;
+  wrong_alloc.Release = nullptr;
   EXPECT_DEBUG_DEATH(
-      atb_Allocator_Free(&wrong_alloc, &mem, K_ATB_ERROR_IGNORED),
-      "self->Free != NULL");
+      atb_Allocator_Release(&wrong_alloc, &mem, K_ATB_ERROR_IGNORED),
+      "self->Release != NULL");
 }
 
-TEST_F(AtbAllocatorTest, Free) {
+TEST_F(AtbAllocatorTest, Release) {
   using testing::Return;
 
   atb_Error err;
   auto mem = K_ATB_MEMSPAN_INVALID;
 
-  EXPECT_TRUE(atb_Allocator_Free(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
+  EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
   EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
 
-  EXPECT_TRUE(atb_Allocator_Free(mock.Itf(), &mem, &err));
+  EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, &err));
   EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
 
   int v;
   mem = atb_MemSpan_From_Value(v);
 
-  EXPECT_CALL(mock, Free(FieldsMatch(mem), K_ATB_ERROR_IGNORED))
+  EXPECT_CALL(mock, Release(FieldsMatch(mem), K_ATB_ERROR_IGNORED))
       .WillOnce(Return(false))
       .WillOnce(Return(true))
       .RetiresOnSaturation();
 
-  EXPECT_FALSE(atb_Allocator_Free(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
+  EXPECT_FALSE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
   EXPECT_THAT(mem, FieldsMatch(atb_MemSpan_From_Value(v)));
 
-  EXPECT_TRUE(atb_Allocator_Free(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
+  EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
   EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
 }
 
@@ -129,7 +129,7 @@ MockAllocator::MockAllocator()
     : m_itf(atb_Allocator{
           this,
           MockAllocator::DoAlloc,
-          MockAllocator::DoFree,
+          MockAllocator::DoRelease,
       }) {}
 
 auto MockAllocator::Itf() const -> const atb_Allocator * { return &(m_itf); }
@@ -140,9 +140,9 @@ bool MockAllocator::DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
   return reinterpret_cast<MockAllocator *>(mock)->Alloc(orig, size, out, err);
 }
 
-bool MockAllocator::DoFree(void *mock, struct atb_MemSpan mem,
-                           struct atb_Error *const err) {
-  return reinterpret_cast<MockAllocator *>(mock)->Free(mem, err);
+bool MockAllocator::DoRelease(void *mock, struct atb_MemSpan mem,
+                              struct atb_Error *const err) {
+  return reinterpret_cast<MockAllocator *>(mock)->Release(mem, err);
 }
 
 } // namespace atb
@@ -151,7 +151,7 @@ auto operator<<(std::ostream &os, const atb_Allocator &a) -> std::ostream & {
   os << "atb_Allocator{";
   os << ".data=" << a.data << ", ";
   os << ".Alloc=" << (void *)a.Alloc << ", ";
-  os << ".Free=" << (void *)a.Free << ", ";
+  os << ".Release=" << (void *)a.Release << ", ";
   os << '}';
   return os;
 }
