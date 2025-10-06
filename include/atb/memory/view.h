@@ -66,7 +66,7 @@ static inline struct atb_MemView atb_MemView_From_Span(struct atb_MemSpan span);
 static inline bool atb_MemView_IsValid(struct atb_MemView view);
 
 /**
- *  \brief TODO
+ *  \brief Indicates if 2 memory blocks overlaps
  *
  *  \param[in] lhs, rhs MemView we wish to check for overlaps
  *
@@ -134,19 +134,20 @@ typedef struct {
  *  \brief Copy \a view into \a dest
  *
  *  \param[in] view The mem view we wish to copy
- *  \param[out] dest The mem span buffer destination
+ *  \param[in] dest The mem span buffer destination
  *  \param[in] opt Options used when copying (truncate/overlap/...)
  *
- *  \return bool True when copying suceeded. False whenever the dest buffer is
- *               too small and truncate is False.
+ *  \return atb_MemSpan K_ATB_MEMSPAN_INVALID in case of failure. Otherwise,
+ *                      dest buffer shrinked by the number of byte written
+ *                      (i.e. remaining space in the dest buffer).
  *
  *  \pre atb_MemView_IsValid(view) == true
  *  \pre atb_MemSpan_IsValid(dest) == true
  *  \pre When overlap is true, atb_MemSpan_IsOverlapping(view, dest) == false
  */
-static inline bool atb_MemView_CopyInto(struct atb_MemView view,
-                                        struct atb_MemSpan dest,
-                                        atb_MemView_CopyInto_Opt_t opt);
+static inline struct atb_MemSpan atb_MemView_CopyInto(
+    struct atb_MemView view, struct atb_MemSpan dest,
+    atb_MemView_CopyInto_Opt_t opt);
 
 /**
  *  \brief Compare (lexicographically) 2 MemView with each other
@@ -274,16 +275,16 @@ static inline struct atb_MemView atb_MemView_ShrinkBack(struct atb_MemView view,
   return view;
 }
 
-static inline bool atb_MemView_CopyInto(struct atb_MemView view,
-                                        struct atb_MemSpan dest,
-                                        atb_MemView_CopyInto_Opt_t opt) {
+static inline struct atb_MemSpan atb_MemView_CopyInto(
+    struct atb_MemView view, struct atb_MemSpan dest,
+    atb_MemView_CopyInto_Opt_t opt) {
   assert(atb_MemView_IsValid(view));
   assert(atb_MemSpan_IsValid(dest));
 
   if (opt.truncate) {
     view = atb_MemView_Slice(view, 0, dest.size);
   } else if (view.size > dest.size) {
-    return false;
+    return K_ATB_MEMSPAN_INVALID;
   }
 
   if (opt.overlap) {
@@ -293,7 +294,7 @@ static inline bool atb_MemView_CopyInto(struct atb_MemView view,
     memcpy(dest.data, view.data, view.size);
   }
 
-  return true;
+  return atb_MemSpan_ShrinkFront(dest, view.size);
 }
 
 static inline atb_Cmp_t atb_MemView_Compare(struct atb_MemView lhs,

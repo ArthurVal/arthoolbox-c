@@ -124,40 +124,40 @@ TEST(AtbMemoryViewTest, Slice) {
   // No op
   EXPECT_THAT(atb_MemView_Slice(view, 0, view.size), FieldsMatch(view));
 
-  EXPECT_THAT(atb_MemView_Slice(view, 1, 1), FieldsMatch({
+  EXPECT_THAT(atb_MemView_Slice(view, 1, 1), FieldsMatch(atb_MemView{
                                                  .data = (char *)view.data + 1,
                                                  .size = 1,
                                              }));
 
-  EXPECT_THAT(atb_MemView_Slice(view, 3, 1), FieldsMatch({
+  EXPECT_THAT(atb_MemView_Slice(view, 3, 1), FieldsMatch(atb_MemView{
                                                  .data = (char *)view.data + 3,
                                                  .size = 1,
                                              }));
 
-  EXPECT_THAT(atb_MemView_Slice(view, 3, 3), FieldsMatch({
+  EXPECT_THAT(atb_MemView_Slice(view, 3, 3), FieldsMatch(atb_MemView{
                                                  .data = (char *)view.data + 3,
                                                  .size = 3,
                                              }));
 
-  EXPECT_THAT(atb_MemView_Slice(view, 1, 3), FieldsMatch({
+  EXPECT_THAT(atb_MemView_Slice(view, 1, 3), FieldsMatch(atb_MemView{
                                                  .data = (char *)view.data + 1,
                                                  .size = 3,
                                              }));
 
   EXPECT_THAT(atb_MemView_Slice(view, 4, view.size + 20),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + 4,
                   .size = view.size - 4,
               }));
 
   EXPECT_THAT(atb_MemView_Slice(view, view.size, 0),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + view.size,
                   .size = 0,
               }));
 
   EXPECT_THAT(atb_MemView_Slice(view, view.size, 20),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + view.size,
                   .size = 0,
               }));
@@ -177,19 +177,19 @@ TEST(AtbMemoryViewTest, ShrinkFront) {
   EXPECT_THAT(atb_MemView_ShrinkFront(view, 0), FieldsMatch(view));
 
   EXPECT_THAT(atb_MemView_ShrinkFront(view, 2),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + 2,
                   .size = view.size - 2,
               }));
 
   EXPECT_THAT(atb_MemView_ShrinkFront(view, view.size),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + view.size,
                   .size = 0,
               }));
 
   EXPECT_THAT(atb_MemView_ShrinkFront(view, view.size + 20),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = (char *)view.data + view.size,
                   .size = 0,
               }));
@@ -208,18 +208,18 @@ TEST(AtbMemoryViewTest, ShrinkBack) {
   // No op
   EXPECT_THAT(atb_MemView_ShrinkBack(view, 0), FieldsMatch(view));
 
-  EXPECT_THAT(atb_MemView_ShrinkBack(view, 2), FieldsMatch({
+  EXPECT_THAT(atb_MemView_ShrinkBack(view, 2), FieldsMatch(atb_MemView{
                                                    .data = view.data,
                                                    .size = view.size - 2,
                                                }));
 
-  EXPECT_THAT(atb_MemView_ShrinkBack(view, view.size), FieldsMatch({
+  EXPECT_THAT(atb_MemView_ShrinkBack(view, view.size), FieldsMatch(atb_MemView{
                                                            .data = view.data,
                                                            .size = 0,
                                                        }));
 
   EXPECT_THAT(atb_MemView_ShrinkBack(view, view.size + 20),
-              FieldsMatch({
+              FieldsMatch(atb_MemView{
                   .data = view.data,
                   .size = 0,
               }));
@@ -315,58 +315,66 @@ TEST(AtbMemoryViewDeathTest, CopyInto) {
 }
 
 TEST(AtbMemoryViewTest, CopyInto) {
+  using atb::FieldsMatch;
   const uint8_t from[4] = {1, 2, 3, 4};
   uint8_t dest[4];
 
   std::fill(std::begin(dest), std::end(dest), 0);
   EXPECT_THAT(dest, testing::ElementsAre(0, 0, 0, 0));
 
-  EXPECT_TRUE(atb_MemView_CopyInto(atb_MemView_From_Array(from),
+  EXPECT_THAT(atb_MemView_CopyInto(atb_MemView_From_Array(from),
                                    atb_MemSpan_From_Array(dest),
                                    {
                                        .truncate = false,
                                        .overlap = false,
-                                   }));
+                                   }),
+              FieldsMatch(atb_MemSpan{.data = dest + 4, .size = 0}));
   EXPECT_THAT(dest, testing::ElementsAre(1, 2, 3, 4));
 
   // Truncate
   std::fill(std::begin(dest), std::end(dest), 0);
-  EXPECT_FALSE(atb_MemView_CopyInto(
-      atb_MemView_From_Array(from),
-      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
-      {
-          .truncate = false,
-          .overlap = false,
-      }));
+
+  // -> Failed, dst too small
+  EXPECT_THAT(atb_MemView_CopyInto(
+                  atb_MemView_From_Array(from),
+                  atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
+                  {
+                      .truncate = false,
+                      .overlap = false,
+                  }),
+              FieldsMatch(K_ATB_MEMSPAN_INVALID));
   EXPECT_THAT(dest, testing::ElementsAre(0, 0, 0, 0));
 
-  EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_From_Array(from),
-      atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
-      {
-          .truncate = true,
-          .overlap = false,
-      }));
+  EXPECT_THAT(atb_MemView_CopyInto(
+                  atb_MemView_From_Array(from),
+                  atb_MemSpan_ShrinkBack(atb_MemSpan_From_Array(dest), 1),
+                  {
+                      .truncate = true,
+                      .overlap = false,
+                  }),
+              FieldsMatch(atb_MemSpan{.data = dest + 3, .size = 0}));
   EXPECT_THAT(dest, testing::ElementsAre(1, 2, 3, 0));
 
   // Overlap - view after dest
-  EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_Slice(atb_MemView_From_Array(dest), 2, 2),
-      atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
-      {
-          .truncate = false,
-          .overlap = true,
-      }));
+  EXPECT_THAT(atb_MemView_CopyInto(
+                  atb_MemView_Slice(atb_MemView_From_Array(dest), 2, 2),
+                  atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
+                  {
+                      .truncate = false,
+                      .overlap = true,
+                  }),
+              FieldsMatch(atb_MemSpan{.data = dest + 1 + 2, .size = 0}));
   EXPECT_THAT(dest, testing::ElementsAre(1, 3, 0, 0));
 
   // Overlap - view before dest
-  EXPECT_TRUE(atb_MemView_CopyInto(
-      atb_MemView_Slice(atb_MemView_From_Array(dest), 0, 2),
-      atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
-      {
-          .truncate = false,
-          .overlap = true,
-      }));
+  EXPECT_THAT(atb_MemView_CopyInto(
+                  atb_MemView_Slice(atb_MemView_From_Array(dest), 0, 2),
+                  atb_MemSpan_Slice(atb_MemSpan_From_Array(dest), 1, 2),
+                  {
+                      .truncate = false,
+                      .overlap = true,
+                  }),
+              FieldsMatch(atb_MemSpan{.data = dest + 1 + 2, .size = 0}));
   EXPECT_THAT(dest, testing::ElementsAre(1, 1, 3, 0));
 }
 

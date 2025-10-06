@@ -4,6 +4,7 @@
 
 #include "atb/memory/view.h"
 #include "utils.hpp"
+#include "test_memory_span.hpp"
 
 std::ostream &operator<<(std::ostream &os, atb_MemView mem);
 
