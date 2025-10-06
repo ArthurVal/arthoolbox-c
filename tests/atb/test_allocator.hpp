@@ -8,6 +8,10 @@
 namespace atb {
 
 struct MockAllocator {
+  MOCK_METHOD(bool, Init, (void *param, struct atb_Error *const err));
+
+  MOCK_METHOD(void, Delete, ());
+
   MOCK_METHOD(bool, Alloc,
               (struct atb_MemSpan orig, size_t size,
                struct atb_MemSpan *const out, struct atb_Error *const err));
@@ -20,6 +24,10 @@ struct MockAllocator {
   auto Itf() const -> const atb_Allocator *;
 
  private:
+  static bool DoInit(void *mock, void *param, struct atb_Error *const err);
+
+  static void DoDelete(void *mock);
+
   static bool DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
                       struct atb_MemSpan *const out,
                       struct atb_Error *const err);

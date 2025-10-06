@@ -14,15 +14,42 @@ extern "C" {
 struct atb_Allocator {
   void *data; /*!< Internal allocator data forwarded at each call*/
 
-  /// Interface in charge of allocating a memory block \a mem \a n bytes
-  /// Whenever \a orgi is Valid, this interface perform a re-alloc
+  /// Optional interface in charge of constructing/initialize the allocator
+  bool (*Init)(void *data, void *param, struct atb_Error *const err);
+
+  /// Optional interface in charge of desctructing/deleting the allocator
+  void (*Delete)(void *data);
+
+  /// Mandatory Interface in charge of allocating a memory block \a mem \a n
+  /// bytes Whenever \a orgi is Valid, this interface perform a re-alloc
   bool (*Alloc)(void *data, struct atb_MemSpan orig, size_t size,
                 struct atb_MemSpan *const out, struct atb_Error *const err);
 
-  /// Interface in charge of freeing/releasing a memory block
+  /// Mandatory Interface in charge of freeing/releasing a memory block
   bool (*Release)(void *data, struct atb_MemSpan mem,
                   struct atb_Error *const err);
 };
+
+/**
+ *  \brief Initialize/construct the allocator using \a param
+ *
+ *  \param[in] param Parameter forwarded to the Init allocator interface
+ *  \param[out] err Error set when failure occurs.
+ *
+ *  \post _Alloc/_Release function are safe to use
+ *
+ *  \return bool True whenever the initialization succeeded, false otherwsie and
+ *               err is set (if not ignored) accordingly.
+ */
+static inline bool atb_Allocator_Init(struct atb_Allocator const *const self,
+                                      void *param, struct atb_Error *const err);
+
+/**
+ *  \brief Delete/desctruct the allocator
+ *
+ *  \post _Alloc/_Release function can't be used anymore
+ */
+static inline void atb_Allocator_Delete(struct atb_Allocator const *const self);
 
 /**
  *  \brief (Re)Allocate \a n bytes of memory.
@@ -64,6 +91,28 @@ static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
 /*****************************************************************************/
 /*                         STATIC INLINE DEFINITIONS */
 /*****************************************************************************/
+
+static inline bool atb_Allocator_Init(struct atb_Allocator const *const self,
+                                      void *param,
+                                      struct atb_Error *const err) {
+  assert(self != NULL);
+  assert(self->Alloc != NULL);
+  assert(self->Release != NULL);
+
+  bool success = true;
+  if (self->Init) {
+    success = self->Init(self->data, param, err);
+  }
+
+  return success;
+}
+
+static inline void atb_Allocator_Delete(
+    struct atb_Allocator const *const self) {
+  assert(self != NULL);
+
+  if (self->Delete) self->Delete(self->data);
+}
 
 static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
                                        struct atb_MemSpan orig, size_t size,

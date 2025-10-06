@@ -9,6 +9,8 @@ struct AtbAllocatorTest : testing::Test {
   void SetUp() override {
     using testing::_;
     using testing::Return;
+    ON_CALL(mock, Init(_, _)).WillByDefault(Return(true));
+    ON_CALL(mock, Delete()).WillByDefault(Return());
     ON_CALL(mock, Alloc(_, _, _, _)).WillByDefault(Return(false));
     ON_CALL(mock, Release(_, _)).WillByDefault(Return(false));
   }
@@ -21,6 +23,74 @@ struct AtbAllocatorTest : testing::Test {
 };
 
 using AtbAllocatorDeathTest = AtbAllocatorTest;
+
+TEST_F(AtbAllocatorDeathTest, Init) {
+  int param;
+
+  EXPECT_DEBUG_DEATH(atb_Allocator_Init(nullptr, &param, K_ATB_ERROR_IGNORED),
+                     "self != NULL");
+
+  atb_Allocator wrong_alloc = *mock.Itf();
+
+  wrong_alloc.Alloc = nullptr;
+  EXPECT_DEBUG_DEATH(
+      atb_Allocator_Init(&wrong_alloc, &param, K_ATB_ERROR_IGNORED),
+      "self->Alloc != NULL");
+
+  wrong_alloc = *mock.Itf();
+
+  wrong_alloc.Release = nullptr;
+  EXPECT_DEBUG_DEATH(
+      atb_Allocator_Init(&wrong_alloc, &param, K_ATB_ERROR_IGNORED),
+      "self->Release != NULL");
+
+  wrong_alloc.Alloc = nullptr;
+  EXPECT_DEBUG_DEATH(
+      atb_Allocator_Init(&wrong_alloc, &param, K_ATB_ERROR_IGNORED),
+      "self->Alloc != NULL");
+}
+
+TEST_F(AtbAllocatorTest, Init) {
+  using testing::Return;
+
+  int param;
+
+  EXPECT_CALL(mock, Init(&param, K_ATB_ERROR_IGNORED))
+      .WillOnce(Return(false))
+      .WillOnce(Return(true))
+      .RetiresOnSaturation();
+  EXPECT_NPRED3(atb_Allocator_Init, mock.Itf(), &param, K_ATB_ERROR_IGNORED);
+  EXPECT_PRED3(atb_Allocator_Init, mock.Itf(), &param, K_ATB_ERROR_IGNORED);
+
+  atb_Error err;
+  EXPECT_CALL(mock, Init(&param, &err))
+      .WillOnce(Return(true))
+      .WillOnce(Return(false))
+      .RetiresOnSaturation();
+  EXPECT_PRED3(atb_Allocator_Init, mock.Itf(), &param, &err);
+  EXPECT_NPRED3(atb_Allocator_Init, mock.Itf(), &param, &err);
+
+  auto allocator_without_init = *mock.Itf();
+  allocator_without_init.Init = nullptr;
+  EXPECT_PRED3(atb_Allocator_Init, &allocator_without_init, &param,
+               K_ATB_ERROR_IGNORED);
+  EXPECT_PRED3(atb_Allocator_Init, &allocator_without_init, &param, &err);
+}
+
+TEST_F(AtbAllocatorDeathTest, Delete) {
+  EXPECT_DEBUG_DEATH(atb_Allocator_Delete(nullptr), "self != NULL");
+}
+
+TEST_F(AtbAllocatorTest, Delete) {
+  using testing::Return;
+
+  EXPECT_CALL(mock, Delete()).WillOnce(Return()).RetiresOnSaturation();
+  atb_Allocator_Delete(mock.Itf());
+
+  auto allocator_without_delete = *mock.Itf();
+  allocator_without_delete.Delete = nullptr;
+  atb_Allocator_Delete(&allocator_without_delete);
+}
 
 TEST_F(AtbAllocatorDeathTest, Alloc) {
   atb_MemSpan res;
@@ -127,12 +197,23 @@ TEST_F(AtbAllocatorTest, Release) {
 
 MockAllocator::MockAllocator()
     : m_itf(atb_Allocator{
-          this,
-          MockAllocator::DoAlloc,
-          MockAllocator::DoRelease,
+          .data = this,
+          .Init = MockAllocator::DoInit,
+          .Delete = MockAllocator::DoDelete,
+          .Alloc = MockAllocator::DoAlloc,
+          .Release = MockAllocator::DoRelease,
       }) {}
 
 auto MockAllocator::Itf() const -> const atb_Allocator * { return &(m_itf); }
+
+bool MockAllocator::DoInit(void *mock, void *param,
+                           struct atb_Error *const err) {
+  return reinterpret_cast<MockAllocator *>(mock)->Init(param, err);
+}
+
+void MockAllocator::DoDelete(void *mock) {
+  return reinterpret_cast<MockAllocator *>(mock)->Delete();
+}
 
 bool MockAllocator::DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
                             struct atb_MemSpan *const out,
@@ -150,6 +231,8 @@ bool MockAllocator::DoRelease(void *mock, struct atb_MemSpan mem,
 auto operator<<(std::ostream &os, const atb_Allocator &a) -> std::ostream & {
   os << "atb_Allocator{";
   os << ".data=" << a.data << ", ";
+  os << ".Init=" << (void *)a.Init << ", ";
+  os << ".Delete=" << (void *)a.Delete << ", ";
   os << ".Alloc=" << (void *)a.Alloc << ", ";
   os << ".Release=" << (void *)a.Release << ", ";
   os << '}';
