@@ -237,7 +237,7 @@ typedef struct atb_View_Copy_Opt {
 /// - `_[Eq, Ne, Lt, Gt, Le, Ge](span, span) -> bool`: Compare 2 spans;
 ///
 /// Functions declared only for SPAN ONLY:
-/// - `_Fill(span, byte) -> void`: Fill the span with byte;
+/// - `_Fill(span, value) -> void`: Fill the span with copy of value;
 ///
 /// Functions declared only for VIEW ONLY:
 /// - `_From_Span(span) -> view`: Create a view from given span;
@@ -246,7 +246,7 @@ typedef struct atb_View_Copy_Opt {
 ///   copy. Otherwise returns an INVALID span;
 #define ATB_SPAN_VIEW_DECLARE(SPECIFIER, SPAN, VIEW, T)       \
   ATB_SPAN_DECLARE(SPECIFIER, SPAN, T);                       \
-  SPECIFIER void SPAN##_Fill(struct SPAN, char);              \
+  SPECIFIER void SPAN##_Fill(struct SPAN, T const *const);    \
   ATB_SPAN_DECLARE(SPECIFIER, VIEW, const T);                 \
   SPECIFIER struct VIEW VIEW##_From_Span(struct SPAN);        \
   SPECIFIER struct SPAN VIEW##_Copy(struct VIEW, struct SPAN, \
@@ -278,7 +278,7 @@ typedef struct atb_View_Copy_Opt {
 /// - `_[Eq, Ne, Lt, Gt, Le, Ge](span, span) -> bool`: Compare 2 spans;
 ///
 /// Functions defined only for SPAN ONLY:
-/// - `_Fill(span, byte) -> void`: Fill the span with byte;
+/// - `_Fill(span, value) -> void`: Fill the span with copy of value;
 ///
 /// Functions defined for VIEW ONLY:
 /// - `_From_Span(span) -> view`: Create a view from given span;
@@ -288,9 +288,12 @@ typedef struct atb_View_Copy_Opt {
 #define ATB_SPAN_VIEW_DEFINE(SPECIFIER, SPAN, VIEW, T)                    \
   ATB_SPAN_DEFINE(SPECIFIER, SPAN, T);                                    \
                                                                           \
-  SPECIFIER void SPAN##_Fill(struct SPAN span, char v) {                  \
+  SPECIFIER void SPAN##_Fill(struct SPAN span, T const *const v) {        \
     assert(SPAN##_IsValid(span));                                         \
-    memset(span.data, v, SPAN##_SizeBytes(span));                         \
+    assert(v != NULL);                                                    \
+                                                                          \
+    T *elem = NULL;                                                       \
+    atb_AnySpan_ForEach(elem, span) { memcpy(elem, v, sizeof(T)); }       \
   }                                                                       \
                                                                           \
   ATB_SPAN_DEFINE(SPECIFIER, VIEW, const T);                              \
@@ -303,7 +306,7 @@ typedef struct atb_View_Copy_Opt {
   }                                                                       \
                                                                           \
   SPECIFIER bool VIEW##_Copy(struct VIEW view, struct SPAN dest,          \
-                             atb_View_Copy_Opt_t opt,                 \
+                             atb_View_Copy_Opt_t opt,                     \
                              struct SPAN *const remaining) {              \
     assert(VIEW##_IsValid(view));                                         \
     assert(SPAN##_IsValid(dest));                                         \

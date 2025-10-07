@@ -371,7 +371,11 @@ TEST_F(AtbSpanTest, Compare) {
 }
 
 TEST_F(AtbSpanDeathTest, Fill) {
-  EXPECT_DEBUG_DEATH(Span_u32_Fill(K_ATB_ANYSPAN_INVALID, 0), "IsValid");
+  Span_u32 valid_span = atb_AnySpan_From_Array(m_arr);
+  uint32_t v = 0;
+
+  EXPECT_DEBUG_DEATH(Span_u32_Fill(K_ATB_ANYSPAN_INVALID, &v), "IsValid");
+  EXPECT_DEBUG_DEATH(Span_u32_Fill(valid_span, nullptr), "!= NULL");
 }
 
 TEST_F(AtbSpanTest, Fill) {
@@ -380,9 +384,11 @@ TEST_F(AtbSpanTest, Fill) {
   using testing::Ne;
 
   std::uint32_t arr[] = {1, 1, 1, 1, 1};
-  EXPECT_THAT(arr, Each(Ne(0)));
-  Span_u32_Fill(atb_AnySpan_From_Array(arr), 0);
-  EXPECT_THAT(arr, Each(Eq(0)));
+
+  std::uint32_t value = 42;
+  EXPECT_THAT(arr, Each(Ne(value)));
+  Span_u32_Fill(atb_AnySpan_From_Array(arr), &value);
+  EXPECT_THAT(arr, Each(Eq(value)));
 }
 
 TEST_F(AtbViewTest, From) {
