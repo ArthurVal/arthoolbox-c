@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "atb/macro.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -114,8 +116,109 @@ static inline struct atb_MemSpan atb_MemSpan_ShrinkBack(struct atb_MemSpan span,
  */
 static inline void atb_MemSpan_Fill(struct atb_MemSpan span, uint8_t value);
 
+/***************************************************************************/
+/*                            SPAN-LIKE auto-gen                           */
+/***************************************************************************/
+
+/// Declare a new span-like struct, named NAME, for the given type T.
+/// All function declaration will be prepend be the provided SPECIFIER.
+#define ATB_MEM_DECLARE_SPAN(SPECIFIER, PREFIX, SUFFIX, T)                     \
+  struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX);                                 \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                        \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _From)(T *, size_t);                \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                        \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _From_MemSpan)(struct atb_MemSpan); \
+  SPECIFIER struct atb_MemSpan ATB_TKN_CONCAT(                                 \
+      PREFIX, Span, SUFFIX,                                                    \
+      _To_MemSpan)(struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX));               \
+  SPECIFIER bool ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _IsValid)(               \
+      struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX));                            \
+  SPECIFIER void ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _Fill)(                  \
+      struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX), uint8_t);                   \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                        \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _ShrinkFront)(                      \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX), size_t);                \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                        \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _ShrinkBack)(                       \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX), size_t);                \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                        \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _Slice)(                            \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX), size_t, size_t)
+
+/// Define a new span-like struct, named NAME, for the given type T.
+#define ATB_MEM_DEFINE_SPAN(PREFIX, SUFFIX, T)  \
+  struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) { \
+    T *data;                                    \
+    size_t size;                                \
+  }
+
+/// Define the span-like operations, working on the previously defined span
+/// NAME, for the given type T.
+/// All function declaration will be prepend be the provided SPECIFIER.
+#define ATB_MEM_DEFINE_SPAN_FN(SPECIFIER, PREFIX, SUFFIX, T)                  \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                       \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _From)(T * other, size_t size) {   \
+    struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span;                         \
+    span.data = other;                                                        \
+    span.size = size;                                                         \
+    return span;                                                              \
+  }                                                                           \
+                                                                              \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) ATB_TKN_CONCAT(       \
+      PREFIX, Span, SUFFIX, _From_MemSpan)(struct atb_MemSpan mem) {          \
+    return ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _From)(                       \
+        (T *)mem.data, (mem.size / sizeof(T)));                               \
+  }                                                                           \
+                                                                              \
+  SPECIFIER struct atb_MemSpan ATB_TKN_CONCAT(                                \
+      PREFIX, Span, SUFFIX,                                                   \
+      _To_MemSpan)(struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span) {        \
+    return atb_MemSpan_From(span.data, (span.size * sizeof(T)));              \
+  }                                                                           \
+                                                                              \
+  SPECIFIER bool ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _IsValid)(              \
+      struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span) {                     \
+    return span.data != NULL;                                                 \
+  }                                                                           \
+                                                                              \
+  SPECIFIER void ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _Fill)(                 \
+      struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span, uint8_t value) {      \
+    atb_MemSpan_Fill(ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _To_MemSpan)(span), \
+                     value);                                                  \
+  }                                                                           \
+                                                                              \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                       \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _ShrinkFront)(                     \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span, size_t n) {       \
+    return ATB_TKN_CONCAT(PREFIX, Span, SUFFIX,                               \
+                          _From_MemSpan)(atb_MemSpan_ShrinkFront(             \
+        ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _To_MemSpan)(span),              \
+        (n * sizeof(T))));                                                    \
+  }                                                                           \
+                                                                              \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                       \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _ShrinkBack)(                      \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span, size_t n) {       \
+    return ATB_TKN_CONCAT(PREFIX, Span, SUFFIX,                               \
+                          _From_MemSpan)(atb_MemSpan_ShrinkBack(              \
+        ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _To_MemSpan)(span),              \
+        (n * sizeof(T))));                                                    \
+  }                                                                           \
+                                                                              \
+  SPECIFIER struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX)                       \
+      ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _Slice)(                           \
+          struct ATB_TKN_CONCAT(PREFIX, Span, SUFFIX) span, size_t begin,     \
+          size_t new_size) {                                                  \
+    return ATB_TKN_CONCAT(PREFIX, Span, SUFFIX,                               \
+                          _From_MemSpan)(atb_MemSpan_Slice(                   \
+        ATB_TKN_CONCAT(PREFIX, Span, SUFFIX, _To_MemSpan)(span),              \
+        (begin * sizeof(T)), (new_size * sizeof(T))));                        \
+  }                                                                           \
+                                                                              \
+  static_assert(true, "NEED SEMICOLON HERE")
+
 /*****************************************************************************/
-/*                         STATIC INLINE DEFINITIONS */
+/*                         STATIC INLINE DEFINITIONS                         */
 /*****************************************************************************/
 
 static inline bool atb_MemSpan_IsValid(struct atb_MemSpan span) {

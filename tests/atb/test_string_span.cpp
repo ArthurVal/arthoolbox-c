@@ -87,11 +87,10 @@ TEST(AtbStringSpanTest, Slice) {
 }
 
 TEST(AtbStringSpanDeathTest, Slice) {
-  EXPECT_DEBUG_DEATH(atb_StrSpan_Slice(K_ATB_STRSPAN_INVALID, 0, 0),
-                     "atb_StrSpan_IsValid\\\(span\\)");
+  EXPECT_DEBUG_DEATH(atb_StrSpan_Slice(K_ATB_STRSPAN_INVALID, 0, 0), "IsValid");
 
   EXPECT_DEBUG_DEATH(atb_StrSpan_ShrinkBack(K_ATB_STRSPAN_INVALID, 0),
-                     "atb_StrSpan_IsValid\\\(span\\)");
+                     "IsValid");
 }
 
 } // namespace
