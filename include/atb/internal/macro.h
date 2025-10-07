@@ -1,6 +1,6 @@
 #pragma once
 
-#define atb_internal_ARGN_200                                                 \
+#define ATB_INTERNAL_ARGN_200                                                 \
   200, 199, 198, 197, 196, 195, 194, 193, 192, 191, 190, 189, 188, 187, 186,  \
       185, 184, 183, 182, 181, 180, 179, 178, 177, 176, 175, 174, 173, 172,   \
       171, 170, 169, 168, 167, 166, 165, 164, 163, 162, 161, 160, 159, 158,   \
@@ -15,7 +15,7 @@
       30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, \
       12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
-#define atb_internal_ARGN_IMPL_200(                                            \
+#define ATB_INTERNAL_ARGN_IMPL_200(                                            \
     _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, \
     _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, \
     _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, \
@@ -34,33 +34,33 @@
     ...)                                                                       \
   N
 
-#define atb_internal_ARGN(...) atb_internal_ARGN_IMPL_200(__VA_ARGS__)
+#define ATB_INTERNAL_ARGN(...) ATB_INTERNAL_ARGN_IMPL_200(__VA_ARGS__)
 
-#define atb_internal_TKN_CONCAT_IMPL(a, b) a##b
+#define ATB_INTERNAL_TKN_CONCAT_IMPL(a, b) a##b
 
-#define atb_internal_TKN_CONCAT_0()
-#define atb_internal_TKN_CONCAT_1(a) a
-#define atb_internal_TKN_CONCAT_2(a, b) atb_internal_TKN_CONCAT_IMPL(a, b)
-#define atb_internal_TKN_CONCAT_3(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_2(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_4(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_3(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_5(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_4(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_6(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_5(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_7(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_6(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_8(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_7(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_9(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_8(__VA_ARGS__))
-#define atb_internal_TKN_CONCAT_10(a, ...) \
-  atb_internal_TKN_CONCAT_2(a, atb_internal_TKN_CONCAT_9(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_0()
+#define ATB_INTERNAL_TKN_CONCAT_1(a) a
+#define ATB_INTERNAL_TKN_CONCAT_2(a, b) ATB_INTERNAL_TKN_CONCAT_IMPL(a, b)
+#define ATB_INTERNAL_TKN_CONCAT_3(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_2(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_4(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_3(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_5(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_4(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_6(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_5(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_7(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_6(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_8(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_7(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_9(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_8(__VA_ARGS__))
+#define ATB_INTERNAL_TKN_CONCAT_10(a, ...) \
+  ATB_INTERNAL_TKN_CONCAT_2(a, ATB_INTERNAL_TKN_CONCAT_9(__VA_ARGS__))
 
-#define atb_internal_TKN_CONCAT_N_IMPL(N, ...) \
-  atb_internal_TKN_CONCAT_##N(__VA_ARGS__)
-#define atb_internal_TKN_CONCAT_N(N, ...) \
-  atb_internal_TKN_CONCAT_N_IMPL(N, __VA_ARGS__)
+#define ATB_INTERNAL_TKN_CONCAT_N_IMPL(N, ...) \
+  ATB_INTERNAL_TKN_CONCAT_##N(__VA_ARGS__)
+#define ATB_INTERNAL_TKN_CONCAT_N(N, ...) \
+  ATB_INTERNAL_TKN_CONCAT_N_IMPL(N, __VA_ARGS__)
 
-#define atb_internal_TKN_STR(a) #a
+#define ATB_INTERNAL_TKN_STR(a) #a
