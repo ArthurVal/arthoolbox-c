@@ -8,8 +8,8 @@ namespace atb {
 auto operator<<(std::ostream &os,
                 const atb_View_Copy_Opt_t &opt) -> std::ostream & {
   os << '{';
-  os << ".truncate=" << (opt.truncate ? 'Y' : 'N');
-  os << ".overlap=" << (opt.overlap ? 'Y' : 'N');
+  os << ".truncate=" << (opt.truncate ? 'Y' : 'N') << ", ";
+  os << ".overlap=" << (opt.overlap ? 'Y' : 'N') << ", ";
   os << '}';
   return os;
 }
@@ -18,8 +18,8 @@ ATB_SPAN_VIEW_DEFINE(, Span_u32, View_u32, std::uint32_t);
 
 auto WriteTo(std::ostream &os, const View_u32 &view) {
   os << '{';
-  os << ".data=" << (void *)view.data;
-  os << ".size=" << view.size;
+  os << ".data=" << (void *)view.data << ", ";
+  os << ".size=" << view.size << ", ";
   os << '}';
 
   if (view.data == nullptr) {
