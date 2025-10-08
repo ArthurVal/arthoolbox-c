@@ -1,6 +1,7 @@
 #include "test_span.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <numeric>
 
 namespace atb {
@@ -14,9 +15,11 @@ auto operator<<(std::ostream &os,
   return os;
 }
 
+namespace {
+
 ATB_SPAN_VIEW_DEFINE(, Span_u32, View_u32, std::uint32_t);
 
-auto WriteTo(std::ostream &os, const View_u32 &view) {
+auto WriteTo(std::ostream &os, View_u32 view) {
   os << '{';
   os << ".data=" << (void *)view.data << ", ";
   os << ".size=" << view.size << ", ";
@@ -38,29 +41,11 @@ std::ostream &operator<<(std::ostream &os, View_u32 view) {
   return os;
 }
 
-auto operator==(View_u32 lhs, View_u32 rhs) noexcept -> bool {
-  return (lhs.data == rhs.data) && (lhs.size == rhs.size);
-}
-
-auto operator!=(View_u32 lhs, View_u32 rhs) noexcept -> bool {
-  return !(lhs == rhs);
-}
-
 std::ostream &operator<<(std::ostream &os, Span_u32 span) {
   os << "Span_u32";
   WriteTo(os, View_u32_From_Span(span));
   return os;
 }
-
-auto operator==(Span_u32 lhs, Span_u32 rhs) noexcept -> bool {
-  return (lhs.data == rhs.data) && (lhs.size == rhs.size);
-}
-
-auto operator!=(Span_u32 lhs, Span_u32 rhs) noexcept -> bool {
-  return !(lhs == rhs);
-}
-
-namespace {
 
 DefineFieldsMatchFor(Span_u32, 2, data, size);
 
