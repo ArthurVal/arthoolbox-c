@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}-test
   test_ratio.cpp
   test_time.cpp
   test_span.cpp
+  test_span_ints.cpp
   test_memory_span.cpp
   # test_memory_view.cpp
   # test_string_span.cpp
