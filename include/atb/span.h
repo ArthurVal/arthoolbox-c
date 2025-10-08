@@ -327,7 +327,9 @@ typedef struct atb_View_Copy_Opt {
                                                                           \
     *remaining = SPAN##_Shrink(dest, view.size, K_ATB_SPAN_SHRINK_FRONT); \
     return true;                                                          \
-  }
+  }                                                                       \
+                                                                          \
+  static_assert(true, "SEMI-COLON NEEDED HERE")
 
 #if defined(__cplusplus)
 }
