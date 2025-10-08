@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <numeric>
 
-namespace atb {
-
 auto operator<<(std::ostream &os,
                 const atb_View_Copy_Opt_t &opt) -> std::ostream & {
   os << '{';
@@ -15,35 +13,29 @@ auto operator<<(std::ostream &os,
   return os;
 }
 
+namespace atb {
+
 namespace {
 
 ATB_SPAN_VIEW_DEFINE(, Span_u32, View_u32, std::uint32_t);
 
-auto WriteTo(std::ostream &os, View_u32 view) {
-  os << '{';
-  os << ".data=" << (void *)view.data << ", ";
-  os << ".size=" << view.size << ", ";
-  os << '}';
+static_assert(IsSpan_v<Span_u32>);
+static_assert(
+    std::is_same_v<std::uint32_t, typename SpanTraits<Span_u32>::value_type>);
 
-  if (view.data == nullptr) {
-    os << " -> /!\\ INVALID";
-  } else if (view.size != 0) {
-    os << " -> [";
-    std::uint32_t const *value = nullptr;
-    atb_AnySpan_ForEach(value, view) { os << *value << ", "; }
-    os << ']';
-  }
-}
+static_assert(IsSpan_v<View_u32>);
+static_assert(std::is_same_v<const std::uint32_t,
+                             typename SpanTraits<View_u32>::value_type>);
 
 std::ostream &operator<<(std::ostream &os, View_u32 view) {
   os << "View_u32";
-  WriteTo(os, view);
+  StreamSpanTo(os, view);
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os, Span_u32 span) {
   os << "Span_u32";
-  WriteTo(os, View_u32_From_Span(span));
+  StreamSpanTo(os, View_u32_From_Span(span));
   return os;
 }
 

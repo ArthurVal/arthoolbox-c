@@ -437,5 +437,5 @@ auto operator<<(std::ostream &os, const atb_Error &err) -> std::ostream & {
 
 auto operator<<(std::ostream &os,
                 const atb_Error *const err) -> std::ostream & {
-  return atb::PrintPtrTo(os, err);
+  return atb::StreamPtrTo(os, err);
 }

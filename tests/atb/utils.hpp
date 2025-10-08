@@ -2,11 +2,40 @@
 
 #include <cstdio>
 #include <string>
+#include <type_traits>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 namespace atb {
+
+namespace details {
+
+template <class, template <class...> class Trait, class... Args>
+struct HasTraitImpl : std::false_type {};
+
+template <template <class...> class Trait, class... Args>
+struct HasTraitImpl<std::void_t<Trait<Args...>>, Trait, Args...>
+    : std::true_type {};
+
+} // namespace details
+
+/// Returns TRUE when the given type Trait<Args...> is a valid type (SFINAE)
+///
+/// Use it like this:
+///
+/// // Create a trait...
+/// template <class ...T>
+/// using FooFunction = decltype(Foo(std::declval<T>()...));
+///
+/// // ...Then use HasTrait:
+/// static_assert(HasTrait_v<FooFunction, int, float, char>);
+/// // -> True if `Foo(int, float, char)` exists
+template <template <class...> class Trait, class... Args>
+struct HasTrait : details::HasTraitImpl<void, Trait, Args...> {};
+
+template <template <class...> class Trait, class... Args>
+constexpr bool HasTrait_v = HasTrait<Trait, Args...>::value;
 
 template <class... Args>
 auto MakeStringFromFmt(const char *fmt, Args &&...args) -> std::string {
@@ -16,15 +45,52 @@ auto MakeStringFromFmt(const char *fmt, Args &&...args) -> std::string {
   return out;
 }
 
-template <class T>
-auto PrintPtrTo(std::ostream &os, T const *const ptr) -> std::ostream & {
-  os << (void *)ptr;
+namespace details {
 
-  if (ptr != nullptr) {
-    os << " -> " << *ptr;
+template <class Sink, class T>
+using StreamOperatorExists =
+    decltype(std::declval<Sink>() << std::declval<T>());
+
+template <class Sink, class T, bool>
+struct IsStreamableToImpl : std::false_type {};
+
+template <class Sink, class T>
+struct IsStreamableToImpl<Sink, T, true>
+    : std::is_same<Sink, decltype(std::declval<Sink>() << std::declval<T>())> {
+};
+
+} // namespace details
+
+template <class Sink, class T>
+struct IsStreamableTo
+    : details::IsStreamableToImpl<
+          Sink, T, HasTrait_v<details::StreamOperatorExists, Sink, T>> {};
+
+template <class Sink, class T>
+constexpr bool IsStreamableTo_v = IsStreamableTo<Sink, T>::value;
+
+template <class Sink, class T>
+constexpr auto TryToStreamTo(Sink &s, T &&value,
+                             std::string_view backup = "<?>") -> Sink & {
+  if constexpr (IsStreamableTo_v<decltype(s), decltype(value)>) {
+    s << std::forward<T>(value);
+  } else {
+    s << backup;
   }
 
-  return os;
+  return s;
+}
+
+template <class Sink, class T>
+constexpr auto StreamPtrTo(Sink &s, T const *const ptr) -> Sink & {
+  s << (void *)ptr;
+
+  if (ptr != nullptr) {
+    s << " -> ";
+    TryToStreamTo(s, *ptr);
+  }
+
+  return s;
 }
 
 template <class Pred>
