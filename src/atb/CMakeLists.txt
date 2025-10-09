@@ -2,6 +2,7 @@ add_library(${PROJECT_NAME}
   ratio.c
   time.c
   error.c
+  span/string.c
   allocator/default.c
 )
 

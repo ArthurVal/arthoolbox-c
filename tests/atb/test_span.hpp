@@ -43,7 +43,7 @@ template <class T>
 struct SpanTraits : details::SpanTraitsImpl<T, IsSpan_v<T>> {};
 
 template <class Sink, class T>
-auto StreamSpanTo(Sink &sink, T span) -> Sink & {
+auto StreamSpanLayoutTo(Sink &sink, T span) -> Sink & {
   static_assert(IsSpan_v<T>);
 
   sink << '{';
@@ -51,15 +51,32 @@ auto StreamSpanTo(Sink &sink, T span) -> Sink & {
   sink << ".size=" << span.size << ", ";
   sink << '}';
 
-  if (span.data == nullptr) {
-    sink << " -> /!\\ INVALID";
-  } else if (span.size != 0 and
-             IsStreamableTo_v<Sink &, decltype(*span.data)>) {
-    sink << " -> [";
+  return sink;
+}
+
+template <class Sink, class T>
+auto StreamSpanContentTo(Sink &sink, T span,
+                         std::string_view sep = ", ") -> Sink & {
+  static_assert(IsSpan_v<T>);
+
+  if (span.data != nullptr) {
     auto const *value = span.data;
-    atb_AnySpan_ForEach(value, span) { sink << *value << ", "; }
-    sink << ']';
+    atb_AnySpan_ForEach(value, span) { sink << *value << sep; }
+  } else {
+    sink << "N/A";
   }
+
+  return sink;
+}
+
+template <class Sink, class T>
+auto StreamSpanTo(Sink &sink, T span) -> Sink & {
+  static_assert(IsSpan_v<T>);
+
+  StreamSpanLayoutTo(sink, span);
+  sink << " -> [";
+  StreamSpanContentTo(sink, span);
+  sink << ']';
 
   return sink;
 }

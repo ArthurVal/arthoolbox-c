@@ -10,10 +10,9 @@ add_executable(${PROJECT_NAME}-test
   test_time.cpp
   test_span.cpp
   test_span_ints.cpp
+  test_span_string.cpp
   test_memory_span.cpp
   # test_memory_view.cpp
-  # test_string_span.cpp
-  # test_string_view.cpp
   test_allocator.cpp
   test_allocator_default.cpp
 )
