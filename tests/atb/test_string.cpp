@@ -8,6 +8,23 @@ using namespace std::string_view_literals;
 namespace atb {
 namespace {
 
+TEST(AtbStringDeathTest, FromInt) {
+  char str[50];
+  const atb_StrSpan dest = atb_AnySpan_From_Array(str);
+
+  EXPECT_DEBUG_DEATH(atb_String_FromInt_u(12345, (ATB_INT_BASE)37, dest,
+                                          nullptr, K_ATB_ERROR_IGNORED),
+                     "IsValid\\(base\\)");
+
+  EXPECT_DEBUG_DEATH(atb_String_FromInt_u(12345, (ATB_INT_BASE)1, dest, nullptr,
+                                          K_ATB_ERROR_IGNORED),
+                     "IsValid\\(base\\)");
+
+  EXPECT_DEBUG_DEATH(atb_String_FromInt_u(12345, (ATB_INT_BASE)(-1), dest,
+                                          nullptr, K_ATB_ERROR_IGNORED),
+                     "IsValid\\(base\\)");
+}
+
 TEST(AtbStringTest, FromInt) {
   char str[50];
   const atb_StrSpan dest = atb_AnySpan_From_Array(str);
@@ -124,6 +141,16 @@ TEST(AtbStringTest, FromInt) {
   EXPECT_EQ(std::string_view(str), "DEADBEEF"sv);
   EXPECT_EQ(remaining.data, std::next(dest.data, "DEADBEEF"sv.size()));
   EXPECT_EQ(remaining.size, dest.size - "DEADBEEF"sv.size());
+
+  // UNSIGNED - WEIRD BASE
+  std::fill(std::begin(str), std::end(str), '\0');
+  remaining = K_ATB_ANYSPAN_INVALID;
+  EXPECT_TRUE(
+      atb_String_FromInt_u(36 - 1, (ATB_INT_BASE)36, dest, &remaining, &err))
+      << err;
+  EXPECT_EQ(std::string_view(str), "Z"sv);
+  EXPECT_EQ(remaining.data, std::next(dest.data, "Z"sv.size()));
+  EXPECT_EQ(remaining.size, dest.size - "Z"sv.size());
 
   // dest too small
   std::fill(std::begin(str), std::end(str), '\0');
