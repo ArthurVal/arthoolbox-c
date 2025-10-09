@@ -2,30 +2,22 @@
 
 #include <stdlib.h>
 
-static bool DefaultAllocator_Alloc(void *data, struct atb_MemSpan orig,
-                                   size_t size, struct atb_MemSpan *const mem,
-                                   struct atb_Error *const err) {
-  if (atb_MemSpan_IsValid(orig)) {
-    data = realloc(orig.data, size);
-  } else {
-    data = malloc(size);
+static void *DefaultAllocator_Alloc(void *data, void *orig, size_t size,
+                                    struct atb_Error *const err) {
+  data = realloc(orig, size);
+
+  if (data == NULL) {
+    atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_NOT_ENOUGH_MEMORY);
   }
 
-  if (data != NULL) {
-    mem->data = data;
-    mem->size = size;
-    return true;
-  } else {
-    atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_NOT_ENOUGH_MEMORY);
-    return false;
-  }
+  return data;
 }
 
-static bool DefaultAllocator_Release(void *data, struct atb_MemSpan mem,
+static bool DefaultAllocator_Release(void *data, void *mem,
                                      struct atb_Error *const err) {
   (void)data;
   (void)err;
-  free(mem.data);
+  free(mem);
   return true;
 }
 

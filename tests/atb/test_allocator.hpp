@@ -2,7 +2,6 @@
 
 #include "atb/allocator.h"
 #include "test_error.hpp"
-#include "test_memory_span.hpp"
 #include "utils.hpp"
 
 namespace atb {
@@ -10,12 +9,10 @@ namespace atb {
 struct MockAllocator {
   MOCK_METHOD(void, Delete, ());
 
-  MOCK_METHOD(bool, Alloc,
-              (struct atb_MemSpan orig, size_t size,
-               struct atb_MemSpan *const out, struct atb_Error *const err));
+  MOCK_METHOD(void *, Alloc,
+              (void *orig, size_t size, struct atb_Error *const err));
 
-  MOCK_METHOD(bool, Release,
-              (struct atb_MemSpan mem, struct atb_Error *const err));
+  MOCK_METHOD(bool, Release, (void *mem, struct atb_Error *const err));
 
   MockAllocator();
 
@@ -24,12 +21,10 @@ struct MockAllocator {
  private:
   static void DoDelete(void *mock);
 
-  static bool DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
-                      struct atb_MemSpan *const out,
-                      struct atb_Error *const err);
+  static void *DoAlloc(void *mock, void *orig, size_t size,
+                       struct atb_Error *const err);
 
-  static bool DoRelease(void *mock, struct atb_MemSpan mem,
-                        struct atb_Error *const err);
+  static bool DoRelease(void *mock, void *mem, struct atb_Error *const err);
 
   const atb_Allocator m_itf;
 };

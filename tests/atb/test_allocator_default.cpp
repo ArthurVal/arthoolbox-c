@@ -1,40 +1,36 @@
 #include "atb/allocator/default.h"
-#include "gtest/gtest.h"
-#include "test_error.hpp"
-#include "test_memory_span.hpp"
+#include "test_allocator.hpp"
 
 namespace {
 
 TEST(AtbAllocatorDefaultTest, AllocRelease) {
   atb_Error err;
 
-  auto mem = K_ATB_MEMSPAN_INVALID;
+  auto size = 10u;
+  char *mem = nullptr;
 
   // malloc
-  EXPECT_PRED5(atb_Allocator_Alloc, atb_DefaultAllocator(), mem, 10, &mem, &err)
-      << err;
-
-  EXPECT_THAT(mem, testing::Not(atb::FieldsMatch(K_ATB_MEMSPAN_INVALID)));
-  EXPECT_EQ(mem.size, 10);
+  mem = reinterpret_cast<char *>(
+      atb_Allocator_Alloc(atb_DefaultAllocator(), nullptr, size, &err));
+  EXPECT_THAT(mem, testing::Not(nullptr)) << err;
 
   // Seg fault ?
-  atb_MemSpan_Fill(mem, 0xFF);
-
-  auto previous = mem;
+  std::fill_n(mem, size, 0xFF);
 
   // realloc
-  EXPECT_PRED5(atb_Allocator_Alloc, atb_DefaultAllocator(), mem, 20, &mem, &err)
-      << err;
-  EXPECT_THAT(mem, testing::Not(atb::FieldsMatch(previous)));
-  EXPECT_EQ(mem.size, 20);
+  size = size * 2;
+  mem = reinterpret_cast<char *>(
+      atb_Allocator_Alloc(atb_DefaultAllocator(), mem, size, &err));
+  EXPECT_THAT(mem, testing::Not(nullptr)) << err;
 
   // Seg fault ?
-  atb_MemSpan_Fill(mem, 0xAB);
+  std::fill_n(mem, size, 0xAB);
 
   // free
-  EXPECT_PRED3(atb_Allocator_Release, atb_DefaultAllocator(), &mem, &err)
+  EXPECT_TRUE(atb_Allocator_Release(atb_DefaultAllocator(),
+                                    reinterpret_cast<void **>(&mem), &err))
       << err;
-  EXPECT_THAT(mem, atb::FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, nullptr);
 }
 
 } // namespace

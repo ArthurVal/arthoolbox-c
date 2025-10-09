@@ -4,7 +4,6 @@
 #include <stddef.h>
 
 #include "atb/error.h"
-#include "atb/memory/span.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -17,14 +16,14 @@ struct atb_Allocator {
   /// Optional interface in charge of desctructing/deleting the allocator
   void (*Delete)(void *data);
 
-  /// Mandatory Interface in charge of allocating a memory block \a mem \a n
-  /// bytes Whenever \a orgi is Valid, this interface perform a re-alloc
-  bool (*Alloc)(void *data, struct atb_MemSpan orig, size_t size,
-                struct atb_MemSpan *const out, struct atb_Error *const err);
+  /// Mandatory Interface in charge of allocating a memory block \a n
+  /// bytes Whenever \a orgi is Valid, this interface perform a re-alloc.
+  /// Returns NULL when failure.
+  void *(*Alloc)(void *data, void *orig, size_t size,
+                 struct atb_Error *const err);
 
   /// Mandatory Interface in charge of freeing/releasing a memory block
-  bool (*Release)(void *data, struct atb_MemSpan mem,
-                  struct atb_Error *const err);
+  bool (*Release)(void *data, void *mem, struct atb_Error *const err);
 };
 
 /**
@@ -39,25 +38,21 @@ static inline void atb_Allocator_Delete(struct atb_Allocator const *const self);
  *
  *  \param[in] orig If valid, indicates that we wish to RE-allocate memory
  *  \param[in] n Number of bytes we wish to (re-)allocate
- *  \param[out] out Memory block allocated
  *  \param[out] err Error set when failure occurs
  *
- *  \return bool True whenever the allocation succeeded, false otherwsie and err
- *               is set (if not ignored) accordingly.
+ *  \return void* The memory block allocated. NULL in case of failure.
  *
  *  \pre self != NULL
  *  \pre self->Alloc != NULL
- *  \pre mem != NULL
  */
-static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
-                                       struct atb_MemSpan orig, size_t size,
-                                       struct atb_MemSpan *const out,
-                                       struct atb_Error *const err);
+static inline void *atb_Allocator_Alloc(struct atb_Allocator const *const self,
+                                        void *orig, size_t size,
+                                        struct atb_Error *const err);
 
 /**
  *  \brief Free/release the underlying memory block allocated.
  *
- *  \param[inout] mem Memory block to de-allocate. Will be invalidated when
+ *  \param[inout] mem Memory block to de-allocate. Will be set to NULL when
  *                    success.
  *
  *  \return bool True whenever the operation succeeded. Otherwise false and err
@@ -68,39 +63,29 @@ static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
  *  \pre mem != NULL
  */
 static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
-                                         struct atb_MemSpan *const mem,
+                                         void **mem,
                                          struct atb_Error *const err);
 
 /*****************************************************************************/
-/*                         STATIC INLINE DEFINITIONS */
+/*                         STATIC INLINE DEFINITIONS                         */
 /*****************************************************************************/
+
 static inline void atb_Allocator_Delete(
     struct atb_Allocator const *const self) {
   assert(self != NULL);
-
   if (self->Delete) self->Delete(self->data);
 }
 
-static inline bool atb_Allocator_Alloc(struct atb_Allocator const *const self,
-                                       struct atb_MemSpan orig, size_t size,
-                                       struct atb_MemSpan *const out,
-                                       struct atb_Error *const err) {
+static inline void *atb_Allocator_Alloc(struct atb_Allocator const *const self,
+                                        void *orig, size_t size,
+                                        struct atb_Error *const err) {
   assert(self != NULL);
   assert(self->Alloc != NULL);
-  assert(out != NULL);
-
-  bool success = self->Alloc(self->data, orig, size, out, err);
-
-  /* DEBUG Safety check */
-  if (success) {
-    assert(out->size == size);
-  }
-
-  return success;
+  return self->Alloc(self->data, orig, size, err);
 }
 
 static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
-                                         struct atb_MemSpan *const mem,
+                                         void **mem,
                                          struct atb_Error *const err) {
   assert(self != NULL);
   assert(self->Release != NULL);
@@ -108,9 +93,9 @@ static inline bool atb_Allocator_Release(struct atb_Allocator const *const self,
 
   bool success = true;
 
-  if (atb_MemSpan_IsValid(*mem)) {
+  if (*mem != NULL) {
     if (self->Release(self->data, *mem, err)) {
-      *mem = K_ATB_MEMSPAN_INVALID;
+      *mem = NULL;
     } else {
       success = false;
     }

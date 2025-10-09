@@ -10,7 +10,7 @@ struct AtbAllocatorTest : testing::Test {
     using testing::_;
     using testing::Return;
     ON_CALL(mock, Delete()).WillByDefault(Return());
-    ON_CALL(mock, Alloc(_, _, _, _)).WillByDefault(Return(false));
+    ON_CALL(mock, Alloc(_, _, _)).WillByDefault(Return(nullptr));
     ON_CALL(mock, Release(_, _)).WillByDefault(Return(false));
   }
 
@@ -39,64 +39,49 @@ TEST_F(AtbAllocatorTest, Delete) {
 }
 
 TEST_F(AtbAllocatorDeathTest, Alloc) {
-  atb_MemSpan res;
+  ON_CALL(mock, Alloc(nullptr, 2, K_ATB_ERROR_IGNORED))
+      .WillByDefault(testing::Return(reinterpret_cast<void *>(0x42)));
 
-  ON_CALL(mock, Alloc(FieldsMatch(K_ATB_MEMSPAN_INVALID), 2, &res,
-                      K_ATB_ERROR_IGNORED))
-      .WillByDefault(testing::Return(true));
-
-  EXPECT_DEBUG_DEATH(atb_Allocator_Alloc(nullptr, K_ATB_MEMSPAN_INVALID, 2,
-                                         &res, K_ATB_ERROR_IGNORED),
-                     "self != NULL");
-
-  EXPECT_DEBUG_DEATH(atb_Allocator_Alloc(mock.Itf(), K_ATB_MEMSPAN_INVALID, 2,
-                                         nullptr, K_ATB_ERROR_IGNORED),
-                     "out != NULL");
-
-  EXPECT_DEBUG_DEATH(atb_Allocator_Alloc(mock.Itf(), K_ATB_MEMSPAN_INVALID, 2,
-                                         &res, K_ATB_ERROR_IGNORED),
-                     "out->size == size");
+  EXPECT_DEBUG_DEATH(
+      atb_Allocator_Alloc(nullptr, nullptr, 2, K_ATB_ERROR_IGNORED),
+      "self != NULL");
 
   atb_Allocator wrong_alloc;
   wrong_alloc.Alloc = nullptr;
-  EXPECT_DEBUG_DEATH(atb_Allocator_Alloc(&wrong_alloc, K_ATB_MEMSPAN_INVALID, 2,
-                                         &res, K_ATB_ERROR_IGNORED),
-                     "self->Alloc != NULL");
+  EXPECT_DEBUG_DEATH(
+      atb_Allocator_Alloc(&wrong_alloc, nullptr, 2, K_ATB_ERROR_IGNORED),
+      "self->Alloc != NULL");
 }
 
 TEST_F(AtbAllocatorTest, Alloc) {
-  using testing::DoAll;
   using testing::Return;
-  using testing::SetArgPointee;
 
-  atb_MemSpan orig = K_ATB_MEMSPAN_INVALID;
-  atb_MemSpan res;
-  EXPECT_CALL(mock, Alloc(FieldsMatch(orig), 42, &res, K_ATB_ERROR_IGNORED))
-      .WillOnce(Return(false))
-      .WillOnce(
-          DoAll(SetArgPointee<2>(atb_MemSpan{.data = nullptr, .size = 42}),
-                Return(true)))
+  void *orig = nullptr;
+  EXPECT_CALL(mock, Alloc(orig, 42, K_ATB_ERROR_IGNORED))
+      .WillOnce(Return(nullptr))
+      .WillOnce(Return(reinterpret_cast<void *>(0x42)))
       .RetiresOnSaturation();
 
-  EXPECT_FALSE(
-      atb_Allocator_Alloc(mock.Itf(), orig, 42, &res, K_ATB_ERROR_IGNORED));
-  EXPECT_TRUE(
-      atb_Allocator_Alloc(mock.Itf(), orig, 42, &res, K_ATB_ERROR_IGNORED));
+  EXPECT_EQ(atb_Allocator_Alloc(mock.Itf(), orig, 42, K_ATB_ERROR_IGNORED),
+            nullptr);
+
+  EXPECT_EQ(atb_Allocator_Alloc(mock.Itf(), orig, 42, K_ATB_ERROR_IGNORED),
+            reinterpret_cast<void *>(0x42));
 
   atb_Error err;
-  EXPECT_CALL(mock, Alloc(FieldsMatch(orig), 42, &res, &err))
-      .WillOnce(
-          DoAll(SetArgPointee<2>(atb_MemSpan{.data = nullptr, .size = 42}),
-                Return(true)))
-      .WillOnce(Return(false))
+  EXPECT_CALL(mock, Alloc(orig, 42, &err))
+      .WillOnce(Return(nullptr))
+      .WillOnce(Return(reinterpret_cast<void *>(0x43)))
       .RetiresOnSaturation();
 
-  EXPECT_TRUE(atb_Allocator_Alloc(mock.Itf(), orig, 42, &res, &err));
-  EXPECT_FALSE(atb_Allocator_Alloc(mock.Itf(), orig, 42, &res, &err));
+  EXPECT_EQ(atb_Allocator_Alloc(mock.Itf(), orig, 42, &err), nullptr);
+  EXPECT_EQ(atb_Allocator_Alloc(mock.Itf(), orig, 42, &err),
+            reinterpret_cast<void *>(0x43));
 }
 
 TEST_F(AtbAllocatorDeathTest, Release) {
-  atb_MemSpan mem;
+  int v;
+  void *mem = &v;
 
   EXPECT_DEBUG_DEATH(atb_Allocator_Release(nullptr, &mem, K_ATB_ERROR_IGNORED),
                      "self != NULL");
@@ -116,27 +101,28 @@ TEST_F(AtbAllocatorTest, Release) {
   using testing::Return;
 
   atb_Error err;
-  auto mem = K_ATB_MEMSPAN_INVALID;
+  void *mem = nullptr;
 
   EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, nullptr);
 
   EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, &err));
-  EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, nullptr);
 
   int v;
-  mem = atb_MemSpan_From_Value(v);
+  mem = &v;
 
-  EXPECT_CALL(mock, Release(FieldsMatch(mem), K_ATB_ERROR_IGNORED))
+  EXPECT_CALL(mock, Release(&v, K_ATB_ERROR_IGNORED))
       .WillOnce(Return(false))
       .WillOnce(Return(true))
       .RetiresOnSaturation();
 
+  mem = &v;
   EXPECT_FALSE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, FieldsMatch(atb_MemSpan_From_Value(v)));
+  EXPECT_THAT(mem, &v);
 
   EXPECT_TRUE(atb_Allocator_Release(mock.Itf(), &mem, K_ATB_ERROR_IGNORED));
-  EXPECT_THAT(mem, FieldsMatch(K_ATB_MEMSPAN_INVALID));
+  EXPECT_THAT(mem, nullptr);
 }
 
 } // namespace
@@ -155,13 +141,12 @@ void MockAllocator::DoDelete(void *mock) {
   return reinterpret_cast<MockAllocator *>(mock)->Delete();
 }
 
-bool MockAllocator::DoAlloc(void *mock, struct atb_MemSpan orig, size_t size,
-                            struct atb_MemSpan *const out,
-                            struct atb_Error *const err) {
-  return reinterpret_cast<MockAllocator *>(mock)->Alloc(orig, size, out, err);
+void *MockAllocator::DoAlloc(void *mock, void *orig, size_t size,
+                             struct atb_Error *const err) {
+  return reinterpret_cast<MockAllocator *>(mock)->Alloc(orig, size, err);
 }
 
-bool MockAllocator::DoRelease(void *mock, struct atb_MemSpan mem,
+bool MockAllocator::DoRelease(void *mock, void *const mem,
                               struct atb_Error *const err) {
   return reinterpret_cast<MockAllocator *>(mock)->Release(mem, err);
 }
