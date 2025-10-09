@@ -1,7 +1,5 @@
 #include "atb/string.h"
 
-#include "math.h"
-
 static const struct atb_StrView m_digits =
     atb_StrView_From_StrLiteral_INIT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -13,19 +11,7 @@ static size_t Int_StrWidth_u(uintmax_t value, ATB_INT_BASE base) {
   size_t width = 1;
 
   if (value != 0) {
-    switch (base) {
-      case K_ATB_INT_BIN:
-        width += (size_t)log2((double)value);
-        break;
-      case K_ATB_INT_DEC:
-        width += (size_t)log10((double)value);
-        break;
-      default:
-        /* Count by hands... */
-        while ((value /= base) != 0) {
-          width += 1;
-        }
-    }
+    while ((value /= base) != 0) width++;
   }
 
   return width;
