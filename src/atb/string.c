@@ -2,6 +2,13 @@
 
 #include "math.h"
 
+static const struct atb_StrView m_digits =
+    atb_StrView_From_StrLiteral_INIT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+static bool INT_BASE_IsValid(ATB_INT_BASE base) {
+  return (2 <= base) && (base <= m_digits.size);
+}
+
 static size_t Int_StrWidth_u(uintmax_t value, ATB_INT_BASE base) {
   size_t width = 1;
 
@@ -37,15 +44,11 @@ static size_t Int_StrWidth_i(intmax_t value, ATB_INT_BASE base) {
 
 static void String_FromInt_u(uintmax_t value, ATB_INT_BASE base,
                              struct atb_StrSpan dest) {
-  const struct atb_StrView digits =
-      atb_StrView_From_StrLiteral_INIT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  assert((2 <= base) && (base < digits.size));
-
   char *const d_last = atb_AnySpan_End(dest);
   char *d_byte = d_last;
 
   do {
-    *(--d_byte) = digits.data[value % base];
+    *(--d_byte) = m_digits.data[value % base];
     value /= base;
   } while (value != 0);
 }
@@ -54,6 +57,8 @@ bool atb_String_FromInt_u(uintmax_t value, ATB_INT_BASE base,
                           struct atb_StrSpan dest,
                           struct atb_StrSpan *const remaining,
                           struct atb_Error *const err) {
+  assert(INT_BASE_IsValid(base));
+
   bool success = true;
   size_t value_width = Int_StrWidth_u(value, base);
 
@@ -78,6 +83,8 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
                           struct atb_StrSpan dest,
                           struct atb_StrSpan *const remaining,
                           struct atb_Error *const err) {
+  assert(INT_BASE_IsValid(base));
+
   bool success = true;
   size_t value_width = Int_StrWidth_i(value, base);
   uintmax_t unsigned_value;
