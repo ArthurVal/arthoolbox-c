@@ -4,6 +4,7 @@ add_library(${PROJECT_NAME}
   error.c
   span/ints.c
   span/string.c
+  string.c
   allocator/default.c
 )
 

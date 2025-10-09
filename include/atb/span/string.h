@@ -40,10 +40,6 @@ ATB_PUBLIC extern struct atb_StrView atb_StrView_From_NullTerminated(
     const char *other);
 /**@}*/
 
-/*****************************************************************************/
-/*                         STATIC INLINE DEFINITIONS                         */
-/*****************************************************************************/
-
 #if defined(__cplusplus)
 }
 #endif
