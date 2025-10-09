@@ -81,7 +81,11 @@ typedef struct atb_View_Copy_Opt {
 ///   2 spans;
 /// - `_[Eq, Ne, Lt, Gt, Le, Ge](span, span) -> bool`: Compare 2 spans;
 #define ATB_SPAN_DECLARE(SPECIFIER, NAME, T)                       \
-  struct NAME;                                                     \
+  struct NAME {                                                    \
+    T *data;                                                       \
+    size_t size;                                                   \
+  };                                                               \
+                                                                   \
   SPECIFIER struct NAME NAME##_From(T *, size_t);                  \
   SPECIFIER bool NAME##_IsValid(struct NAME);                      \
   SPECIFIER size_t NAME##_SizeBytes(struct NAME);                  \
@@ -94,9 +98,10 @@ typedef struct atb_View_Copy_Opt {
   SPECIFIER atb_Cmp_t NAME##_Compare(struct NAME, struct NAME);    \
   ATB_CMP_DECLARE_ALL(SPECIFIER, NAME##_, struct NAME)
 
-/// Define a span struct named \a NAME, representing a contiguous, NON-OWNING,
-/// range of values of type \a T, and all its associated functions.
-/// All functions are defined using \a SPECIFIER as specifiers.
+/// Define all functions associated to a span-like struct named \a NAME (struct
+/// needs to be defined beforehands), representing a contiguous, NON-OWNING,
+/// range of values of type \a T. All functions are defined using \a SPECIFIER
+/// as specifiers.
 ///
 /// Functions defined are the following:
 /// - `_From(ptr, size) -> SPAN`: Create a span from the given ptr/size;
@@ -117,11 +122,6 @@ typedef struct atb_View_Copy_Opt {
 ///   2 spans;
 /// - `_[Eq, Ne, Lt, Gt, Le, Ge](span, span) -> bool`: Compare 2 spans;
 #define ATB_SPAN_DEFINE(SPECIFIER, NAME, T)                                  \
-  struct NAME {                                                              \
-    T *data;                                                                 \
-    size_t size;                                                             \
-  };                                                                         \
-                                                                             \
   SPECIFIER struct NAME NAME##_From(T *other, size_t size) {                 \
     struct NAME s;                                                           \
     s.data = other;                                                          \
@@ -217,6 +217,8 @@ typedef struct atb_View_Copy_Opt {
 /// associated functions. All functions are declared using \a SPECIFIER as
 /// specifiers
 ///
+/// \pre struct NAME has been defined beforehands
+///
 /// Functions declared for EACH structs individually (i.e. SPAN and VIEW):
 /// - `_From(ptr, size) -> span`: Create a span from the given ptr/size;
 /// - `_IsValid(span) -> bool`: Indicates if the span is VALID;
@@ -241,16 +243,16 @@ typedef struct atb_View_Copy_Opt {
 ///
 /// Functions declared only for VIEW ONLY:
 /// - `_From_Span(span) -> view`: Create a view from given span;
-/// - `_Copy(view, span, opt) -> span`: Copy elements of view into span and
-///   returns the remaining space inside the destination span if succeeded to
-///   copy. Otherwise returns an INVALID span;
-#define ATB_SPAN_VIEW_DECLARE(SPECIFIER, SPAN, VIEW, T)       \
-  ATB_SPAN_DECLARE(SPECIFIER, SPAN, T);                       \
-  SPECIFIER void SPAN##_Fill(struct SPAN, T const *const);    \
-  ATB_SPAN_DECLARE(SPECIFIER, VIEW, const T);                 \
-  SPECIFIER struct VIEW VIEW##_From_Span(struct SPAN);        \
-  SPECIFIER struct SPAN VIEW##_Copy(struct VIEW, struct SPAN, \
-                                    atb_View_Copy_Opt_t)
+/// - `_Copy(view, dest, opt, remaining) -> bool`: Copy elements of view
+///   into dest. If succeeded (returned true), remaining is set to the remaining
+///   space inside the destination span;
+#define ATB_SPAN_VIEW_DECLARE(SPECIFIER, SPAN, VIEW, T)                     \
+  ATB_SPAN_DECLARE(SPECIFIER, SPAN, T);                                     \
+  SPECIFIER void SPAN##_Fill(struct SPAN, T const *const);                  \
+  ATB_SPAN_DECLARE(SPECIFIER, VIEW, const T);                               \
+  SPECIFIER struct VIEW VIEW##_From_Span(struct SPAN);                      \
+  SPECIFIER bool VIEW##_Copy(struct VIEW, struct SPAN, atb_View_Copy_Opt_t, \
+                             struct SPAN *const)
 
 /// Define a PAIR of struct corresponding to a span (modifiable) and a view
 /// (constant) (respectively named \a SPAN and \a VIEW), representing a

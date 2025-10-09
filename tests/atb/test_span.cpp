@@ -17,7 +17,7 @@ namespace atb {
 
 namespace {
 
-ATB_SPAN_VIEW_DEFINE(, Span_u32, View_u32, std::uint32_t);
+ATB_SPAN_VIEW_DECLARE(, Span_u32, View_u32, std::uint32_t);
 
 static_assert(IsSpan_v<Span_u32>);
 static_assert(
@@ -752,6 +752,8 @@ TEST_F(AtbViewTest, Copy) {
               FieldsMatch(Span_u32{std::next(span.data, view.size), 0}));
   EXPECT_THAT(buff, ElementsAre(10, 11, 12, 10, 11, 12, 13));
 }
+
+ATB_SPAN_VIEW_DEFINE(, Span_u32, View_u32, std::uint32_t);
 
 } // namespace
 

@@ -9,7 +9,8 @@
 extern "C" {
 #endif
 
-#define _ATB_DEFINE_INT_SPANS(T, NAME, ...) \
+#define _ATB_DEFINE_INT_SPANS(T, NAME, ...)                                  \
+  ATB_SPAN_VIEW_DECLARE(static inline, atb_Span_##NAME, atb_View_##NAME, T); \
   ATB_SPAN_VIEW_DEFINE(static inline, atb_Span_##NAME, atb_View_##NAME, T);
 
 ATB_INTS_X_FOREACH(_ATB_DEFINE_INT_SPANS)
