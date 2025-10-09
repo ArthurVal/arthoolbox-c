@@ -25,4 +25,5 @@ struct MockErrorFormatter {
 };
 
 DefineFieldsMatchFor(atb_Error, 2, category, code);
+
 } // namespace atb

@@ -431,7 +431,7 @@ auto MockErrorFormatter::DoDescribe(void *data, atb_ErrorCode_t code,
 
 auto operator<<(std::ostream &os, const atb_Error &err) -> std::ostream & {
   os << "atb_Error"
-     << atb::MakeStringFromFmt(K_ATB_ERROR_FMT, atb_Error_FMT_VA_ARG(err));
+     << atb::MakeStringFromFmt(K_ATB_FMT_ERROR, ATB_FMT_VA_ARG_ERROR(err));
   return os;
 }
 

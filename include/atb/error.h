@@ -21,32 +21,22 @@ typedef int32_t atb_ErrorCode_t;
 /// Error described using an error code (int) and an error category, use to
 /// describe and distinguish code values between different domains.
 struct atb_Error {
-  union {
-    struct {
-      atb_ErrorCategory_t category; /*!< Error domain/category */
-      atb_ErrorCode_t code;         /*!< Error code */
-    };
-    uint64_t raw; /*!< Serial raw repr of the error */
-  };
+  atb_ErrorCategory_t category; /*!< Error domain/category */
+  atb_ErrorCode_t code;         /*!< Error code */
 };
 
 static_assert(sizeof(struct atb_Error) == sizeof(uint64_t), "");
 
 /* Format string helper ****************************************************/
 
-#define K_ATB_ERROR_FMT_RAW "%#.8X"
-#define atb_Error_FMT_RAW_VA_ARG(err) (err).raw
-
-#define K_ATB_ERROR_FMT \
-  "{.raw=" K_ATB_ERROR_FMT_RAW " -> .category=%#.2X, .code=%i}"
-#define atb_Error_FMT_VA_ARG(err) \
-  atb_Error_FMT_RAW_VA_ARG(err), (err).category, (err).code
+#define K_ATB_FMT_ERROR "{.category=%#.2X, .code=%i}"
+#define ATB_FMT_VA_ARG_ERROR(err) (err).category, (err).code
 
 /* Constant ****************************************************************/
 
 /// Sentinel value used to signal that we wish to ignore an error when calling a
 /// function
-#define K_ATB_ERROR_IGNORED (struct atb_Error*)NULL
+#define K_ATB_ERROR_IGNORED (struct atb_Error *)NULL
 
 /* Operations **************************************************************/
 
