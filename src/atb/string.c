@@ -107,13 +107,3 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
 
   return success;
 }
-
-/* #define _DECLARE_FROM_INT(T, NAME, ...)                    \ */
-/*   ATB_PUBLIC extern bool atb_String_FromInt_##NAME(        \ */
-/*       T value, ATB_INT_BASE base, struct atb_StrSpan dest, \ */
-/*       struct atb_StrSpan *const remaining, struct atb_Error *const err);
- */
-
-/* ATB_INTS_X_FOREACH(_DECLARE_FROM_INT) */
-
-/* #undef _DECLARE_FROM_INT */
