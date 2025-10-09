@@ -10,6 +10,7 @@ extern "C" {
 
 #define _ATB_DECLARE_INT_SPANS(T, NAME, ...) \
   ATB_SPAN_VIEW_DECLARE(ATB_PUBLIC extern, atb_Span_##NAME, atb_View_##NAME, T);
+
 ATB_INTS_X_FOREACH(_ATB_DECLARE_INT_SPANS)
 
 #undef _ATB_DECLARE_INT_SPANS
