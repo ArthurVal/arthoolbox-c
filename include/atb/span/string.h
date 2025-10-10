@@ -40,6 +40,20 @@ ATB_PUBLIC extern struct atb_StrView atb_StrView_From_NullTerminated(
     const char *other);
 /**@}*/
 
+/**
+ * \brief Indicates if \a str starts with \a prefix
+ *
+ * \param[in] str String we wish to check for
+ * \param[in] prefix Prefix we are looking for
+ *
+ * \returns bool True when \a str starts with \a prefix
+ *
+ * \pre IsValid(str)
+ * \pre IsValid(prefix)
+ */
+ATB_PUBLIC extern bool atb_StrView_StartsWith(struct atb_StrView str,
+                                              struct atb_StrView prefix);
+
 #if defined(__cplusplus)
 }
 #endif
