@@ -84,6 +84,52 @@ TEST(AtbSpanStringTest, StartsWith) {
                                       atb_StrView_From_StrLiteral("")));
 }
 
+TEST(AtbSpanStringDeathTest, EndsWith) {
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                           K_ATB_ANYSPAN_INVALID),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_EndsWith(K_ATB_ANYSPAN_INVALID,
+                           atb_StrView_From_StrLiteral("Chocolatine")),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_EndsWith(K_ATB_ANYSPAN_INVALID, K_ATB_ANYSPAN_INVALID),
+      "IsValid");
+}
+
+TEST(AtbSpanStringTest, EndsWith) {
+  EXPECT_TRUE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                   atb_StrView_From_StrLiteral("e")));
+
+  EXPECT_TRUE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                   atb_StrView_From_StrLiteral("ne")));
+
+  EXPECT_TRUE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                   atb_StrView_From_StrLiteral("ine")));
+
+  EXPECT_TRUE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                   atb_StrView_From_StrLiteral("Chocolatine")));
+
+  EXPECT_FALSE(
+      atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                           atb_StrView_From_StrLiteral("Chocolatinecoucou")));
+
+  EXPECT_FALSE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                    atb_StrView_From_StrLiteral("cou")));
+
+  EXPECT_FALSE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                    atb_StrView_From_StrLiteral("Kou")));
+
+  EXPECT_FALSE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                    atb_StrView_From_StrLiteral("Co ")));
+
+  EXPECT_FALSE(atb_StrView_EndsWith(atb_StrView_From_StrLiteral("Chocolatine"),
+                                    atb_StrView_From_StrLiteral("")));
+}
+
 } // namespace
 
 } // namespace atb

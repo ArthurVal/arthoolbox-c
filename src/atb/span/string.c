@@ -24,3 +24,16 @@ extern bool atb_StrView_StartsWith(struct atb_StrView str,
 
   return success;
 }
+
+extern bool atb_StrView_EndsWith(struct atb_StrView str,
+                                 struct atb_StrView prefix) {
+  assert(atb_StrView_IsValid(str));
+  assert(atb_StrView_IsValid(prefix));
+
+  bool success = false;
+  if ((prefix.size != 0) && (prefix.size <= str.size)) {
+    success = atb_StrView_Eq(prefix, atb_StrView_Last(str, prefix.size));
+  }
+
+  return success;
+}
