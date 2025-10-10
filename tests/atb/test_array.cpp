@@ -38,15 +38,21 @@ TEST(AtbArrayTest, ForEach) {
   int *expected_ptr = toto;
   std::size_t i = 0;
 
-  atb_Array_ForEach(v, toto) {
+  atb_Array_ForEachUnsafe(v, toto) {
     EXPECT_EQ(v, expected_ptr++);
     EXPECT_EQ(*v, toto[i++]);
   }
 
-  atb_Array_ForEachR(v, toto) {
+  atb_Array_RForEachUnsafe(v, toto) {
     EXPECT_EQ(v, --expected_ptr);
     EXPECT_EQ(*v, toto[--i]);
   }
+
+  atb_Array_ForEach(v, toto, *v == 2) {}
+  EXPECT_EQ(*v, toto[2]);
+
+  atb_Array_RForEach(v, toto, *v == 1) {}
+  EXPECT_EQ(*v, toto[1]);
 }
 
 } // namespace

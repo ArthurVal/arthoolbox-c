@@ -110,7 +110,45 @@ extern "C" {
  *    puts("- Begin");
  *
  *    int *elem = NULL;
- *    atb_Array_ForEach(elem, my_static_array) {
+ *    atb_Array_ForEach(elem, my_static_array, *elem == 4) {
+ *      printf("%d, ", *elem);
+ *    }
+ *
+ *    puts("\n- End");
+ *
+ *    return 0;
+ *  }
+ *  \endcode
+ *
+ *  STDOUT Output:
+ *  - Begin
+ *  1, 2, 3,
+ *  - End
+ *
+ *  \param[out] elem Raw pointer of the an array elements used to iterate
+ *  \param[in] array Static C array (size known at compile time, do not work on
+ *                   raw pointers)
+ *  \param[in] predicate Safe predicate used to quits the loop prematurely when
+ *                       it evaluates to TRUE
+ */
+#define atb_Array_ForEach(elem, array, predicate) \
+  for (elem = atb_Array_Begin(array);             \
+       (elem != atb_Array_End(array)) && (!(predicate)); ++elem)
+
+/**
+ *  \brief Same as _ForEach without the safe predicate
+ *
+ *  Example:
+ *
+ *  \code
+ *  int main(int argc, char** argv) {
+ *
+ *    int may_static_array[] = {1,2,3,4,5,6};
+ *
+ *    puts("- Begin");
+ *
+ *    int *elem = NULL;
+ *    atb_Array_ForEachUnsafe(elem, my_static_array) {
  *      printf("%d, ", *elem);
  *    }
  *
@@ -129,8 +167,8 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_ForEach(elem, array) \
-  for (elem = atb_Array_Begin(array); elem != atb_Array_End(array); ++elem)
+#define atb_Array_ForEachUnsafe(elem, array) \
+  atb_Array_ForEach(elem, array, false)
 
 /**
  *  \return The address of the LAST element of a static array
@@ -140,7 +178,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_BeginR(array) atb_Array_End(array) - 1
+#define atb_Array_RBegin(array) atb_Array_End(array) - 1
 
 /**
  *  \return The address of the ONE BEFORE THE FIRST element of a static array
@@ -152,7 +190,7 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_EndR(array) atb_Array_BeginR(array) - atb_Array_Size(array)
+#define atb_Array_REnd(array) atb_Array_RBegin(array) - atb_Array_Size(array)
 
 /**
  *  \brief Same as _ForEach but in REVERSE order
@@ -167,7 +205,45 @@ extern "C" {
  *    puts("- Begin");
  *
  *    int *elem = NULL;
- *    atb_Array_ForEachR(elem, my_static_array) {
+ *    atb_Array_ForEachR(elem, my_static_array, *elem == 4) {
+ *      printf("%d, ", *elem);
+ *    }
+ *
+ *    puts("\n- End");
+ *
+ *    return 0;
+ *  }
+ *  \endcode
+ *
+ *  STDOUT Output:
+ *  - Begin
+ *  6, 5,
+ *  - End
+ *
+ *  \param[out] elem Raw pointer of the an array elements used to iterate
+ *  \param[in] array Static C array (size known at compile time, do not work on
+ *                   raw pointers)
+ *  \param[in] predicate Safe predicate used to quits the loop prematurely when
+ *                       it evaluates to TRUE
+ */
+#define atb_Array_RForEach(elem, array, predicate) \
+  for (elem = atb_Array_RBegin(array);             \
+       (elem != atb_Array_REnd(array)) && (!(predicate)); --elem)
+
+/**
+ *  \brief Same as _RForEach without the safe predicate
+ *
+ *  Example:
+ *
+ *  \code
+ *  int main(int argc, char** argv) {
+ *
+ *    int may_static_array[] = {1,2,3,4,5,6};
+ *
+ *    puts("- Begin");
+ *
+ *    int *elem = NULL;
+ *    atb_Array_RForEachUnsafe(elem, my_static_array) {
  *      printf("%d, ", *elem);
  *    }
  *
@@ -186,8 +262,8 @@ extern "C" {
  *  \param[in] array Static C array (size known at compile time, do not work on
  *                   raw pointers)
  */
-#define atb_Array_ForEachR(elem, array) \
-  for (elem = atb_Array_BeginR(array); elem != atb_Array_EndR(array); --elem)
+#define atb_Array_RForEachUnsafe(elem, array) \
+  atb_Array_RForEach(elem, array, false)
 
 #if defined(__cplusplus)
 } /* extern "C" */
