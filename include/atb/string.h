@@ -35,8 +35,8 @@ typedef enum {
  *                       integer.
  * \param[out] err Optional. Error set whenever the operation failed.
  *                 Possible values are:
- *                 - K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE: When the provided \a
- *                   dest is too small to fit the int string repr
+ *                 - GENERIC_VALUE_TOO_LARGE: When the provided \a dest is too
+ *                   small to fit the int string repr;
  *
  * \returns bool True on success. False otherwise, \a err is set accordingly and
  *               both dest and remaining remains untouched.
