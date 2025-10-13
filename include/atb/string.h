@@ -34,7 +34,7 @@ typedef enum {
  *
  *  \param[in] str The input str to check for an INT base qualifier
  *  \param[out] base The base found
- *  \param[out] remaining Remaining part of the input striped of the base
+ *  \param[out] remaining Optional Part of the input striped of the base
  *  \param[out] err Optional. Error set whenever the operation failed.
  *                  Possible values are:
  *                  - GENERIC_INVALID_ARGUMENT: The \a str is too smal (size 0)
@@ -43,6 +43,8 @@ typedef enum {
  *
  * \returns bool True on success. False otherwise, \a err is set accordingly and
  *               both \a base and \a remaining remain untouched.
+ *
+ *  \pre base != NULL
  */
 ATB_PUBLIC bool atb_String_ToIntBase(struct atb_StrView str,
                                      ATB_INT_BASE *const base,
