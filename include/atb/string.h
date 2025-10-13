@@ -20,6 +20,35 @@ typedef enum {
   K_ATB_INT_HEX = 16, /*!< Hexadecimal */
 } ATB_INT_BASE;
 
+/**
+ *  \brief Try to deduce the base from a str.
+ *
+ *  Expected base prefix are the following:
+ *  - '0x' | '0X': K_ATB_INT_HEX;
+ *  - '0b' | '0B': K_ATB_INT_BIN;
+ *  - '0'  | '0o': K_ATB_INT_OCT;
+ *  - Any digits (optionally starting with '-'): K_ATB_INT_DEC
+ *
+ *  If none of the previous is found at the begin of the input view, this is
+ *  considered as an error.
+ *
+ *  \param[in] str The input str to check for an INT base qualifier
+ *  \param[out] base The base found
+ *  \param[out] remaining Remaining part of the input striped of the base
+ *  \param[out] err Optional. Error set whenever the operation failed.
+ *                  Possible values are:
+ *                  - GENERIC_INVALID_ARGUMENT: The \a str is too smal (size 0)
+ *                  - GENERIC_ARGUMENT_OUT_OF_DOMAIN: The \a str doesn't start
+ *                    with a base qualifier NOR a digit
+ *
+ * \returns bool True on success. False otherwise, \a err is set accordingly and
+ *               both \a base and \a remaining remain untouched.
+ */
+ATB_PUBLIC bool atb_String_ToIntBase(struct atb_StrView str,
+                                     ATB_INT_BASE *const base,
+                                     struct atb_StrView *const remaining,
+                                     struct atb_Error *const err);
+
 /**@{*/
 /**
  * \brief Convert the given \a value to its string repr into \a dest.

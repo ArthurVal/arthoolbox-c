@@ -19,6 +19,7 @@ static size_t Int_StrWidth_u(uintmax_t value, ATB_INT_BASE base) {
 
 static size_t Int_StrWidth_i(intmax_t value, ATB_INT_BASE base) {
   size_t width = 0;
+
   if (value < 0) {
     width = 1 + Int_StrWidth_u((uintmax_t)(~value + 1), base);
   } else {
@@ -96,6 +97,66 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
     }
 
     String_FromInt_u(unsigned_value, base, dest);
+  }
+
+  return success;
+}
+
+bool atb_String_ToIntBase(struct atb_StrView str, ATB_INT_BASE *const base,
+                          struct atb_StrView *const remaining,
+                          struct atb_Error *const err) {
+  bool success = true;
+
+  if (str.size == 0) {
+    atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
+    success = false;
+  } else if (!isdigit(str.data[0]) && (str.data[0] != '-')) {
+    // Neither starts with a digit NOR '-'
+    atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN);
+    success = false;
+  } else if ((str.data[0] == '-') &&
+             ((str.size == 1) || (!isdigit(str.data[1])))) {
+    // Starts '-' but either:
+    // - of size == 1
+    // - followed by something that's not a digit
+    atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN);
+    success = false;
+  } else if ((str.data[0] == '0') && (str.size > 1)) {
+    // Starts with digit '0' of size > 1
+    if (isdigit(str.data[1])) {
+      // Second char IS a digit
+      *base = K_ATB_INT_OCT;
+      *remaining = atb_StrView_Shrink(str, 1, K_ATB_SPAN_SHRINK_FRONT);
+    } else {
+      // Second char IS NOT a digit -> Base qualifier OR single 0
+      switch (str.data[1]) {
+        case 'x':
+        case 'X':
+          *base = K_ATB_INT_HEX;
+          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          break;
+
+        case 'b':
+        case 'B':
+          *base = K_ATB_INT_BIN;
+          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          break;
+
+        case 'o':
+          *base = K_ATB_INT_OCT;
+          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          break;
+
+        default:
+          // This means that str == "0<SOMETHING NOT DIGIT>", should be parsed
+          // as 0
+          *base = K_ATB_INT_DEC;
+          *remaining = str;
+      }
+    }
+  } else {
+    *base = K_ATB_INT_DEC;
+    *remaining = str;
   }
 
   return success;
