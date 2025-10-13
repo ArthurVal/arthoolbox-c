@@ -105,7 +105,10 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
 bool atb_String_ToIntBase(struct atb_StrView str, ATB_INT_BASE *const base,
                           struct atb_StrView *const remaining,
                           struct atb_Error *const err) {
+  assert(base != NULL);
+
   bool success = true;
+  size_t base_offset = 0;
 
   if (str.size == 0) {
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_INVALID_ARGUMENT);
@@ -126,37 +129,39 @@ bool atb_String_ToIntBase(struct atb_StrView str, ATB_INT_BASE *const base,
     if (isdigit(str.data[1])) {
       // Second char IS a digit
       *base = K_ATB_INT_OCT;
-      *remaining = atb_StrView_Shrink(str, 1, K_ATB_SPAN_SHRINK_FRONT);
+      base_offset = 1;
     } else {
       // Second char IS NOT a digit -> Base qualifier OR single 0
       switch (str.data[1]) {
         case 'x':
         case 'X':
           *base = K_ATB_INT_HEX;
-          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          base_offset = 2;
           break;
 
         case 'b':
         case 'B':
           *base = K_ATB_INT_BIN;
-          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          base_offset = 2;
           break;
 
         case 'o':
           *base = K_ATB_INT_OCT;
-          *remaining = atb_StrView_Shrink(str, 2, K_ATB_SPAN_SHRINK_FRONT);
+          base_offset = 2;
           break;
 
         default:
           // This means that str == "0<SOMETHING NOT DIGIT>", should be parsed
           // as 0
           *base = K_ATB_INT_DEC;
-          *remaining = str;
       }
     }
   } else {
     *base = K_ATB_INT_DEC;
-    *remaining = str;
+  }
+
+  if (success && (remaining != NULL)) {
+    *remaining = atb_StrView_Shrink(str, base_offset, K_ATB_SPAN_SHRINK_FRONT);
   }
 
   return success;
