@@ -73,7 +73,7 @@ extern "C" {
  *  \param[in] idx Index we wish to check for
  */
 #define atb_Array_IsOutOfRange(array, idx) \
-  (((idx) < 0) || (atb_Array_Size(array) <= (idx)))
+  (((idx) < 0) || (atb_Array_Size(array) <= (size_t)(idx)))
 
 /**
  *  \return The address of the FIRST element of a static array
