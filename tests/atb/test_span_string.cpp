@@ -130,6 +130,74 @@ TEST(AtbSpanStringTest, EndsWith) {
                                     atb_StrView_From_StrLiteral("")));
 }
 
+TEST(AtbSpanStringDeathTest, Find) {
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                       K_ATB_ANYSPAN_INVALID, NULL),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find(K_ATB_ANYSPAN_INVALID,
+                       atb_StrView_From_StrLiteral("Chocolatine"), NULL),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find(K_ATB_ANYSPAN_INVALID, K_ATB_ANYSPAN_INVALID, NULL),
+      "IsValid");
+}
+
+TEST(AtbSpanStringTest, Find) {
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("co"), NULL));
+
+  size_t offset = 0;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("co"), &offset));
+  EXPECT_EQ(offset, 3);
+
+  offset = 1;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("Chocolatine"),
+                               &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 1;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("Cho"), &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 1;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("ChotineCho"),
+                               atb_StrView_From_StrLiteral("Cho"), &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 0;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("la"), &offset));
+  EXPECT_EQ(offset, 5);
+
+  offset = 0;
+  EXPECT_TRUE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                               atb_StrView_From_StrLiteral("e"), &offset));
+  EXPECT_EQ(offset, 10);
+
+  offset = 20;
+  EXPECT_FALSE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                                atb_StrView_From_StrLiteral("tina"), &offset));
+  EXPECT_EQ(offset, 20);
+
+  offset = 20;
+  EXPECT_FALSE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                                atb_StrView_From_StrLiteral("Chocolatine "),
+                                &offset));
+  EXPECT_EQ(offset, 20);
+
+  offset = 20;
+  EXPECT_FALSE(atb_StrView_Find(atb_StrView_From_StrLiteral("Chocolatine"),
+                                atb_StrView_From_StrLiteral(""), &offset));
+  EXPECT_EQ(offset, 20);
+}
+
 } // namespace
 
 } // namespace atb

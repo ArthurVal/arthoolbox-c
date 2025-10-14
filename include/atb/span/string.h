@@ -68,6 +68,24 @@ ATB_PUBLIC extern bool atb_StrView_StartsWith(struct atb_StrView str,
 ATB_PUBLIC extern bool atb_StrView_EndsWith(struct atb_StrView str,
                                             struct atb_StrView suffix);
 
+/**
+ * \brief Try to find the FIRST appearance of underlying \a substring in \a str
+ *
+ * \param[in] str String we wish to check for
+ * \param[in] substr Substring pattern we are looking for inside \a str
+ * \param[out] where Optionally (when not NULL), set to where the \a substr has
+ *                   been found inside \a str
+ *
+ * \returns bool True when \a substr has been found inside \a str. False
+ *               otherwise and \a where is left untouched.
+ *
+ * \pre IsValid(str)
+ * \pre IsValid(pattern)
+ */
+ATB_PUBLIC extern bool atb_StrView_Find(struct atb_StrView str,
+                                        struct atb_StrView substr,
+                                        size_t *const where);
+
 #if defined(__cplusplus)
 }
 #endif
