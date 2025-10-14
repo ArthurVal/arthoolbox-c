@@ -180,8 +180,8 @@ TEST(AtbStringTest, FromInt) {
 
 TEST(AtbStringDeathTest, ToIntBase) {
   EXPECT_DEBUG_DEATH(
-      atb_String_ToIntBase(atb_StrView_From_StrLiteral("3058u018u"), nullptr,
-                           nullptr, K_ATB_ERROR_IGNORED),
+      atb_String_GetIntBase(atb_StrView_From_StrLiteral("3058u018u"), nullptr,
+                            nullptr, K_ATB_ERROR_IGNORED),
       "base != NULL");
 }
 
@@ -192,102 +192,102 @@ TEST(AtbStringTest, ToIntBase) {
   ATB_INT_BASE base;
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_DEC);
   EXPECT_EQ(ToSv(remaining), "0");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("12378"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("12378"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_DEC);
   EXPECT_EQ(ToSv(remaining), "12378");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("-12"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("-12"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_DEC);
   EXPECT_EQ(ToSv(remaining), "-12");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0x12378"),
-                                   &base, &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0x12378"),
+                                    &base, &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_HEX);
   EXPECT_EQ(ToSv(remaining), "12378");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0XAF"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0XAF"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_HEX);
   EXPECT_EQ(ToSv(remaining), "AF");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0xbF"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0xbF"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_HEX);
   EXPECT_EQ(ToSv(remaining), "bF");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0777"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0777"), &base,
+                                    &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_OCT);
   EXPECT_EQ(ToSv(remaining), "777");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0o2135"), &base,
-                                   &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0o2135"),
+                                    &base, &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_OCT);
   EXPECT_EQ(ToSv(remaining), "2135");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0b10010"),
-                                   &base, &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0b10010"),
+                                    &base, &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_BIN);
   EXPECT_EQ(ToSv(remaining), "10010");
 
   remaining = K_ATB_ANYSPAN_INVALID;
-  EXPECT_TRUE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("0B10010"),
-                                   &base, &remaining, &err))
+  EXPECT_TRUE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("0B10010"),
+                                    &base, &remaining, &err))
       << err;
   EXPECT_EQ(base, K_ATB_INT_BIN);
   EXPECT_EQ(ToSv(remaining), "10010");
 
   // FAILS:
-  EXPECT_FALSE(atb_String_ToIntBase(atb_StrView_From_StrLiteral(""), &base,
-                                    &remaining, &err))
+  EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral(""), &base,
+                                     &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
   EXPECT_THAT(err, FieldsMatch((atb_Error){
                        K_ATB_ERROR_GENERIC,
                        K_ATB_ERROR_GENERIC_INVALID_ARGUMENT,
                    }));
 
-  EXPECT_FALSE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("A0B10010"),
-                                    &base, &remaining, &err))
+  EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("A0B10010"),
+                                     &base, &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
   EXPECT_THAT(err, FieldsMatch((atb_Error){
                        K_ATB_ERROR_GENERIC,
                        K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
                    }));
 
-  EXPECT_FALSE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("-"), &base,
-                                    &remaining, &err))
+  EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("-"), &base,
+                                     &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
   EXPECT_THAT(err, FieldsMatch((atb_Error){
                        K_ATB_ERROR_GENERIC,
                        K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
                    }));
 
-  EXPECT_FALSE(atb_String_ToIntBase(atb_StrView_From_StrLiteral("-A"), &base,
-                                    &remaining, &err))
+  EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("-A"), &base,
+                                     &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
   EXPECT_THAT(err, FieldsMatch((atb_Error){
                        K_ATB_ERROR_GENERIC,

@@ -104,9 +104,9 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
   return success;
 }
 
-bool atb_String_ToIntBase(struct atb_StrView str, ATB_INT_BASE *const base,
-                          struct atb_StrView *const remaining,
-                          struct atb_Error *const err) {
+bool atb_String_GetIntBase(struct atb_StrView str, ATB_INT_BASE *const base,
+                           struct atb_StrView *const remaining,
+                           struct atb_Error *const err) {
   assert(base != NULL);
 
   bool success = true;
