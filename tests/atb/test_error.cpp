@@ -4,7 +4,7 @@ namespace atb {
 namespace {
 
 TEST(AtbErrorTest, Ignored) {
-  EXPECT_PRED1(atb_Error_IsIgnored, (atb_Error *)K_ATB_ERROR_IGNORED);
+  EXPECT_PRED1(atb_Error_IsIgnored, K_ATB_ERROR_IGNORED);
 
   atb_Error err;
   EXPECT_NPRED1(atb_Error_IsIgnored, &err);
