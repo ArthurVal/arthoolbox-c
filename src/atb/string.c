@@ -31,14 +31,14 @@ static size_t Int_StrWidth_i(intmax_t value, ATB_INT_BASE base) {
   return width;
 }
 
-static void String_FromInt_u(uintmax_t value, ATB_INT_BASE base,
+static void String_FromInt_u(uintmax_t value, struct atb_StrView base,
                              struct atb_StrSpan dest) {
   char *const d_last = atb_AnySpan_End(dest);
   char *d_byte = d_last;
 
   do {
-    *(--d_byte) = m_digits.data[value % base];
-    value /= base;
+    *(--d_byte) = base.data[value % base.size];
+    value /= base.size;
   } while (value != 0);
 }
 
@@ -57,7 +57,8 @@ bool atb_String_FromInt_u(uintmax_t value, ATB_INT_BASE base,
     atb_GenericError_Set(err, K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE);
     success = false;
   } else {
-    String_FromInt_u(value, base, atb_StrSpan_First(dest, value_width));
+    String_FromInt_u(value, atb_StrView_First(m_digits, base),
+                     atb_StrSpan_First(dest, value_width));
 
     if (remaining != NULL) {
       *remaining =
@@ -98,7 +99,7 @@ bool atb_String_FromInt_i(intmax_t value, ATB_INT_BASE base,
       unsigned_value = (uintmax_t)value;
     }
 
-    String_FromInt_u(unsigned_value, base, dest);
+    String_FromInt_u(unsigned_value, atb_StrView_First(m_digits, base), dest);
   }
 
   return success;
