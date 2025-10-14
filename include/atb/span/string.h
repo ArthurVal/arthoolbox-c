@@ -15,11 +15,11 @@ extern "C" {
 
 ATB_SPAN_VIEW_DECLARE(ATB_PUBLIC extern, atb_StrSpan, atb_StrView, char);
 
-/// Constrcut a StrView from a string literal (static initializer)
+/// Construct a StrView from a string literal (static initializer)
 #define atb_StrView_From_StrLiteral_INIT(str) \
   { .data = str, .size = atb_Array_Size(str) - 1, }
 
-/// Constrcut a StrView from a string literal (compound literal)
+/// Construct a StrView from a string literal (compound literal)
 #define atb_StrView_From_StrLiteral(str) \
   (struct atb_StrView) atb_StrView_From_StrLiteral_INIT(str)
 
