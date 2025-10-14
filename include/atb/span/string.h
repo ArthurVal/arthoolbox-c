@@ -76,11 +76,10 @@ ATB_PUBLIC extern bool atb_StrView_EndsWith(struct atb_StrView str,
  * \param[out] where Optionally (when not NULL), set to where the \a substr has
  *                   been found inside \a str
  *
- * \returns bool True when \a substr has been found inside \a str. False
- *               otherwise and \a where is left untouched.
+ * \returns bool True one success. False otherwise, \a where is left untouched.
  *
  * \pre IsValid(str)
- * \pre IsValid(pattern)
+ * \pre IsValid(substr)
  */
 ATB_PUBLIC extern bool atb_StrView_Find(struct atb_StrView str,
                                         struct atb_StrView substr,
@@ -94,14 +93,13 @@ ATB_PUBLIC extern bool atb_StrView_Find(struct atb_StrView str,
  * \param[out] where Optionally (when not NULL), set to where the \a substr has
  *                   been found inside \a str
  *
- * \returns bool True when \a substr has been found inside \a str. False
- *               otherwise and \a where is left untouched.
+ * \returns bool True one success. False otherwise, \a where is left untouched.
  *
  * \pre IsValid(str)
- * \pre IsValid(pattern)
+ * \pre IsValid(substr)
  */
 ATB_PUBLIC extern bool atb_StrView_RFind(struct atb_StrView str,
-                                         struct atb_StrView pattern,
+                                         struct atb_StrView substr,
                                          size_t *const where);
 
 #if defined(__cplusplus)
