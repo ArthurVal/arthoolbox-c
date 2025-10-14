@@ -80,22 +80,23 @@ typedef struct atb_View_Copy_Opt {
 /// - `_Compare(span, span) -> int`: Three-way comparison (lexicographically) of
 ///   2 spans;
 /// - `_[Eq, Ne, Lt, Gt, Le, Ge](span, span) -> bool`: Compare 2 spans;
-#define ATB_SPAN_DECLARE(SPECIFIER, NAME, T)                       \
-  struct NAME {                                                    \
-    T *data;                                                       \
-    size_t size;                                                   \
-  };                                                               \
-                                                                   \
-  SPECIFIER struct NAME NAME##_From(T *, size_t);                  \
-  SPECIFIER bool NAME##_IsValid(struct NAME);                      \
-  SPECIFIER size_t NAME##_SizeBytes(struct NAME);                  \
-  SPECIFIER bool NAME##_IsOverlapping(struct NAME, struct NAME);   \
-  SPECIFIER struct NAME NAME##_First(struct NAME, size_t);         \
-  SPECIFIER struct NAME NAME##_Last(struct NAME, size_t);          \
-  SPECIFIER struct NAME NAME##_Shrink(struct NAME, size_t,         \
-                                      ATB_SPAN_SHRINK_DIR);        \
-  SPECIFIER struct NAME NAME##_Slice(struct NAME, size_t, size_t); \
-  SPECIFIER atb_Cmp_t NAME##_Compare(struct NAME, struct NAME);    \
+#define ATB_SPAN_DECLARE(SPECIFIER, NAME, T)                                \
+  struct NAME {                                                             \
+    T *data;                                                                \
+    size_t size;                                                            \
+  };                                                                        \
+                                                                            \
+  SPECIFIER struct NAME NAME##_From(T *begin, size_t size);                 \
+  SPECIFIER bool NAME##_IsValid(struct NAME span);                          \
+  SPECIFIER size_t NAME##_SizeBytes(struct NAME span);                      \
+  SPECIFIER bool NAME##_IsOverlapping(struct NAME span, struct NAME other); \
+  SPECIFIER struct NAME NAME##_First(struct NAME span, size_t n);           \
+  SPECIFIER struct NAME NAME##_Last(struct NAME span, size_t n);            \
+  SPECIFIER struct NAME NAME##_Shrink(struct NAME span, size_t n,           \
+                                      ATB_SPAN_SHRINK_DIR dir);             \
+  SPECIFIER struct NAME NAME##_Slice(struct NAME span, size_t begin,        \
+                                     size_t count);                         \
+  SPECIFIER atb_Cmp_t NAME##_Compare(struct NAME lhs, struct NAME rhs);     \
   ATB_CMP_DECLARE_ALL(SPECIFIER, NAME##_, struct NAME)
 
 /// Define all functions associated to a span-like struct named \a NAME (struct
@@ -246,13 +247,14 @@ typedef struct atb_View_Copy_Opt {
 /// - `_Copy(view, dest, opt, remaining) -> bool`: Copy elements of view
 ///   into dest. If succeeded (returned true), remaining is set to the remaining
 ///   space inside the destination span;
-#define ATB_SPAN_VIEW_DECLARE(SPECIFIER, SPAN, VIEW, T)                     \
-  ATB_SPAN_DECLARE(SPECIFIER, SPAN, T);                                     \
-  SPECIFIER void SPAN##_Fill(struct SPAN, T const *const);                  \
-  ATB_SPAN_DECLARE(SPECIFIER, VIEW, const T);                               \
-  SPECIFIER struct VIEW VIEW##_From_Span(struct SPAN);                      \
-  SPECIFIER bool VIEW##_Copy(struct VIEW, struct SPAN, atb_View_Copy_Opt_t, \
-                             struct SPAN *const)
+#define ATB_SPAN_VIEW_DECLARE(SPECIFIER, SPAN, VIEW, T)               \
+  ATB_SPAN_DECLARE(SPECIFIER, SPAN, T);                               \
+  SPECIFIER void SPAN##_Fill(struct SPAN span, T const *const value); \
+  ATB_SPAN_DECLARE(SPECIFIER, VIEW, const T);                         \
+  SPECIFIER struct VIEW VIEW##_From_Span(struct SPAN span);           \
+  SPECIFIER bool VIEW##_Copy(struct VIEW view, struct SPAN dest,      \
+                             atb_View_Copy_Opt_t opt,                 \
+                             struct SPAN *const remaining)
 
 /// Define a PAIR of struct corresponding to a span (modifiable) and a view
 /// (constant) (respectively named \a SPAN and \a VIEW), representing a
