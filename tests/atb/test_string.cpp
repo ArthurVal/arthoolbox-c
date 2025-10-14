@@ -178,14 +178,14 @@ TEST(AtbStringTest, FromInt) {
                    }));
 }
 
-TEST(AtbStringDeathTest, ToIntBase) {
+TEST(AtbStringDeathTest, GetIntBase) {
   EXPECT_DEBUG_DEATH(
       atb_String_GetIntBase(atb_StrView_From_StrLiteral("3058u018u"), nullptr,
                             nullptr, K_ATB_ERROR_IGNORED),
       "base != NULL");
 }
 
-TEST(AtbStringTest, ToIntBase) {
+TEST(AtbStringTest, GetIntBase) {
   atb_Error err;
   atb_StrView remaining = K_ATB_ANYSPAN_INVALID;
 
