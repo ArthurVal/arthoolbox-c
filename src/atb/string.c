@@ -1,5 +1,7 @@
 #include "atb/string.h"
 
+#include <ctype.h> /* isdigit */
+
 static const struct atb_StrView m_digits =
     atb_StrView_From_StrLiteral_INIT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
