@@ -102,6 +102,24 @@ ATB_PUBLIC extern bool atb_StrView_RFind(struct atb_StrView str,
                                          struct atb_StrView substr,
                                          size_t *const where);
 
+/**
+ * \brief Try to find the FIRST appearance of ONE OF the underlying characters
+ *        containedb within \a pattern inside \a str
+ *
+ * \param[in] str String we wish to check for
+ * \param[in] pattern List of char we are looking for
+ * \param[out] where Optionally (when not NULL), set to where the char has
+ *                   been found inside \a str
+ *
+ * \returns bool True one success. False otherwise, \a where is left untouched.
+ *
+ * \pre IsValid(str)
+ * \pre IsValid(pattern)
+ */
+ATB_PUBLIC extern bool atb_StrView_Find_FirstOf(struct atb_StrView str,
+                                                struct atb_StrView pattern,
+                                                size_t *const where);
+
 #if defined(__cplusplus)
 }
 #endif

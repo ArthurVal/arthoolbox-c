@@ -74,3 +74,28 @@ bool atb_StrView_RFind(struct atb_StrView str, struct atb_StrView substr,
 
   return found;
 }
+
+bool atb_StrView_Find_FirstOf(struct atb_StrView str,
+                              struct atb_StrView pattern, size_t *const where) {
+  assert(atb_StrView_IsValid(str));
+  assert(atb_StrView_IsValid(pattern));
+
+  const char *first_found = NULL;
+  const char *ch_found = NULL;
+
+  for (const char *ch = atb_AnySpan_Begin(pattern);
+       ch != atb_AnySpan_End(pattern); ++ch) {
+    ch_found = (const char *)memchr(str.data, *ch, str.size);
+
+    if ((ch_found != NULL) &&
+        ((first_found == NULL) || (first_found > ch_found))) {
+      first_found = ch_found;
+    }
+  }
+
+  if ((where != NULL) && (first_found != NULL)) {
+    *where = (size_t)(first_found - str.data);
+  }
+
+  return (first_found != NULL);
+}
