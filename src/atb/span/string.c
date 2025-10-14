@@ -117,3 +117,24 @@ bool atb_StrView_Find_FirstNotOf(struct atb_StrView str,
 
   return found;
 }
+
+bool atb_StrView_Find_LastOf(struct atb_StrView str, struct atb_StrView pattern,
+                             size_t *const where) {
+  assert(atb_StrView_IsValid(str));
+  assert(atb_StrView_IsValid(pattern));
+
+  bool found = false;
+  const char *ch = atb_AnySpan_End(str);
+
+  if (pattern.size > 0) {
+    while (!found && (ch != atb_AnySpan_Begin(str))) {
+      found = (memchr(pattern.data, *(--ch), pattern.size) != NULL);
+    }
+
+    if ((where != NULL) && (found)) {
+      *where = (size_t)(ch - str.data);
+    }
+  }
+
+  return found;
+}

@@ -394,6 +394,70 @@ TEST(AtbSpanStringTest, Find_FirstNotOf) {
   EXPECT_EQ(offset, 20);
 }
 
+TEST(AtbSpanStringDeathTest, Find_LastOf) {
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              K_ATB_ANYSPAN_INVALID, NULL),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find_LastOf(K_ATB_ANYSPAN_INVALID,
+                              atb_StrView_From_StrLiteral("Chocolatine"), NULL),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(atb_StrView_Find_LastOf(K_ATB_ANYSPAN_INVALID,
+                                             K_ATB_ANYSPAN_INVALID, NULL),
+                     "IsValid");
+}
+
+TEST(AtbSpanStringTest, Find_LastOf) {
+  EXPECT_TRUE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral("co"), NULL));
+
+  size_t offset = 0;
+  EXPECT_TRUE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral("co"), &offset));
+  EXPECT_EQ(offset, 4);
+
+  offset = 0;
+  EXPECT_TRUE(atb_StrView_Find_LastOf(
+      atb_StrView_From_StrLiteral("Chocolatine"),
+      atb_StrView_From_StrLiteral("enitalocohC"), &offset));
+  EXPECT_EQ(offset, 10);
+
+  offset = 0;
+  EXPECT_TRUE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral("580aXV"), &offset));
+  EXPECT_EQ(offset, 6);
+
+  offset = 0;
+  EXPECT_TRUE(atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("ChotineCho"),
+                                      atb_StrView_From_StrLiteral("C"),
+                                      &offset));
+  EXPECT_EQ(offset, 7);
+
+  offset = 20;
+  EXPECT_FALSE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral("385"), &offset));
+  EXPECT_EQ(offset, 20);
+
+  offset = 20;
+  EXPECT_FALSE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral(" "), &offset));
+  EXPECT_EQ(offset, 20);
+
+  offset = 20;
+  EXPECT_FALSE(
+      atb_StrView_Find_LastOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                              atb_StrView_From_StrLiteral(""), &offset));
+  EXPECT_EQ(offset, 20);
+}
+
 } // namespace
 
 } // namespace atb
