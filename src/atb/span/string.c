@@ -55,3 +55,22 @@ bool atb_StrView_Find(struct atb_StrView str, struct atb_StrView substr,
 
   return found;
 }
+
+bool atb_StrView_RFind(struct atb_StrView str, struct atb_StrView substr,
+                       size_t *const where) {
+  assert(atb_StrView_IsValid(str));
+  assert(atb_StrView_IsValid(substr));
+
+  bool found = atb_StrView_EndsWith(str, substr);
+
+  while (!found && (str.size > substr.size)) {
+    str = atb_StrView_Shrink(str, 1, K_ATB_SPAN_SHRINK_BACK);
+    found = atb_StrView_EndsWith(str, substr);
+  }
+
+  if ((where != NULL) && found) {
+    *where = (str.size - substr.size);
+  }
+
+  return found;
+}
