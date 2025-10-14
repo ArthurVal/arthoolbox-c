@@ -330,6 +330,70 @@ TEST(AtbSpanStringTest, Find_FirstOf) {
   EXPECT_EQ(offset, 20);
 }
 
+TEST(AtbSpanStringDeathTest, Find_FirstNotOf) {
+  EXPECT_DEBUG_DEATH(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                                  K_ATB_ANYSPAN_INVALID, NULL),
+      "IsValid");
+
+  EXPECT_DEBUG_DEATH(atb_StrView_Find_FirstNotOf(
+                         K_ATB_ANYSPAN_INVALID,
+                         atb_StrView_From_StrLiteral("Chocolatine"), NULL),
+                     "IsValid");
+
+  EXPECT_DEBUG_DEATH(atb_StrView_Find_FirstNotOf(K_ATB_ANYSPAN_INVALID,
+                                                 K_ATB_ANYSPAN_INVALID, NULL),
+                     "IsValid");
+}
+
+TEST(AtbSpanStringTest, Find_FirstNotOf) {
+  EXPECT_TRUE(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                                  atb_StrView_From_StrLiteral("co"), NULL));
+
+  size_t offset = 0;
+  EXPECT_TRUE(atb_StrView_Find_FirstNotOf(
+      atb_StrView_From_StrLiteral("Chocolatine"),
+      atb_StrView_From_StrLiteral("alcohC"), &offset));
+  EXPECT_EQ(offset, 7);
+
+  offset = 20;
+  EXPECT_FALSE(atb_StrView_Find_FirstNotOf(
+      atb_StrView_From_StrLiteral("Chocolatine"),
+      atb_StrView_From_StrLiteral("enitalochC"), &offset));
+  EXPECT_EQ(offset, 20);
+
+  offset = 1;
+  EXPECT_TRUE(atb_StrView_Find_FirstNotOf(
+      atb_StrView_From_StrLiteral("Chocolatine"),
+      atb_StrView_From_StrLiteral("580aXV"), &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 0;
+  EXPECT_TRUE(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("ChotineCho"),
+                                  atb_StrView_From_StrLiteral("Cho"), &offset));
+  EXPECT_EQ(offset, 3);
+
+  offset = 1;
+  EXPECT_TRUE(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                                  atb_StrView_From_StrLiteral("385"), &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 1;
+  EXPECT_TRUE(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                                  atb_StrView_From_StrLiteral(" "), &offset));
+  EXPECT_EQ(offset, 0);
+
+  offset = 20;
+  EXPECT_FALSE(
+      atb_StrView_Find_FirstNotOf(atb_StrView_From_StrLiteral("Chocolatine"),
+                                  atb_StrView_From_StrLiteral(""), &offset));
+  EXPECT_EQ(offset, 20);
+}
+
 } // namespace
 
 } // namespace atb
