@@ -6,8 +6,6 @@
 #include <stddef.h> /* NULL */
 #include <stdint.h>
 
-#include "atb/export.h"
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -57,97 +55,6 @@ static inline bool atb_Error_IsIgnored(struct atb_Error const *const self);
  */
 static inline void atb_Error_Set(struct atb_Error *const self,
                                  atb_ErrorCategory_t cat, atb_ErrorCode_t code);
-
-/**
- *  \brief Describe the underlying error (if possible) into the destination
- *         string buffer pointed by [d_first, d_first + d_size)
- *
- *  If the category is KNOWN (i.e. category's formatter exists),
- *  the description often takes the following format:
- *  "<CATEGORY NAME>: <CODE DESCRIPTION>"
- *  If the error system doesn't have any formatter for the given category, the
- *  output format is simply:
- *  "0x<CATEGORY HEX VALUE>: <CODE VALUE>"
- *
- *  \important This function DOESN'T ADD NULL CHAR ('\0') at the end of the
- *             dest buffer, NOR does it include the NULL char within its return
- *             count value.
- *
- *  \note Giving a NULL ptr as \a d_first still provides the max number of char
- *        needed to ouput the description (same as snprintf functions).
- *
- *  \param [in] d_first Begin of the destination string buffer.
- *                      If NULL, update \a written with the expected size of
- *                      the description.
- *  \param [in] d_size Size of the destination string buffer
- *  \param [out] written Number of bytes written into d_first
- *
- *  \pre written != NULL
- *
- *  \return bool True if the description could be written into d_first (written
- *               is updated accordinlgy). False when d_size is too small or the
- *               specific category formatter failed. The destination buffer and
- *               written are left unchanged in case of faillure.
- */
-extern bool atb_Error_Describe(struct atb_Error const *const self,
-                               char *d_first, size_t d_size,
-                               size_t *written) ATB_PUBLIC;
-
-/* -- Formatters *************************************************************/
-
-/**
- *  \return bool True whenever the given category has a formatter attached to it
- *  \param[in] category Error category we wish to check for
- */
-extern bool atb_ErrorCategory_HasFormatter(atb_ErrorCategory_t category)
-    ATB_PUBLIC;
-
-/// Error formatter interface function assocaite to an error category.
-/// This interface will be called whenever an user wish to make a human readable
-/// representation of an error
-struct atb_ErrorFormatter {
-  void *data; /*!< Internal date forwarded to the Describe function call */
-
-  /// Function called in order to get the description of an error code for a
-  /// given category.
-  /// It follows the same principale as `atb_Error_Describe()`. See the doc for
-  /// more details on args values/return expectations.
-  bool (*Describe)(void *data, atb_ErrorCode_t code, char *d_first,
-                   size_t d_size, size_t *written);
-};
-
-/**
- *  \brief Attach a new formatter for the given category
- *
- *  \param[in] category Error category we wish to attach a formatter to
- *  \param[in] name Null terminated name of the formatter (max 64 bytes)
- *  \param[in] fmt Formatter interface used
- *  \param[out] err Generic Error set whenever adding the formatter failed.
- *                  Value can be one of the following:
- *                  - K_ATB_ERROR_GENERIC_INVALID_ARGUMENT:
- *                    Category already has a formatter;
- *                  - K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE:
- *                    Name is too big;
- *
- *  \return bool True when
- *
- *  \pre name != NULL
- *  \pre fmt.Describe != NULL
- */
-extern bool atb_ErrorCategory_AddFormatter(
-    atb_ErrorCategory_t category, const char *name,
-    struct atb_ErrorFormatter fmt, struct atb_Error *const err) ATB_PUBLIC;
-
-/**
- *  \brief Remove the formatter associated to a category
- *
- *  \param[in] category Category we wish to remove the formatter from
- *
- *  \return bool True whenever the formatter was successfully removed. False
- *               when the category don't have any formatter attached to it.
- */
-extern bool atb_ErrorCategory_RemoveFormatter(atb_ErrorCategory_t category)
-    ATB_PUBLIC;
 
 /***************************************************************************/
 /*                      PRE-DEFINED Error categories                       */

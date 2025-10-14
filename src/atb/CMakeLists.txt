@@ -1,7 +1,6 @@
 add_library(${PROJECT_NAME}
   ratio.c
   time.c
-  error.c
   span/ints.c
   span/string.c
   string.c
