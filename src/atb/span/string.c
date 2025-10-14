@@ -12,8 +12,7 @@ struct atb_StrView atb_StrView_From_NullTerminated(const char *other) {
   return atb_StrView_From(other, strlen(other));
 }
 
-extern bool atb_StrView_StartsWith(struct atb_StrView str,
-                                   struct atb_StrView prefix) {
+bool atb_StrView_StartsWith(struct atb_StrView str, struct atb_StrView prefix) {
   assert(atb_StrView_IsValid(str));
   assert(atb_StrView_IsValid(prefix));
 
@@ -25,8 +24,7 @@ extern bool atb_StrView_StartsWith(struct atb_StrView str,
   return success;
 }
 
-extern bool atb_StrView_EndsWith(struct atb_StrView str,
-                                 struct atb_StrView suffix) {
+bool atb_StrView_EndsWith(struct atb_StrView str, struct atb_StrView suffix) {
   assert(atb_StrView_IsValid(str));
   assert(atb_StrView_IsValid(suffix));
 
