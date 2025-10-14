@@ -55,18 +55,18 @@ ATB_PUBLIC extern bool atb_StrView_StartsWith(struct atb_StrView str,
                                               struct atb_StrView prefix);
 
 /**
- * \brief Indicates if \a str ends with \a prefix
+ * \brief Indicates if \a str ends with \a suffix
  *
  * \param[in] str String we wish to check for
- * \param[in] prefix Prefix we are looking for
+ * \param[in] suffix Suffix we are looking for
  *
- * \returns bool True when \a str ends with \a prefix
+ * \returns bool True when \a str ends with \a suffix
  *
  * \pre IsValid(str)
- * \pre IsValid(prefix)
+ * \pre IsValid(suffix)
  */
 ATB_PUBLIC extern bool atb_StrView_EndsWith(struct atb_StrView str,
-                                            struct atb_StrView prefix);
+                                            struct atb_StrView suffix);
 
 #if defined(__cplusplus)
 }

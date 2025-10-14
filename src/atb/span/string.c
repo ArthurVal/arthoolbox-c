@@ -26,13 +26,13 @@ extern bool atb_StrView_StartsWith(struct atb_StrView str,
 }
 
 extern bool atb_StrView_EndsWith(struct atb_StrView str,
-                                 struct atb_StrView prefix) {
+                                 struct atb_StrView suffix) {
   assert(atb_StrView_IsValid(str));
-  assert(atb_StrView_IsValid(prefix));
+  assert(atb_StrView_IsValid(suffix));
 
   bool success = false;
-  if ((prefix.size != 0) && (prefix.size <= str.size)) {
-    success = atb_StrView_Eq(prefix, atb_StrView_Last(str, prefix.size));
+  if ((suffix.size != 0) && (suffix.size <= str.size)) {
+    success = atb_StrView_Eq(suffix, atb_StrView_Last(str, suffix.size));
   }
 
   return success;
