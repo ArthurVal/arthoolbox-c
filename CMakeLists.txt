@@ -25,6 +25,10 @@ include(CMakePrintHelpers)
 # configure_package_config_file() and write_basic_package_version_file()
 include(CMakePackageConfigHelpers)
 
+# Common usefull cmake macros/functions...
+include(cmake/common.cmake)
+common_disable_in_src_builds()
+
 ###############################################################################
 #                            GLOBAL USEFULL OPTIONS                           #
 ###############################################################################
@@ -46,27 +50,7 @@ cmake_print_variables(CMAKE_C_STANDARD_REQUIRED)
 cmake_print_variables(CMAKE_INSTALL_PREFIX)
 
 # BUILD_TYPE ##################################################################
-# We default CMAKE_BUILD_TYPE to some value if not set, with a warning msg
-if(
-    NOT DEFINED CMAKE_BUILD_TYPE
-    OR "${CMAKE_BUILD_TYPE}" STREQUAL ""
-  )
-  message(WARNING
-    " CMAKE_BUILD_TYPE has not been defined. It should be set to one of: \n"
-    " - Debug:          ${CMAKE_C_FLAGS_DEBUG}\n"
-    " - Release:        ${CMAKE_C_FLAGS_RELEASE}\n"
-    " - RelWithDebInfo: ${CMAKE_C_FLAGS_RELWITHDEBINFO})\n"
-    " - MinSizeRel:     ${CMAKE_C_FLAGS_MINSIZEREL}\n"
-    " - ... (Other based on the generator used)\n"
-    " ==> Default to \"RELEASE\"\n"
-  )
-
-  set(CMAKE_BUILD_TYPE RELEASE
-    CACHE STRING
-    "Build optimizations. One of Debug, Release, RelWithDebInfo or MinSizeRel."
-    FORCE
-  )
-endif()
+common_warn_build_type(DEFAULT RELEASE)
 cmake_print_variables(CMAKE_BUILD_TYPE)
 
 # BUILD_SHARED_LIBS ###########################################################
@@ -83,33 +67,7 @@ cmake_print_variables(BUILD_SHARED_LIBS)
 ###############################################################################
 #                           PROJET SPECIFIC OPTIONS                           #
 ###############################################################################
-# ENABLE_IN_SRC_BUILDS ########################################################
-# By default, In-source builds are disabled in order to not add compilation
-# artifacts into the source directory which is tracked by git...
-#
-# In case it is impossible to do anything else other than in-src builds (for a
-# distro, docker, ... ? IDK ...), set this variable to ON in order to bypass the
-# in-src build check
-option(${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS
-  "Enable In-source builds"
-  OFF
-)
-cmake_print_variables(${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS)
-
-if(NOT ${PROJECT_PREFIX}_ENABLE_IN_SRC_BUILDS)
-  get_filename_component(SRC_DIR "${CMAKE_SOURCE_DIR}" REALPATH)
-  get_filename_component(BIN_DIR "${CMAKE_BINARY_DIR}" REALPATH)
-  if("${SRC_DIR}" STREQUAL "${BIN_DIR}")
-    message(FATAL_ERROR
-      " In-source build is not allowed.\n"
-      " Please make an independant build directory using:\n"
-      " cmake -S <SOURCE_DIR> -B <BUILD_DIR>\n"
-      " \n"
-      " Feel free to:\n"
-      " rm -rf ${SRC_DIR}/CMakeFiles ${SRC_DIR}/CMakeCache.txt\n"
-    )
-  endif()
-endif()
+# N/A
 
 ###############################################################################
 #                                    BUILD                                    #
@@ -151,15 +109,17 @@ endif()
 cmake_print_variables(${PROJECT_PREFIX}_ENABLE_TESTING)
 
 if(${PROJECT_PREFIX}_ENABLE_TESTING)
-  message(STATUS "${PROJECT_PREFIX} Unit testing: ENABLED")
-  if(CMAKE_CROSSCOMPILING)
-    message(WARNING " SKIPPING Unit testing since we are cross compiling...")
-  else()
+  message(STATUS "${PROJECT_PREFIX} Unit-tests: ENABLED")
+  if(NOT CMAKE_CROSSCOMPILING)
     enable_testing()
     add_subdirectory(tests)
+  else()
+    message(WARNING
+      "${PROJECT_PREFIX} Unit-tests: SKIPPED -> Cross compilation enabled"
+    )
   endif()
 else()
-  message(STATUS "${PROJECT_PREFIX} Unit testing: DISABLED")
+  message(STATUS "${PROJECT_PREFIX} Unit-tests: DISABLED")
 endif()
 
 
