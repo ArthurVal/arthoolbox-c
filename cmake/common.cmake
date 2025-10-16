@@ -52,11 +52,12 @@ function(common_disable_in_src_builds)
 endfunction()
 
 # ~~~
-# Warn when CMAKE_BUILD_TYPE has not been set and force it to a default value.
+# Warn when CMAKE_BUILD_TYPE has not been set. Optionally set it to DEFAULT when
+# not defined.
 #
 # Arguments:
 #   * DEFAULT (optional - in):
-#       Optional default CMAKE_BUILD_TYPE value used when CMAKE_BUILD_TYPE is
+#       Optional default CMAKE_BUILD_TYPE value set when CMAKE_BUILD_TYPE is
 #       not defined by the user.
 # ~~~
 function(common_warn_build_type)
@@ -66,10 +67,6 @@ function(common_warn_build_type)
     ""        # <- Multi values
     ${ARGN}
   )
-
-  if(NOT _args_DEFAULT)
-    set(_args_DEFAULT RELEASE)
-  endif()
 
   if(
       NOT DEFINED CMAKE_BUILD_TYPE
@@ -85,11 +82,13 @@ function(common_warn_build_type)
       " ==> Default to \"${_args_DEFAULT}\"\n"
     )
 
-    set(CMAKE_BUILD_TYPE ${_args_DEFAULT}
-      CACHE STRING
-      "Build optimizations. One of Debug, Release, RelWithDebInfo, MinSizeRel..."
-      FORCE
-    )
+    if(_args_DEFAULT)
+      set(CMAKE_BUILD_TYPE ${_args_DEFAULT}
+        CACHE STRING
+        "Build optimizations. One of Debug, Release, RelWithDebInfo, MinSizeRel..."
+        FORCE
+      )
+    endif()
   endif()
 endfunction()
 
