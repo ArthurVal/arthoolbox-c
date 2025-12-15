@@ -134,8 +134,6 @@ extern "C" {
 ///                && ...;
 #define ATB_FAILS(DO) (DO, false)
 
-/* TODO */
-
 #if defined(__cplusplus)
 } /* extern "C" */
 #endif
