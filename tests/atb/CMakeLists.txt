@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}-test
   test_string.cpp
   test_allocator.cpp
   test_allocator_default.cpp
+  test_functional.cpp
 )
 
 target_include_directories(${PROJECT_NAME}-test
