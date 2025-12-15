@@ -16,13 +16,13 @@ extern "C" {
 /// traits', i.e. the first argument will be \a data that is always forwarded;
 ///
 /// Example:
-/// ATB_CALLABLE_DECLARE_2(bool, Foo, int, float) give the following
+/// ATB_CALLABLE_DECLARE(bool, Foo, int, float) give the following
 /// signature: f(void*, int, float) -> bool
 ///
-/// ATB_CALLABLE_DECLARE_0(void, Bar) give the following signature:
+/// ATB_CALLABLE_DECLARE(void, Bar) give the following signature:
 /// f(void*) -> void
 ///
-/// ATB_CALLABLE_DECLARE_1(int, Baz, int) give the following signature:
+/// ATB_CALLABLE_DECLARE(int, Baz, int) give the following signature:
 /// f(void*, int) -> int
 #define ATB_CALLABLE_DECLARE(R, NAME, ...) \
   struct NAME {                            \
