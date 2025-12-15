@@ -12,8 +12,8 @@
  *  \brief Create a token by concatenating the given args AFTER evaluation (up
  *         to 10 tokens)
  */
-#define ATB_TKN_CONCAT(...) \
-  ATB_INTERNAL_TKN_CONCAT_N(ATB_VA_ARGN(__VA_ARGS__), __VA_ARGS__)
+#define ATB_TKN_CAT(...) \
+  ATB_INTERNAL_TKN_CAT_N(ATB_VA_ARGN(__VA_ARGS__), __VA_ARGS__)
 
 /**
  *  \brief Stringify a token AFTER evaluation
