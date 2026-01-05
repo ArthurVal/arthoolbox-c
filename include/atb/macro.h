@@ -19,3 +19,11 @@
  *  \brief Stringify a token AFTER evaluation
  */
 #define ATB_TKN_STR(a) ATB_INTERNAL_TKN_STR(a)
+
+/**
+ *  \brief Evaluate to 1 if the T is 'void', 0 otherwise.
+ *
+ *  \note This doesn't work if T is either 'void *' or 'void const *'.
+ *        In this case, use a typedef `typedef void * void_ptr`.
+ */
+#define ATB_IS_VOID(T) ATB_INTERNAL_IS_VOID(T)

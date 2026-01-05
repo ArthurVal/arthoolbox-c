@@ -53,4 +53,11 @@ TEST(AtbMacroTest, TKN_STR) {
   EXPECT_STREQ("0", ATB_TKN_STR(0));
   EXPECT_STREQ("0", ATB_TKN_STR(TEST_COUCOU_0));
 }
+
+TEST(AtbMacroTest, IS_VOID) {
+  EXPECT_EQ(ATB_IS_VOID(void), 1);
+  EXPECT_EQ(ATB_IS_VOID(int), 0);
+  EXPECT_EQ(ATB_IS_VOID(float), 0);
+}
+
 } // namespace
