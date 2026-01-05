@@ -35,10 +35,10 @@ extern "C" {
 /// Binds \a FUNCTION and \a DATA to ANY callable.
 /// Can be used as Static Initializer
 #define ATB_INIT_BIND(FUNCTION, DATA) \
-  { .fn = FUNCTION, .data = (void *)DATA }
+  { .fn = (FUNCTION), .data = (void *)(DATA) }
 
 /// Binds \a F and \a D to \a TYPE as a Compound litteral
-#define ATB_BIND_AS(TYPE, F, D) (TYPE) ATB_INIT_BIND((F), (D))
+#define ATB_BIND_AS(TYPE, F, D) (TYPE) ATB_INIT_BIND(F, D)
 
 /// Binds to the NULL/NULL function/data pair.
 #define K_ATB_INIT_BIND_NULL ATB_INIT_BIND(NULL, NULL)
