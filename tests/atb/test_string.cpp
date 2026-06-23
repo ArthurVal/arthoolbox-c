@@ -159,10 +159,10 @@ TEST(AtbStringTest, FromInt) {
       0xCAFE, K_ATB_INT_HEX, atb_StrSpan_First(dest, 2), &remaining, &err));
   EXPECT_THAT(str, testing::Each('\0'));
   EXPECT_THAT(remaining, FieldsMatch((atb_StrSpan)K_ATB_ANYSPAN_INVALID));
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE,
-                   }));
+  EXPECT_EQ(err, (atb_Error{
+                     .category = K_ATB_ERROR_GENERIC,
+                     .code = K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE,
+                 }));
 
   err.category = 0;
   err.code = 0;
@@ -172,9 +172,9 @@ TEST(AtbStringTest, FromInt) {
       -12345, K_ATB_INT_DEC, atb_StrSpan_First(dest, 2), &remaining, &err));
   EXPECT_THAT(str, testing::Each('\0'));
   EXPECT_THAT(remaining, FieldsMatch((atb_StrSpan)K_ATB_ANYSPAN_INVALID));
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE,
+  EXPECT_THAT(err, (atb_Error{
+                       .category = K_ATB_ERROR_GENERIC,
+                       .code = K_ATB_ERROR_GENERIC_VALUE_TOO_LARGE,
                    }));
 }
 
@@ -265,34 +265,34 @@ TEST(AtbStringTest, GetIntBase) {
   EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral(""), &base,
                                      &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_INVALID_ARGUMENT,
-                   }));
+  EXPECT_EQ(err, (atb_Error{
+                     .category = K_ATB_ERROR_GENERIC,
+                     .code = K_ATB_ERROR_GENERIC_INVALID_ARGUMENT,
+                 }));
 
   EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("A0B10010"),
                                      &base, &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
-                   }));
+  EXPECT_EQ(err, (atb_Error{
+                     .category = K_ATB_ERROR_GENERIC,
+                     .code = K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
+                 }));
 
   EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("-"), &base,
                                      &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
-                   }));
+  EXPECT_EQ(err, (atb_Error{
+                     .category = K_ATB_ERROR_GENERIC,
+                     .code = K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
+                 }));
 
   EXPECT_FALSE(atb_String_GetIntBase(atb_StrView_From_StrLiteral("-A"), &base,
                                      &remaining, &err))
       << "Base: " << base << " | Remaining: " << ToSv(remaining);
-  EXPECT_THAT(err, FieldsMatch((atb_Error){
-                       K_ATB_ERROR_GENERIC,
-                       K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
-                   }));
+  EXPECT_EQ(err, (atb_Error{
+                     .category = K_ATB_ERROR_GENERIC,
+                     .code = K_ATB_ERROR_GENERIC_ARGUMENT_OUT_OF_DOMAIN,
+                 }));
 }
 
 } // namespace

@@ -45,3 +45,7 @@ auto operator<<(std::ostream &os,
                 const atb_Error *const err) -> std::ostream & {
   return atb::StreamPtrTo(os, err);
 }
+
+auto operator==(atb_Error lhs, atb_Error rhs) -> bool {
+  return (lhs.category == rhs.category) && (lhs.code == rhs.code);
+}
